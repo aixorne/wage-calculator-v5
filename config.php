@@ -1,8 +1,14 @@
 <?php
 
-// อ่าน API Key จาก Environment ของ Render
 $OCR_API_KEY = getenv('OCR_SPACE_API_KEY');
 
 if (!$OCR_API_KEY) {
-    die("ไม่พบ OCR_SPACE_API_KEY ใน Environment");
+    header('Content-Type: application/json; charset=utf-8');
+
+    echo json_encode([
+        'success' => false,
+        'error' => 'ไม่พบ OCR_SPACE_API_KEY ใน Environment ของ Render'
+    ], JSON_UNESCAPED_UNICODE);
+
+    exit;
 }
