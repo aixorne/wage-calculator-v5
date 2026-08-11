@@ -188,11 +188,23 @@ async function runOCR() {
 
         if (!data.success) {
 
-            throw new Error(
-                data.error ||
-                'OCR ไม่สำเร็จ'
-            );
-        }
+    let message =
+        data.error || 'OCR ไม่สำเร็จ';
+
+    if (data.error_code !== undefined) {
+        message +=
+            '\nUpload Error Code: ' +
+            data.error_code;
+    }
+
+    if (data.curl_error) {
+        message +=
+            '\nCURL: ' +
+            data.curl_error;
+    }
+
+    throw new Error(message);
+}
 
         ocrResult.value =
             data.text || '';
