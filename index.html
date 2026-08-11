@@ -1,0 +1,545 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>WorkPay OCR • V4</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.css" rel="stylesheet">
+
+<style>
+:root{
+  --bg:#f4f7fb;
+  --card:#ffffff;
+  --text:#172033;
+  --muted:#7c879b;
+  --primary:#635bff;
+  --primary2:#8b5cf6;
+  --success:#16a34a;
+  --danger:#ef4444;
+  --border:#e7ebf3;
+  --shadow:0 18px 50px rgba(37,44,72,.09);
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  color:var(--text);
+  background:
+    radial-gradient(circle at 10% 0%,rgba(99,91,255,.10),transparent 28%),
+    radial-gradient(circle at 100% 10%,rgba(139,92,246,.10),transparent 25%),
+    var(--bg);
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans Thai",sans-serif;
+}
+.app{max-width:1100px;margin:auto;padding:24px 14px 60px}
+.hero{
+  background:linear-gradient(135deg,#171a33,#29225a);
+  color:#fff;border-radius:28px;padding:26px;
+  box-shadow:var(--shadow);margin-bottom:18px;
+}
+.hero .badge{
+  background:rgba(255,255,255,.12);
+  border:1px solid rgba(255,255,255,.15);
+  padding:8px 12px;border-radius:999px;
+}
+.hero h1{font-size:clamp(28px,5vw,42px);font-weight:800;margin:15px 0 6px}
+.hero p{color:#d8d9ea;margin:0}
+.cardx{
+  background:rgba(255,255,255,.92);
+  border:1px solid rgba(255,255,255,.8);
+  border-radius:24px;padding:20px;
+  box-shadow:var(--shadow);margin-bottom:18px;
+  backdrop-filter:blur(10px);
+}
+.section-title{font-weight:800;font-size:20px;margin-bottom:15px}
+.upload-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:760px){.upload-grid{grid-template-columns:1fr}}
+.upload-box{
+  border:2px dashed #d9deeb;border-radius:20px;padding:18px;
+  transition:.2s;background:#fbfcff;
+}
+.upload-box:hover{border-color:var(--primary);background:#f8f7ff}
+.upload-box.in{border-color:#b9e7c9}
+.upload-box.out{border-color:#ffc2c2}
+.upload-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}
+.upload-head strong{font-size:17px}
+.tag{font-size:12px;font-weight:700;padding:6px 9px;border-radius:999px;background:#eef0ff;color:#5148e8}
+.preview{
+  display:none;width:100%;max-height:300px;object-fit:contain;
+  border-radius:15px;background:#10131c;border:1px solid #202535;
+  margin-top:12px;
+}
+input[type=file]{display:none}
+.file-btn{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  width:100%;min-height:52px;border-radius:14px;
+  background:#fff;border:1px solid var(--border);
+  font-weight:750;cursor:pointer;transition:.2s;
+}
+.file-btn:hover{transform:translateY(-1px);border-color:var(--primary);box-shadow:0 8px 25px rgba(99,91,255,.12)}
+.status{font-size:13px;color:var(--muted);margin-top:10px;min-height:20px}
+.btn-main{
+  border:0;border-radius:15px;padding:14px 18px;font-weight:800;
+  background:linear-gradient(135deg,var(--primary),var(--primary2));
+  color:#fff;box-shadow:0 10px 25px rgba(99,91,255,.25);
+}
+.btn-main:disabled{opacity:.55}
+.btn-soft{border:1px solid var(--border);background:#fff;border-radius:12px;font-weight:700}
+.result{
+  background:linear-gradient(135deg,#f8f7ff,#fff);
+  border:1px solid #e8e5ff;border-radius:20px;padding:18px;
+}
+.money{
+  font-size:36px;font-weight:900;
+  background:linear-gradient(90deg,#5148e8,#8b5cf6);
+  color:transparent;background-clip:text;-webkit-background-clip:text;
+}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+@media(max-width:700px){.stat-grid{grid-template-columns:1fr 1fr}}
+.stat{background:#f8f9fc;border:1px solid var(--border);padding:15px;border-radius:16px}
+.stat small{color:var(--muted)}.stat strong{display:block;font-size:20px;margin-top:4px}
+.table-wrap{overflow:auto;border:1px solid var(--border);border-radius:16px}
+table{margin:0!important;min-width:850px}
+thead th{background:#f7f8fc!important;border-bottom:1px solid var(--border)!important}
+tbody td{vertical-align:middle}
+.empty{text-align:center;color:var(--muted);padding:30px!important}
+
+/* Crop modal */
+.crop-modal{
+  position:fixed;inset:0;background:rgba(10,13,25,.78);
+  z-index:9999;display:none;align-items:center;justify-content:center;
+  padding:14px;backdrop-filter:blur(8px);
+}
+.crop-modal.show{display:flex}
+.crop-dialog{
+  width:min(980px,100%);max-height:95vh;overflow:hidden;
+  background:#fff;border-radius:24px;box-shadow:0 30px 100px rgba(0,0,0,.35);
+  display:flex;flex-direction:column;
+}
+.crop-top{padding:16px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.crop-top h3{font-size:19px;font-weight:850;margin:0}
+.crop-area{height:min(62vh,620px);background:#0c0f18;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.crop-area img{display:block;max-width:100%}
+.crop-bottom{padding:14px 16px;display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
+.crop-tip{
+  margin-right:auto;align-self:center;color:var(--muted);font-size:13px
+}
+.crop-actions{display:flex;gap:8px}
+.crop-confirm{
+  border:0;background:linear-gradient(135deg,var(--primary),var(--primary2));
+  color:#fff;padding:11px 18px;border-radius:12px;font-weight:800;
+}
+.crop-cancel{border:1px solid var(--border);background:#fff;padding:11px 18px;border-radius:12px;font-weight:750}
+.crop-reset{border:1px solid var(--border);background:#fff;padding:11px 14px;border-radius:12px;font-weight:750}
+@media(max-width:600px){
+  .crop-bottom{display:block}.crop-tip{margin-bottom:10px}
+  .crop-actions{display:grid;grid-template-columns:1fr 1fr}
+  .crop-actions button{width:100%}
+}
+.toastx{
+  position:fixed;right:18px;bottom:18px;z-index:10000;
+  background:#151827;color:#fff;padding:13px 16px;border-radius:14px;
+  box-shadow:0 15px 40px rgba(0,0,0,.2);display:none
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+
+  <div class="hero">
+    <span class="badge">✨ WorkPay OCR V4</span>
+    <h1>สแกนเวลา → คำนวณค่าแรง</h1>
+    <p>เลือกรูปแล้ว <b>ครอปก่อนเข้าระบบ</b> เพื่อให้ OCR อ่านวันที่และเวลาได้แม่นขึ้น</p>
+  </div>
+
+  <div class="cardx">
+    <div class="section-title">📸 1. เลือกรูปและครอปก่อนอัปโหลด</div>
+
+    <div class="upload-grid">
+      <div class="upload-box in">
+        <div class="upload-head">
+          <strong>🟢 เวลาเข้า</strong><span class="tag">รูปที่ 1</span>
+        </div>
+        <label class="file-btn" for="inFile">📁 เลือกรูปเวลาเข้า</label>
+        <input id="inFile" type="file" accept="image/*">
+        <img id="inPreview" class="preview">
+        <div id="inStatus" class="status">ยังไม่ได้เลือกรูป</div>
+      </div>
+
+      <div class="upload-box out">
+        <div class="upload-head">
+          <strong>🔴 เวลาออก</strong><span class="tag">รูปที่ 2</span>
+        </div>
+        <label class="file-btn" for="outFile">📁 เลือกรูปเวลาออก</label>
+        <input id="outFile" type="file" accept="image/*">
+        <img id="outPreview" class="preview">
+        <div id="outStatus" class="status">ยังไม่ได้เลือกรูป</div>
+      </div>
+    </div>
+
+    <div class="alert alert-primary mt-3 mb-3">
+      <b>วิธีครอป:</b> หลังเลือกรูป ระบบจะเปิดหน้าต่างครอปทันที
+      ให้ลากกรอบครอบเฉพาะบริเวณ <b>วันที่ + เวลา</b> เช่น
+      <code>2026-08-10 19:41</code> แล้วกด <b>ใช้ภาพนี้</b>
+    </div>
+
+    <button id="scanBtn" class="btn-main w-100" disabled>🔍 สแกนเวลาและคำนวณค่าแรง</button>
+    <div id="ocrStatus" class="status text-center"></div>
+  </div>
+
+  <div id="resultSection" class="cardx" style="display:none">
+    <div class="section-title">🧾 2. ผลการสแกน</div>
+    <div class="alert alert-warning">ตรวจสอบข้อมูลก่อนบันทึก เพราะ OCR อาจอ่านตัวเลขบางตัวผิดได้</div>
+
+    <div class="row g-3">
+      <div class="col-md-4"><label class="fw-bold mb-2">วันที่</label><input id="resultDate" type="date" class="form-control"></div>
+      <div class="col-md-4"><label class="fw-bold mb-2">เวลาเข้า</label><input id="resultIn" type="time" class="form-control"></div>
+      <div class="col-md-4"><label class="fw-bold mb-2">เวลาออก</label><input id="resultOut" type="time" class="form-control"></div>
+    </div>
+    <button id="recalcBtn" class="btn btn-soft w-100 mt-3 py-2">🔄 คำนวณใหม่</button>
+
+    <div class="result mt-4">
+      <div class="row g-3 align-items-center">
+        <div class="col-md-7">
+          <div class="text-muted">ค่าแรงรวมวันที่นี้</div>
+          <div id="totalPay" class="money">0 ฿</div>
+        </div>
+        <div class="col-md-5">
+          <div class="d-flex justify-content-between"><span>ค่าแรงปกติ</span><b id="normalPay">0 ฿</b></div>
+          <div class="d-flex justify-content-between mt-2"><span>OT</span><b id="otPay">0 ฿</b></div>
+          <div class="d-flex justify-content-between mt-2"><span>OT ชั่วโมง</span><b id="otHours">0.00 ชม.</b></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-3">
+      <div><b>วัน:</b> <span id="dayType">-</span></div>
+      <div><b>ช่วง OT:</b> <span id="otTime">-</span></div>
+    </div>
+
+    <button id="saveBtn" class="btn btn-success w-100 py-3 mt-4 fw-bold">💾 บันทึกวันนี้</button>
+  </div>
+
+  <div class="cardx">
+    <div class="section-title">📅 3. สรุปค่าแรงรายเดือน</div>
+    <div class="d-flex gap-2 mb-3">
+      <input id="monthFilter" type="month" class="form-control" style="max-width:220px">
+    </div>
+
+    <div class="stat-grid mb-4">
+      <div class="stat"><small>วันทำงาน</small><strong id="sumDays">0 วัน</strong></div>
+      <div class="stat"><small>ค่าแรงปกติ</small><strong id="sumNormal">0 ฿</strong></div>
+      <div class="stat"><small>OT รวม</small><strong id="sumOT">0 ชม.</strong></div>
+      <div class="stat"><small>รวมทั้งเดือน</small><strong id="sumTotal">0 ฿</strong></div>
+    </div>
+
+    <div class="table-wrap">
+      <table class="table table-hover">
+        <thead><tr><th>วันที่</th><th>วัน</th><th>เข้า</th><th>ออก</th><th>ปกติ</th><th>OT</th><th>ค่า OT</th><th>รวม</th><th>ลบ</th></tr></thead>
+        <tbody id="history"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Crop Modal -->
+<div id="cropModal" class="crop-modal">
+  <div class="crop-dialog">
+    <div class="crop-top">
+      <h3 id="cropTitle">✂️ ครอปรูป</h3>
+      <button id="cropClose" class="btn-close"></button>
+    </div>
+    <div class="crop-area">
+      <img id="cropImage" alt="crop">
+    </div>
+    <div class="crop-bottom">
+      <div class="crop-tip">ลากกรอบให้ครอบเฉพาะ <b>วันที่ + เวลา</b></div>
+      <div class="crop-actions">
+        <button id="cropReset" class="crop-reset">↺ รีเซ็ต</button>
+        <button id="cropCancel" class="crop-cancel">ยกเลิก</button>
+        <button id="cropConfirm" class="crop-confirm">✓ ใช้ภาพนี้</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toastx"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+
+<script>
+const NORMAL_RATE=44, SUNDAY_RATE=88, OT_RATE=66, OT_START=1050;
+let cropper=null, cropTarget=null, cropObjectURL=null;
+let inImageBlob=null, outImageBlob=null, currentResult=null;
+
+const $=id=>document.getElementById(id);
+const pad=n=>String(n).padStart(2,"0");
+const money=v=>Number(v).toLocaleString("th-TH",{maximumFractionDigits:2})+" ฿";
+const timeMin=t=>{const [h,m]=t.split(":").map(Number);return h*60+m};
+const minTime=v=>pad(Math.floor(v/60))+":"+pad(v%60);
+const thaiDay=s=>["อาทิตย์","จันทร์","อังคาร","พุธ","พฤหัสบดี","ศุกร์","เสาร์"][new Date(s+"T00:00:00").getDay()];
+const formatDate=s=>{const d=new Date(s+"T00:00:00");return pad(d.getDate())+"/"+pad(d.getMonth()+1)+"/"+d.getFullYear()};
+
+function toast(msg){
+  $("toast").textContent=msg;$("toast").style.display="block";
+  clearTimeout(window._toast);window._toast=setTimeout(()=>$("toast").style.display="none",2500);
+}
+
+function openCrop(file,target){
+  cropTarget=target;
+  if(cropObjectURL)URL.revokeObjectURL(cropObjectURL);
+  cropObjectURL=URL.createObjectURL(file);
+  $("cropImage").src=cropObjectURL;
+  $("cropTitle").textContent=target==="in"?"✂️ ครอปเวลาเข้า":"✂️ ครอปเวลาออก";
+  $("cropModal").classList.add("show");
+
+  $("cropImage").onload=()=>{
+    if(cropper)cropper.destroy();
+    cropper=new Cropper($("cropImage"),{
+      viewMode:1,
+      dragMode:"crop",
+      autoCropArea:.55,
+      responsive:true,
+      background:false,
+      movable:true,
+      zoomable:true,
+      rotatable:false,
+      scalable:false,
+      guides:true,
+      center:true,
+      highlight:true
+    });
+  };
+}
+
+function closeCrop(){
+  $("cropModal").classList.remove("show");
+  if(cropper){cropper.destroy();cropper=null}
+  if(cropObjectURL){URL.revokeObjectURL(cropObjectURL);cropObjectURL=null}
+  cropTarget=null;
+}
+
+async function finishCrop(){
+  if(!cropper)return;
+  const canvas=cropper.getCroppedCanvas({
+    maxWidth:1800,maxHeight:1000,
+    imageSmoothingEnabled:true,imageSmoothingQuality:"high"
+  });
+  canvas.toBlob(blob=>{
+    const url=URL.createObjectURL(blob);
+    if(cropTarget==="in"){
+      inImageBlob=blob;
+      $("inPreview").src=url;$("inPreview").style.display="block";
+      $("inStatus").textContent="✅ ครอปแล้ว พร้อม OCR";
+    }else{
+      outImageBlob=blob;
+      $("outPreview").src=url;$("outPreview").style.display="block";
+      $("outStatus").textContent="✅ ครอปแล้ว พร้อม OCR";
+    }
+    closeCrop();
+    $("scanBtn").disabled=!(inImageBlob&&outImageBlob);
+    toast("✅ ครอปรูปเรียบร้อย");
+  },"image/jpeg",.95);
+}
+
+$("inFile").addEventListener("change",e=>{
+  if(e.target.files[0])openCrop(e.target.files[0],"in");
+});
+$("outFile").addEventListener("change",e=>{
+  if(e.target.files[0])openCrop(e.target.files[0],"out");
+});
+$("cropConfirm").onclick=finishCrop;
+$("cropCancel").onclick=closeCrop;
+$("cropClose").onclick=closeCrop;
+$("cropReset").onclick=()=>{
+  if(cropper)cropper.reset();
+};
+
+function normalizeDate(s){
+  const n=s.match(/\d+/g);if(!n||n.length<3)return null;
+  let y=+n[0],mo=+n[1],d=+n[2];if(y>2400)y-=543;
+  if(y<2000||mo<1||mo>12||d<1||d>31)return null;
+  return y+"-"+pad(mo)+"-"+pad(d);
+}
+function normalizeTime(s){
+  const n=s.match(/\d+/g);if(!n||n.length<2)return null;
+  let h=+n[0],m=+n[1];if(h>23||m>59)return null;
+  return pad(h)+":"+pad(m);
+}
+function extractDateTime(text){
+  let t=text.replace(/[Oo]/g,"0").replace(/[IiLl]/g,"1").replace(/[|]/g,"1");
+  const a=t.match(/(20\d{2})\s*[-/.]\s*(\d{1,2})\s*[-/.]\s*(\d{1,2}).*?(\d{1,2})\s*[:.]\s*(\d{2})/);
+  if(a){
+    const date=normalizeDate(a[1]+"-"+a[2]+"-"+a[3]);
+    const time=normalizeTime(a[4]+":"+a[5]);
+    if(date&&time)return{date,time};
+  }
+  const dm=t.match(/20\d{2}\s*[-/.]\s*\d{1,2}\s*[-/.]\s*\d{1,2}/);
+  const tm=t.match(/\b([01]?\d|2[0-3])\s*[:.]\s*([0-5]\d)\b/);
+  if(dm&&tm)return{date:normalizeDate(dm[0]),time:normalizeTime(tm[0])};
+  return null;
+}
+
+async function blobCanvas(blob){
+  const url=URL.createObjectURL(blob);
+  const img=new Image();
+  await new Promise((res,rej)=>{img.onload=res;img.onerror=rej;img.src=url});
+  const scale=Math.min(5,Math.max(2,1800/img.width));
+  const c=document.createElement("canvas");
+  c.width=Math.round(img.width*scale);c.height=Math.round(img.height*scale);
+  const ctx=c.getContext("2d");ctx.imageSmoothingEnabled=false;
+  ctx.drawImage(img,0,0,c.width,c.height);
+  URL.revokeObjectURL(url);
+  return c;
+}
+async function runOCR(blob,label){
+  const c=await blobCanvas(blob);
+  let result=await Tesseract.recognize(c,"eng",{
+    logger:m=>{
+      if(m.status==="recognizing text")
+        $("ocrStatus").textContent=label+" • "+Math.round(m.progress*100)+"%";
+    },
+    tessedit_char_whitelist:"0123456789:-./",
+    tessedit_pageseg_mode:7
+  });
+  let found=extractDateTime(result.data.text);
+  if(found)return found;
+
+  // รอบสอง: threshold
+  const ctx=c.getContext("2d"),d=ctx.getImageData(0,0,c.width,c.height);
+  for(let i=0;i<d.data.length;i+=4){
+    const g=.299*d.data[i]+.587*d.data[i+1]+.114*d.data[i+2];
+    const v=g>150?255:0;
+    d.data[i]=d.data[i+1]=d.data[i+2]=v;
+  }
+  ctx.putImageData(d,0,0);
+  result=await Tesseract.recognize(c,"eng",{
+    logger:m=>{
+      if(m.status==="recognizing text")
+        $("ocrStatus").textContent=label+" รอบ 2 • "+Math.round(m.progress*100)+"%";
+    },
+    tessedit_char_whitelist:"0123456789:-./",
+    tessedit_pageseg_mode:7
+  });
+  found=extractDateTime(result.data.text);
+  if(found)return found;
+  throw new Error(label+" อ่านวันที่/เวลาไม่ได้");
+}
+
+function adjustIn(t){
+  const m=timeMin(t);
+  // 07:30-07:59 ให้ถือเป็น 08:00
+  if(m>=450&&m<480)return"08:00";
+  return t;
+}
+function adjustOut(t){
+  const m=timeMin(t);
+  // 20:00-20:29 = 20:00
+  if(m>=1200&&m<1230)return"20:00";
+  // 20:30-20:59 = 20:30
+  if(m>=1230&&m<1260)return"20:30";
+  return t;
+}
+
+function calculate(date,inn,out){
+  const sunday=new Date(date+"T00:00:00").getDay()===0;
+  const normalPay=8*(sunday?SUNDAY_RATE:NORMAL_RATE);
+  const outM=timeMin(out);
+  const otM=Math.max(0,outM-OT_START);
+  const otHours=otM/60;
+  const otPay=otHours*OT_RATE;
+  return{normalPay,otHours,otPay,total:normalPay+otPay,sunday};
+}
+function displayCalc(){
+  const date=$("resultDate").value,inn=$("resultIn").value,out=$("resultOut").value;
+  if(!date||!inn||!out)return;
+  const p=calculate(date,inn,out);
+  $("dayType").textContent=p.sunday?"อาทิตย์ • ปกติ 88 ฿/ชม.":"จันทร์-เสาร์ • ปกติ 44 ฿/ชม.";
+  $("normalPay").textContent=money(p.normalPay);
+  $("otHours").textContent=p.otHours.toFixed(2)+" ชม.";
+  $("otPay").textContent=money(p.otPay);
+  $("totalPay").textContent=money(p.total);
+  $("otTime").textContent=p.otHours>0?"17:30 - "+out:"ไม่มี OT";
+  currentResult={id:Date.now(),date,inTime:inn,outTime:out,normalPay:p.normalPay,otHours:p.otHours,otPay:p.otPay,total:p.total,sunday:p.sunday};
+  $("resultSection").style.display="block";
+}
+
+$("scanBtn").onclick=async()=>{
+  if(!inImageBlob||!outImageBlob)return;
+  $("scanBtn").disabled=true;
+  try{
+    const a=await runOCR(inImageBlob,"กำลังอ่านเวลาเข้า");
+    $("inStatus").textContent="✅ OCR: "+a.date+" "+a.time;
+    const b=await runOCR(outImageBlob,"กำลังอ่านเวลาออก");
+    $("outStatus").textContent="✅ OCR: "+b.date+" "+b.time;
+
+    $("resultDate").value=a.date;
+    $("resultIn").value=adjustIn(a.time);
+    $("resultOut").value=adjustOut(b.time);
+    displayCalc();
+    $("ocrStatus").textContent="✅ อ่านสำเร็จ";
+  }catch(e){
+    console.error(e);
+    $("ocrStatus").textContent="❌ "+e.message;
+    alert("OCR อ่านไม่สำเร็จ\n\nลองครอปให้แคบลง โดยเอาเฉพาะวันที่ + เวลา แล้วลองใหม่");
+  }finally{
+    $("scanBtn").disabled=!(inImageBlob&&outImageBlob);
+  }
+};
+
+$("recalcBtn").onclick=displayCalc;
+
+$("saveBtn").onclick=()=>{
+  if(!currentResult)return;
+  let data=JSON.parse(localStorage.getItem("workPayData")||"[]");
+  const i=data.findIndex(x=>x.date===currentResult.date);
+  if(i>=0){
+    if(!confirm("มีข้อมูลวันที่ "+formatDate(currentResult.date)+" แล้ว\nต้องการแทนที่ข้อมูลเดิมหรือไม่?"))return;
+    data[i]=currentResult;
+  }else data.push(currentResult);
+  data.sort((a,b)=>a.date.localeCompare(b.date));
+  localStorage.setItem("workPayData",JSON.stringify(data));
+  toast("💾 บันทึกข้อมูลแล้ว");
+  loadHistory();
+};
+
+function deleteRecord(id){
+  if(!confirm("ต้องการลบรายการนี้หรือไม่?"))return;
+  let d=JSON.parse(localStorage.getItem("workPayData")||"[]").filter(x=>String(x.id)!==String(id));
+  localStorage.setItem("workPayData",JSON.stringify(d));loadHistory();
+}
+function loadHistory(){
+  const month=$("monthFilter").value;
+  const data=JSON.parse(localStorage.getItem("workPayData")||"[]").filter(x=>x.date.startsWith(month));
+  let normal=0,ot=0,total=0;
+  $("history").innerHTML="";
+  data.forEach(x=>{
+    normal+=+x.normalPay;ot+=+x.otHours;total+=+x.total;
+    const tr=document.createElement("tr");
+    tr.innerHTML=`
+      <td>${formatDate(x.date)}</td>
+      <td>${thaiDay(x.date)}</td>
+      <td>${x.inTime}</td>
+      <td>${x.outTime}</td>
+      <td>${money(x.normalPay)}</td>
+      <td>${(+x.otHours).toFixed(2)}</td>
+      <td>${money(x.otPay)}</td>
+      <td><b>${money(x.total)}</b></td>
+      <td><button class="btn btn-sm btn-outline-danger" onclick="deleteRecord('${x.id}')">🗑️</button></td>`;
+    $("history").appendChild(tr);
+  });
+  if(!data.length)$("history").innerHTML='<tr><td colspan="9" class="empty">ยังไม่มีข้อมูลของเดือนนี้</td></tr>';
+  $("sumDays").textContent=data.length+" วัน";
+  $("sumNormal").textContent=money(normal);
+  $("sumOT").textContent=ot.toFixed(2)+" ชม.";
+  $("sumTotal").textContent=money(total);
+}
+
+const now=new Date();
+$("monthFilter").value=now.getFullYear()+"-"+pad(now.getMonth()+1);
+$("monthFilter").onchange=loadHistory;
+loadHistory();
+</script>
+</body>
+</html>
