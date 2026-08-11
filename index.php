@@ -3,159 +3,446 @@
 
 <head>
 
-    <meta charset="UTF-8">
+<meta charset="UTF-8">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
 
-    <title>ระบบคำนวณค่าแรง V5.2</title>
+<title>ระบบคำนวณค่าแรง V5.3</title>
 
-    <link
-        rel="stylesheet"
-        href="style.css"
-    >
+<link
+    rel="stylesheet"
+    href="style.css"
+>
+
+<style>
+
+/* =====================================================
+   V5.3 CALENDAR / UI
+===================================================== */
+
+.calendar-header {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+    margin-bottom:15px;
+}
+
+.calendar-header button {
+    width:auto;
+    min-width:50px;
+    padding:8px 14px;
+}
+
+.calendar-title {
+    font-size:20px;
+    font-weight:bold;
+}
+
+.calendar {
+    display:grid;
+    grid-template-columns:
+        repeat(7, 1fr);
+    gap:5px;
+}
+
+.calendar-day-name {
+    text-align:center;
+    font-weight:bold;
+    padding:8px 2px;
+    font-size:13px;
+}
+
+.calendar-cell {
+    min-height:85px;
+    border:1px solid #ddd;
+    border-radius:10px;
+    padding:7px;
+    background:#fff;
+    overflow:hidden;
+}
+
+.calendar-cell.empty {
+    background:#f5f5f5;
+    border:none;
+}
+
+.calendar-cell.today {
+    border:2px solid #2196f3;
+}
+
+.calendar-date {
+    font-weight:bold;
+    font-size:14px;
+}
+
+.calendar-money {
+    margin-top:7px;
+    font-size:13px;
+    font-weight:bold;
+}
+
+.calendar-time {
+    font-size:11px;
+    margin-top:4px;
+    color:#555;
+}
+
+.shift-card {
+    border:1px solid #ddd;
+    border-radius:12px;
+    padding:15px;
+    margin-bottom:12px;
+    background:#fff;
+}
+
+.shift-total {
+    font-size:20px;
+    font-weight:bold;
+    margin-top:12px;
+}
+
+.pay-period {
+    border:1px solid #ddd;
+    border-radius:14px;
+    padding:17px;
+    margin-bottom:15px;
+    background:#fff;
+}
+
+.pay-period h3 {
+    margin-top:0;
+}
+
+.pay-period-total {
+    font-size:24px;
+    font-weight:bold;
+    margin-top:10px;
+}
+
+.badge {
+    display:inline-block;
+    padding:4px 8px;
+    border-radius:7px;
+    font-size:12px;
+    background:#eee;
+    margin-left:5px;
+}
+
+.night {
+    background:#e9e3ff;
+}
+
+.day {
+    background:#fff3cd;
+}
+
+.error-box {
+    padding:12px;
+    border-radius:10px;
+    background:#fff0f0;
+    border:1px solid #ffcccc;
+    margin-bottom:10px;
+}
+
+</style>
 
 </head>
+
 
 <body>
 
 <div class="container">
 
-    <h1>💰 ระบบคำนวณค่าแรง V5.2</h1>
+<h1>💰 ระบบคำนวณค่าแรง V5.3</h1>
 
-    <p class="subtitle">
-        อัปโหลดรูปเวลาเข้า-ออกงาน แล้วระบบคำนวณให้อัตโนมัติ
-    </p>
-
-
-    <!-- =========================
-         UPLOAD
-    ========================== -->
-
-    <div class="card">
-
-        <label for="imageInput">
-            📷 เลือกรูปเวลาเข้า-ออกงาน
-        </label>
-
-        <input
-            type="file"
-            id="imageInput"
-            accept="image/*"
-            multiple
-        >
-
-        <div
-            id="fileList"
-            style="margin-top:15px;"
-        ></div>
-
-        <button
-            id="ocrButton"
-            onclick="runAllOCR()"
-        >
-            🔍 วิเคราะห์รูปทั้งหมด
-        </button>
-
-        <div
-            id="loading"
-            class="loading"
-        >
-            ⏳ กำลังเตรียมข้อมูล...
-        </div>
-
-    </div>
+<p class="subtitle">
+OCR + กะกลางวัน + กะดึก + ปฏิทิน + รอบจ่าย
+</p>
 
 
-    <!-- =========================
-         DAILY RESULTS
-    ========================== -->
+<!-- =====================================================
+     UPLOAD
+===================================================== -->
 
-    <div
-        id="summaryCard"
-        class="card"
-        style="display:none;"
-    >
+<div class="card">
 
-        <h2>📊 สรุปค่าแรง</h2>
+<h2>📷 อัปโหลดรูป</h2>
 
-        <div id="summary"></div>
+<p>
+เลือกภาพเวลาเข้าและออกงานทั้งหมดที่ต้องการตรวจสอบ
+</p>
 
-    </div>
+<input
+    type="file"
+    id="imageInput"
+    accept="image/*"
+    multiple
+>
+
+<div
+    id="fileList"
+    style="margin-top:15px;"
+></div>
+
+<button
+    id="ocrButton"
+    onclick="runAllOCR()"
+>
+🔍 วิเคราะห์รูปทั้งหมด
+</button>
+
+<div
+    id="loading"
+    class="loading"
+>
+⏳ พร้อมทำงาน
+</div>
+
+</div>
 
 
-    <!-- =========================
-         OCR RESULTS
-    ========================== -->
+<!-- =====================================================
+     PAY RULE
+===================================================== -->
 
-    <div
-        id="resultsCard"
-        class="card"
-        style="display:none;"
-    >
+<div class="card">
 
-        <h2>📝 ผล OCR แต่ละรูป</h2>
+<h2>⚙️ กฎค่าแรง</h2>
 
-        <div id="results"></div>
+<div>
+☀️ กะกลางวัน:
+<b>08:00–17:00</b>
+</div>
 
-    </div>
+<div style="margin-top:7px;">
+🌙 กะดึก:
+<b>20:00–05:00</b>
+</div>
+
+<div style="margin-top:7px;">
+จันทร์–เสาร์:
+<b>352 บาท/กะ</b>
++
+<b>OT 66 บาท/ชม.</b>
+</div>
+
+<div style="margin-top:7px;">
+อาทิตย์:
+<b>88 บาท/ชม.</b>
+</div>
+
+<div style="margin-top:7px;">
+⏱️ OT เริ่ม 17:30 หรือ 05:30
+</div>
+
+<div style="margin-top:7px;">
+🔢 OT ปัดลงทุก 30 นาที
+</div>
+
+</div>
+
+
+<!-- =====================================================
+     CALENDAR
+===================================================== -->
+
+<div
+    id="calendarCard"
+    class="card"
+>
+
+<h2>📅 ปฏิทินค่าแรง</h2>
+
+<div class="calendar-header">
+
+<button onclick="changeMonth(-1)">
+◀
+</button>
+
+<div
+    id="calendarTitle"
+    class="calendar-title"
+>
+</div>
+
+<button onclick="changeMonth(1)">
+▶
+</button>
+
+</div>
+
+<div
+    id="calendar"
+    class="calendar"
+></div>
+
+</div>
+
+
+<!-- =====================================================
+     PAY PERIODS
+===================================================== -->
+
+<div
+    id="periodCard"
+    class="card"
+>
+
+<h2>💰 รอบจ่าย</h2>
+
+<div id="periods">
+ยังไม่มีข้อมูล
+</div>
+
+</div>
+
+
+<!-- =====================================================
+     SHIFT DETAILS
+===================================================== -->
+
+<div
+    id="detailsCard"
+    class="card"
+>
+
+<h2>📋 รายละเอียดงาน</h2>
+
+<div id="details">
+ยังไม่มีข้อมูล
+</div>
+
+</div>
+
+
+<!-- =====================================================
+     OCR
+===================================================== -->
+
+<div
+    id="resultsCard"
+    class="card"
+    style="display:none;"
+>
+
+<h2>📝 ผล OCR</h2>
+
+<div id="results"></div>
+
+</div>
 
 </div>
 
 
 <script>
 
-/* =========================================================
-   ELEMENTS
-========================================================= */
-
-const imageInput =
-    document.getElementById('imageInput');
-
-const fileList =
-    document.getElementById('fileList');
-
-const ocrButton =
-    document.getElementById('ocrButton');
-
-const loading =
-    document.getElementById('loading');
-
-const resultsCard =
-    document.getElementById('resultsCard');
-
-const results =
-    document.getElementById('results');
-
-const summaryCard =
-    document.getElementById('summaryCard');
-
-const summary =
-    document.getElementById('summary');
-
-
-/* =========================================================
-   SETTINGS
-========================================================= */
+/* =====================================================
+   CONSTANTS
+===================================================== */
 
 const NORMAL_DAILY_WAGE = 352;
 
-const OT_HOURLY_WAGE = 66;
+const OT_RATE = 66;
 
-const SUNDAY_HOURLY_WAGE = 88;
-
-const NORMAL_START = 8 * 60;      // 08:00
-
-const NORMAL_END = 17 * 60;       // 17:00
-
-const OT_START = 17 * 60 + 30;   // 17:30
+const SUNDAY_RATE = 88;
 
 
-/* =========================================================
+/*
+ * กลางวัน
+ */
+const DAY_START = 8 * 60;
+
+const DAY_END = 17 * 60;
+
+const DAY_OT_START =
+    17 * 60 + 30;
+
+
+/*
+ * กลางคืน
+ */
+const NIGHT_START = 20 * 60;
+
+const NIGHT_END = 5 * 60;
+
+const NIGHT_OT_START =
+    5 * 60 + 30;
+
+
+/* =====================================================
+   GLOBAL DATA
+===================================================== */
+
+let shifts = [];
+
+let ocrRecords = [];
+
+let calendarDate =
+    new Date();
+
+
+/* =====================================================
+   ELEMENTS
+===================================================== */
+
+const imageInput =
+    document.getElementById(
+        'imageInput'
+    );
+
+const fileList =
+    document.getElementById(
+        'fileList'
+    );
+
+const loading =
+    document.getElementById(
+        'loading'
+    );
+
+const ocrButton =
+    document.getElementById(
+        'ocrButton'
+    );
+
+const results =
+    document.getElementById(
+        'results'
+    );
+
+const resultsCard =
+    document.getElementById(
+        'resultsCard'
+    );
+
+const calendar =
+    document.getElementById(
+        'calendar'
+    );
+
+const calendarTitle =
+    document.getElementById(
+        'calendarTitle'
+    );
+
+const periods =
+    document.getElementById(
+        'periods'
+    );
+
+const details =
+    document.getElementById(
+        'details'
+    );
+
+
+/* =====================================================
    FILE LIST
-========================================================= */
+===================================================== */
 
 imageInput.addEventListener(
     'change',
@@ -164,11 +451,9 @@ imageInput.addEventListener(
         fileList.innerHTML = '';
 
         const files =
-            Array.from(this.files);
-
-        if (!files.length) {
-            return;
-        }
+            Array.from(
+                this.files
+            );
 
         files.forEach(
             (file, index) => {
@@ -179,61 +464,65 @@ imageInput.addEventListener(
                     );
 
                 div.style.padding =
-                    '7px 0';
+                    '6px 0';
 
                 div.innerHTML =
                     `
                     📷 ${index + 1}.
                     ${escapeHTML(file.name)}
                     <small>
-                        (${formatBytes(file.size)})
+                    (${formatBytes(file.size)})
                     </small>
                     `;
 
-                fileList.appendChild(div);
+                fileList.appendChild(
+                    div
+                );
             }
         );
     }
 );
 
 
-/* =========================================================
-   MAIN OCR PROCESS
-========================================================= */
+/* =====================================================
+   OCR ALL
+===================================================== */
 
 async function runAllOCR() {
 
     const files =
-        Array.from(imageInput.files);
+        Array.from(
+            imageInput.files
+        );
+
 
     if (!files.length) {
 
         alert(
-            'กรุณาเลือกรูปอย่างน้อย 1 รูป'
+            'กรุณาเลือกรูปก่อน'
         );
 
         return;
     }
 
-    ocrButton.disabled = true;
 
-    loading.style.display = 'block';
+    ocrButton.disabled =
+        true;
 
-    resultsCard.style.display = 'none';
+    loading.style.display =
+        'block';
 
-    summaryCard.style.display = 'none';
+    results.innerHTML =
+        '';
 
-    results.innerHTML = '';
+    resultsCard.style.display =
+        'none';
 
-    summary.innerHTML = '';
 
-    const records = [];
+    ocrRecords = [];
+
 
     try {
-
-        /*
-         * OCR ทีละรูป
-         */
 
         for (
             let i = 0;
@@ -241,26 +530,19 @@ async function runAllOCR() {
             i++
         ) {
 
-            const file = files[i];
-
             loading.textContent =
-                `⏳ กำลังอ่านรูป ${i + 1} / ${files.length}`;
+                `⏳ OCR รูป ${i + 1} / ${files.length}`;
 
-
-            /*
-             * บีบอัดรูป
-             */
 
             const compressed =
-                await compressImage(file);
+                await compressImage(
+                    files[i]
+                );
 
-
-            /*
-             * ส่งไป OCR
-             */
 
             const formData =
                 new FormData();
+
 
             formData.append(
                 'image',
@@ -273,8 +555,8 @@ async function runAllOCR() {
                 await fetch(
                     'ocr.php',
                     {
-                        method: 'POST',
-                        body: formData
+                        method:'POST',
+                        body:formData
                     }
                 );
 
@@ -285,29 +567,12 @@ async function runAllOCR() {
 
             if (!data.success) {
 
-                let error =
-                    data.error ||
-                    'OCR ไม่สำเร็จ';
-
-                if (
-                    data.error_code !==
-                    undefined
-                ) {
-
-                    error +=
-                        '\nUpload Error Code: ' +
-                        data.error_code;
-                }
-
-                if (data.curl_error) {
-
-                    error +=
-                        '\nCURL: ' +
-                        data.curl_error;
-                }
-
                 throw new Error(
-                    `รูปที่ ${i + 1}: ${error}`
+                    `รูปที่ ${i + 1}: ` +
+                    (
+                        data.error ||
+                        'OCR ไม่สำเร็จ'
+                    )
                 );
             }
 
@@ -316,64 +581,46 @@ async function runAllOCR() {
                 data.text || '';
 
 
-            /*
-             * ดึงเวลา
-             */
-
             const times =
-                extractTimes(text);
+                extractTimes(
+                    text
+                );
 
 
-            /*
-             * ดึงวันที่
-             */
-
-            const dateInfo =
-                extractDate(text);
+            const date =
+                extractDate(
+                    text
+                );
 
 
-            records.push({
+            ocrRecords.push({
 
-                index: i,
+                index:i,
 
                 fileName:
-                    file.name,
+                    files[i].name,
 
-                text:
-                    text,
+                text:text,
 
-                times:
-                    times,
+                times:times,
 
-                date:
-                    dateInfo.date,
-
-                dateKey:
-                    dateInfo.key
+                date:date
             });
         }
 
 
-        /*
-         * แสดง OCR
-         */
+        showOCR();
 
-        showOCRResults(records);
+        buildShifts();
 
+        renderCalendar();
 
-        /*
-         * จับคู่รายวัน + คำนวณ
-         */
+        renderPeriods();
 
-        const days =
-            buildDailyRecords(records);
+        renderDetails();
 
 
-        showSummary(days);
-
-    }
-
-    catch (error) {
+    } catch(error) {
 
         console.error(error);
 
@@ -381,62 +628,57 @@ async function runAllOCR() {
             error.message
         );
 
-    }
+    } finally {
 
-    finally {
-
-        loading.style.display = 'none';
+        loading.style.display =
+            'none';
 
         loading.textContent =
-            '⏳ กำลังเตรียมข้อมูล...';
+            '⏳ พร้อมทำงาน';
 
-        ocrButton.disabled = false;
+        ocrButton.disabled =
+            false;
     }
 }
 
 
-/* =========================================================
+/* =====================================================
    EXTRACT TIMES
-========================================================= */
+===================================================== */
 
 function extractTimes(text) {
 
-    /*
-     * รองรับ:
-     * 08:00
-     * 8:00
-     * 08.00
-     * 8.00
-     */
-
     const regex =
         /\b([01]?\d|2[0-3])[\.:]([0-5]\d)\b/g;
+
 
     const result = [];
 
     let match;
 
+
     while (
-        (match = regex.exec(text)) !== null
+        (match =
+            regex.exec(text)) !== null
     ) {
 
         const hour =
             String(
-                parseInt(match[1], 10)
-            ).padStart(2, '0');
+                parseInt(
+                    match[1],
+                    10
+                )
+            ).padStart(
+                2,
+                '0'
+            );
 
-        const minute =
-            match[2];
 
         result.push(
-            `${hour}:${minute}`
+            `${hour}:${match[2]}`
         );
     }
 
-
-    /*
-     * ลบเวลาซ้ำ
-     */
 
     return [
         ...new Set(result)
@@ -444,59 +686,60 @@ function extractTimes(text) {
 }
 
 
-/* =========================================================
+/* =====================================================
    EXTRACT DATE
-========================================================= */
+===================================================== */
 
 function extractDate(text) {
-
-    /*
-     * รองรับ:
-     *
-     * 11/08/2026
-     * 11-08-2026
-     * 11/08/26
-     *
-     * รวมถึงวันที่ไม่มีปี
-     * 11/08
-     */
 
     const regex =
         /\b(0?[1-9]|[12]\d|3[01])[\-\/](0?[1-9]|1[0-2])(?:[\-\/](\d{2,4}))?\b/;
 
+
     const match =
-        text.match(regex);
+        text.match(
+            regex
+        );
 
 
     if (!match) {
 
-        return {
-            date: null,
-            key: null
-        };
+        return null;
     }
 
 
     let day =
-        parseInt(match[1], 10);
+        parseInt(
+            match[1],
+            10
+        );
+
 
     let month =
-        parseInt(match[2], 10);
+        parseInt(
+            match[2],
+            10
+        );
+
 
     let year =
         match[3]
-            ? parseInt(match[3], 10)
+            ? parseInt(
+                match[3],
+                10
+            )
             : new Date().getFullYear();
 
-
-    /*
-     * ถ้าเป็น พ.ศ.
-     */
 
     if (year < 100) {
 
         year += 2000;
     }
+
+
+    /*
+     * พ.ศ.
+     */
 
     if (year > 2400) {
 
@@ -504,365 +747,432 @@ function extractDate(text) {
     }
 
 
-    const key =
-        `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-
-
     return {
 
-        date:
-            `${String(day).padStart(2, '0')}/${String(month).padStart(2, '0')}/${year}`,
+        year:year,
+
+        month:month,
+
+        day:day,
 
         key:
-            key
+            `${year}-${String(month).padStart(2,'0')}-${String(day).padStart(2,'0')}`,
+
+        display:
+            `${String(day).padStart(2,'0')}/${String(month).padStart(2,'0')}/${year}`
     };
 }
 
 
-/* =========================================================
-   SHOW OCR RESULTS
-========================================================= */
+/* =====================================================
+   SHOW OCR
+===================================================== */
 
-function showOCRResults(records) {
+function showOCR() {
 
     results.innerHTML = '';
 
-    records.forEach(
-        (record, index) => {
 
-            const box =
+    ocrRecords.forEach(
+        (record,index) => {
+
+            const div =
                 document.createElement(
                     'div'
                 );
 
-            box.style.border =
-                '1px solid #ddd';
 
-            box.style.borderRadius =
-                '12px';
-
-            box.style.padding =
-                '15px';
-
-            box.style.marginBottom =
-                '15px';
+            div.className =
+                'shift-card';
 
 
-            const dateText =
-                record.date ||
-                'ไม่พบวันที่';
+            div.innerHTML = `
 
-
-            const timeText =
-                record.times.length
-                    ? record.times.join(', ')
-                    : 'ไม่พบเวลา';
-
-
-            box.innerHTML = `
+                <b>📷 รูป ${index + 1}</b>
 
                 <div>
-                    <b>
-                        📷 รูปที่ ${index + 1}
-                    </b>
-                </div>
-
-                <div style="margin-top:7px;">
                     📁
-                    ${escapeHTML(record.fileName)}
+                    ${escapeHTML(
+                        record.fileName
+                    )}
                 </div>
 
-                <div style="margin-top:7px;">
-                    📅 วันที่:
-                    ${escapeHTML(dateText)}
+                <div>
+                    📅
+                    ${
+                        record.date
+                            ? record.date.display
+                            : 'ไม่พบวันที่'
+                    }
                 </div>
 
-                <div style="margin-top:7px;">
-                    ⏰ เวลา:
-                    ${escapeHTML(timeText)}
+                <div>
+                    ⏰
+                    ${
+                        record.times.length
+                            ? record.times.join(
+                                ', '
+                            )
+                            : 'ไม่พบเวลา'
+                    }
                 </div>
 
-                <details style="margin-top:10px;">
+                <details>
 
                     <summary>
-                        ดูข้อความ OCR
+                        ดู OCR
                     </summary>
 
                     <textarea
-                        style="
-                            width:100%;
-                            min-height:150px;
-                            margin-top:10px;
-                        "
                         readonly
-                    >${escapeHTML(record.text)}</textarea>
+                        style="
+                        width:100%;
+                        min-height:120px;
+                        margin-top:10px;
+                        "
+                    >${escapeHTML(
+                        record.text
+                    )}</textarea>
 
                 </details>
-
             `;
 
-            results.appendChild(box);
+
+            results.appendChild(
+                div
+            );
         }
     );
+
 
     resultsCard.style.display =
         'block';
 }
 
 
-/* =========================================================
-   BUILD DAILY RECORDS
-========================================================= */
+/* =====================================================
+   BUILD SHIFTS
+===================================================== */
 
-function buildDailyRecords(records) {
+function buildShifts() {
 
-    const groups = {};
+    const events = [];
 
 
     /*
-     * 1. จัดกลุ่มตามวันที่
+     * แต่ละรูปอาจมีเวลาเดียว
      */
 
-    records.forEach(
+    ocrRecords.forEach(
         record => {
 
-            let key =
-                record.dateKey;
+            if (
+                !record.date
+            ) {
 
-
-            /*
-             * ถ้าหาวันที่ไม่ได้
-             * ใช้กลุ่ม unknown
-             */
-
-            if (!key) {
-
-                key =
-                    'unknown-' +
-                    record.index;
+                return;
             }
 
 
-            if (!groups[key]) {
+            record.times.forEach(
+                time => {
 
-                groups[key] = [];
-            }
+                    const minutes =
+                        timeToMinutes(
+                            time
+                        );
 
 
-            groups[key].push(
-                record
+                    events.push({
+
+                        dateKey:
+                            record.date.key,
+
+                        year:
+                            record.date.year,
+
+                        month:
+                            record.date.month,
+
+                        day:
+                            record.date.day,
+
+                        time:
+                            time,
+
+                        minutes:
+                            minutes,
+
+                        fileName:
+                            record.fileName
+                    });
+                }
             );
         }
     );
 
 
     /*
-     * 2. สร้างข้อมูลแต่ละวัน
+     * สร้าง timestamp
      */
 
-    const days = [];
+    events.forEach(
+        event => {
+
+            event.timestamp =
+                new Date(
+                    event.dateKey +
+                    'T' +
+                    event.time +
+                    ':00'
+                ).getTime();
+        }
+    );
 
 
-    Object.keys(groups)
-        .sort()
-        .forEach(
-            key => {
+    /*
+     * เรียงเวลา
+     */
 
-                const group =
-                    groups[key];
-
-
-                /*
-                 * รวมเวลาจากทุกรูปของวันนั้น
-                 */
-
-                let allTimes = [];
+    events.sort(
+        (a,b) =>
+            a.timestamp -
+            b.timestamp
+    );
 
 
-                group.forEach(
-                    record => {
-
-                        record.times.forEach(
-                            time => {
-
-                                allTimes.push({
-
-                                    time:
-                                        time,
-
-                                    fileName:
-                                        record.fileName,
-
-                                    recordIndex:
-                                        record.index
-                                });
-
-                            }
-                        );
-                    }
-                );
+    shifts = [];
 
 
-                /*
-                 * แปลงเป็นนาที
-                 */
-
-                allTimes =
-                    allTimes.map(
-                        item => ({
-
-                            ...item,
-
-                            minutes:
-                                timeToMinutes(
-                                    item.time
-                                )
-                        })
-                    );
+    let i = 0;
 
 
-                /*
-                 * เรียงตามเวลา
-                 */
+    while (
+        i < events.length
+    ) {
 
-                allTimes.sort(
-                    (a, b) =>
-                        a.minutes -
-                        b.minutes
-                );
+        const start =
+            events[i];
 
 
-                /*
-                 * ลบเวลาเหมือนกัน
-                 */
+        let end = null;
 
-                const uniqueTimes = [];
 
-                allTimes.forEach(
-                    item => {
+        /*
+         * หา event ถัดไป
+         */
 
-                        const exists =
-                            uniqueTimes.some(
-                                x =>
-                                    x.minutes ===
-                                    item.minutes
-                            );
+        if (
+            i + 1 <
+            events.length
+        ) {
 
-                        if (!exists) {
+            const next =
+                events[i + 1];
 
-                            uniqueTimes.push(
-                                item
-                            );
-                        }
-                    }
-                );
 
+            const diff =
+                (
+                    next.timestamp -
+                    start.timestamp
+                ) / 60000;
+
+
+            /*
+             * งานหนึ่งกะ
+             * ไม่ควรเกิน 16 ชั่วโมง
+             */
+
+            if (
+                diff > 0 &&
+                diff <= 16 * 60
+            ) {
 
                 /*
-                 * หาเวลาเข้าและออก
+                 * ตรวจว่าเป็น
+                 * คู่ที่สมเหตุสมผล
                  */
-
-                let checkIn = null;
-
-                let checkOut = null;
-
 
                 if (
-                    uniqueTimes.length >= 2
+                    isValidShiftPair(
+                        start,
+                        next
+                    )
                 ) {
 
-                    checkIn =
-                        uniqueTimes[0];
+                    end =
+                        next;
 
-                    checkOut =
-                        uniqueTimes[
-                            uniqueTimes.length - 1
-                        ];
+                    i += 2;
+
+                } else {
+
+                    i += 1;
                 }
 
+            } else {
 
-                /*
-                 * คำนวณ
-                 */
-
-                let calculation =
-                    null;
-
-
-                if (
-                    checkIn &&
-                    checkOut
-                ) {
-
-                    calculation =
-                        calculateWage(
-                            key,
-                            checkIn.minutes,
-                            checkOut.minutes
-                        );
-                }
-
-
-                days.push({
-
-                    dateKey:
-                        key,
-
-                    date:
-                        getDisplayDate(
-                            key
-                        ),
-
-                    times:
-                        uniqueTimes,
-
-                    checkIn:
-                        checkIn,
-
-                    checkOut:
-                        checkOut,
-
-                    calculation:
-                        calculation,
-
-                    records:
-                        group
-                });
+                i += 1;
             }
-        );
+
+        } else {
+
+            i += 1;
+        }
 
 
-    return days;
+        if (!end) {
+
+            /*
+             * รูปเข้าไม่มีรูปออก
+             */
+
+            shifts.push({
+
+                start:start,
+
+                end:null,
+
+                incomplete:true,
+
+                pay:0
+            });
+
+            continue;
+        }
+
+
+        const calculation =
+            calculateShift(
+                start,
+                end
+            );
+
+
+        shifts.push({
+
+            start:start,
+
+            end:end,
+
+            incomplete:false,
+
+            ...calculation
+        });
+    }
+
+
+    /*
+     * เรียงตามวันที่เริ่มงาน
+     */
+
+    shifts.sort(
+        (a,b) =>
+            a.start.timestamp -
+            b.start.timestamp
+    );
 }
 
 
-/* =========================================================
-   CALCULATE WAGE
-========================================================= */
+/* =====================================================
+   VALID SHIFT PAIR
+===================================================== */
 
-function calculateWage(
-    dateKey,
-    rawCheckIn,
-    rawCheckOut
+function isValidShiftPair(
+    start,
+    end
 ) {
 
+    const s =
+        start.minutes;
+
+    const e =
+        end.minutes;
+
+
     /*
-     * วันในสัปดาห์
+     * กะกลางวัน
      *
-     * 0 = อาทิตย์
-     * 1 = จันทร์
-     * ...
-     * 6 = เสาร์
+     * 07:30-08:00
+     * -> 17:00+
      */
 
-    const date =
+    if (
+        s >= 7 * 60 + 30 &&
+        s <= 12 * 60
+    ) {
+
+        if (
+            end.dateKey ===
+            start.dateKey
+        ) {
+
+            return e >= 16 * 60;
+        }
+    }
+
+
+    /*
+     * กะดึก
+     *
+     * 20:00+
+     * -> วันถัดไป
+     */
+
+    if (
+        s >= 19 * 60 &&
+        end.dateKey !==
+        start.dateKey
+    ) {
+
+        return e <= 12 * 60;
+    }
+
+
+    /*
+     * เผื่อ OCR วันที่ผิด
+     * แต่เวลาเป็นกะดึก
+     */
+
+    if (
+        s >= 19 * 60 &&
+        e <= 12 * 60
+    ) {
+
+        return true;
+    }
+
+
+    return false;
+}
+
+
+/* =====================================================
+   CALCULATE SHIFT
+===================================================== */
+
+function calculateShift(
+    start,
+    end
+) {
+
+    const startMinutes =
+        start.minutes;
+
+
+    const endMinutes =
+        end.minutes;
+
+
+    const startDate =
         new Date(
-            dateKey + 'T12:00:00'
+            start.dateKey +
+            'T12:00:00'
         );
 
 
     const dayOfWeek =
-        date.getDay();
+        startDate.getDay();
 
 
     const isSunday =
@@ -870,515 +1180,989 @@ function calculateWage(
 
 
     /*
-     * ปรับเวลาเข้า
-     *
-     * 07:30 - 08:00
-     * ให้เป็น 08:00
+     * กะดึก
      */
 
-    let checkIn =
-        rawCheckIn;
+    const isNight =
+        startMinutes >=
+        19 * 60;
 
-
-    if (
-        checkIn >= 450 &&
-        checkIn <= 480
-    ) {
-
-        checkIn = 480;
-    }
-
-
-    /*
-     * ถ้าเลิกก่อน 17:30
-     * ไม่มี OT
-     */
 
     let normalMinutes = 0;
 
     let otMinutes = 0;
 
+    let adjustedStart =
+        startMinutes;
 
-    /*
-     * เวลาปกติ
-     *
-     * เริ่มจากเวลาเข้า
-     * จนถึง 17:00
-     */
+    let normalPay = 0;
 
-    if (
-        checkIn < NORMAL_END
-    ) {
-
-        normalMinutes =
-            NORMAL_END -
-            checkIn;
-
-    }
+    let otPay = 0;
 
 
-    /*
-     * ถ้าเลิกตั้งแต่ 17:30
-     * เริ่ม OT
-     */
-
-    if (
-        rawCheckOut >= OT_START
-    ) {
+    if (isNight) {
 
         /*
-         * ปัดเวลาลงทุก 30 นาที
+         * กะดึก
          *
-         * 20:01 - 20:29
-         * → 20:00
+         * 20:00 -> 05:00
          *
-         * 20:30 - 20:59
-         * → 20:30
+         * เข้าเร็ว 19:30-20:00
+         * ให้นับ 20:00
          */
 
-        const roundedOut =
-            Math.floor(
-                rawCheckOut / 30
-            ) * 30;
+        if (
+            adjustedStart >=
+            19 * 60 + 30 &&
+            adjustedStart <=
+            20 * 60
+        ) {
+
+            adjustedStart =
+                20 * 60;
+        }
+
+
+        /*
+         * เวลาออก
+         *
+         * เพราะเป็นวันถัดไป
+         * ให้แปลงเป็นนาทีต่อเนื่อง
+         */
+
+        let endContinuous =
+            endMinutes;
+
+
+        if (
+            endContinuous <
+            12 * 60
+        ) {
+
+            endContinuous +=
+                24 * 60;
+        }
+
+
+        const normalEnd =
+            29 * 60;
+
+
+        /*
+         * 05:00
+         */
+
+        if (
+            endContinuous >=
+            normalEnd
+        ) {
+
+            normalMinutes =
+                normalEnd -
+                adjustedStart;
+
+        } else {
+
+            normalMinutes =
+                Math.max(
+                    0,
+                    endContinuous -
+                    adjustedStart
+                );
+        }
+
+
+        /*
+         * OT เริ่ม 05:30
+         */
+
+        const otStart =
+            29 * 60 + 30;
+
+
+        if (
+            endContinuous >=
+            otStart
+        ) {
+
+            const roundedOut =
+                Math.floor(
+                    endContinuous / 30
+                ) * 30;
+
+
+            otMinutes =
+                Math.max(
+                    0,
+                    roundedOut -
+                    otStart
+                );
+        }
+
+
+    } else {
+
+        /*
+         * กะกลางวัน
+         */
+
+        /*
+         * 07:30-08:00
+         * -> 08:00
+         */
+
+        if (
+            adjustedStart >=
+            7 * 60 + 30 &&
+            adjustedStart <=
+            8 * 60
+        ) {
+
+            adjustedStart =
+                8 * 60;
+        }
+
+
+        /*
+         * ค่าแรงปกติถึง 17:00
+         */
+
+        normalMinutes =
+            Math.max(
+                0,
+                DAY_END -
+                adjustedStart
+            );
 
 
         /*
          * OT เริ่ม 17:30
          */
 
-        otMinutes =
-            Math.max(
-                0,
-                roundedOut -
-                OT_START
-            );
+        if (
+            endMinutes >=
+            DAY_OT_START
+        ) {
+
+            const roundedOut =
+                Math.floor(
+                    endMinutes / 30
+                ) * 30;
+
+
+            otMinutes =
+                Math.max(
+                    0,
+                    roundedOut -
+                    DAY_OT_START
+                );
+        }
     }
 
 
     /*
-     * จันทร์ - เสาร์
+     * ค่าแรง
      */
 
-    if (!isSunday) {
+    if (isSunday) {
 
-        const normalPay =
+        /*
+         * อาทิตย์
+         * 88 บาท / ชั่วโมง
+         */
+
+        normalPay =
+            (
+                normalMinutes /
+                60
+            ) *
+            SUNDAY_RATE;
+
+
+        otPay =
+            (
+                otMinutes /
+                60
+            ) *
+            SUNDAY_RATE;
+
+    } else {
+
+        /*
+         * จันทร์-เสาร์
+         */
+
+        normalPay =
             NORMAL_DAILY_WAGE;
 
 
-        const otPay =
+        otPay =
             (
-                otMinutes / 60
+                otMinutes /
+                60
             ) *
-            OT_HOURLY_WAGE;
-
-
-        return {
-
-            dayName:
-                getThaiDay(dayOfWeek),
-
-            isSunday:
-                false,
-
-            adjustedCheckIn:
-                minutesToTime(checkIn),
-
-            rawCheckOut:
-                minutesToTime(rawCheckOut),
-
-            normalMinutes:
-                normalMinutes,
-
-            normalPay:
-                normalPay,
-
-            otMinutes:
-                otMinutes,
-
-            otPay:
-                otPay,
-
-            totalPay:
-                normalPay +
-                otPay
-        };
+            OT_RATE;
     }
-
-
-    /*
-     * วันอาทิตย์
-     *
-     * 88 บาท / ชั่วโมง
-     */
-
-    const normalPay =
-        (
-            normalMinutes / 60
-        ) *
-        SUNDAY_HOURLY_WAGE;
-
-
-    const otPay =
-        (
-            otMinutes / 60
-        ) *
-        SUNDAY_HOURLY_WAGE;
 
 
     return {
 
         dayName:
-            'อาทิตย์',
+            getThaiDay(
+                dayOfWeek
+            ),
 
         isSunday:
-            true,
+            isSunday,
 
-        adjustedCheckIn:
-            minutesToTime(checkIn),
+        isNight:
+            isNight,
 
-        rawCheckOut:
-            minutesToTime(rawCheckOut),
+        adjustedStart:
+            adjustedStart,
 
         normalMinutes:
             normalMinutes,
 
-        normalPay:
-            normalPay,
-
         otMinutes:
             otMinutes,
+
+        normalPay:
+            normalPay,
 
         otPay:
             otPay,
 
-        totalPay:
+        pay:
             normalPay +
             otPay
     };
 }
 
 
-/* =========================================================
-   SHOW SUMMARY
-========================================================= */
+/* =====================================================
+   CALENDAR
+===================================================== */
 
-function showSummary(days) {
+function renderCalendar() {
 
-    summary.innerHTML = '';
-
-    let totalPay = 0;
-
-    let totalOT = 0;
+    const year =
+        calendarDate.getFullYear();
 
 
-    days.forEach(
-        day => {
+    const month =
+        calendarDate.getMonth();
 
-            const box =
+
+    calendarTitle.textContent =
+        `${getThaiMonth(month)} ${year + 543}`;
+
+
+    calendar.innerHTML =
+        '';
+
+
+    const names = [
+        'อา',
+        'จ',
+        'อ',
+        'พ',
+        'พฤ',
+        'ศ',
+        'ส'
+    ];
+
+
+    names.forEach(
+        name => {
+
+            const div =
                 document.createElement(
                     'div'
                 );
 
+            div.className =
+                'calendar-day-name';
 
-            box.style.padding =
-                '18px';
+            div.textContent =
+                name;
 
-            box.style.marginBottom =
-                '15px';
-
-            box.style.borderRadius =
-                '12px';
-
-            box.style.background =
-                '#f7f9fc';
-
-            box.style.border =
-                '1px solid #e2e6ea';
+            calendar.appendChild(
+                div
+            );
+        }
+    );
 
 
-            /*
-             * ไม่มีเวลาเข้า/ออก
-             */
+    const firstDay =
+        new Date(
+            year,
+            month,
+            1
+        ).getDay();
+
+
+    const daysInMonth =
+        new Date(
+            year,
+            month + 1,
+            0
+        ).getDate();
+
+
+    for (
+        let i = 0;
+        i < firstDay;
+        i++
+    ) {
+
+        const empty =
+            document.createElement(
+                'div'
+            );
+
+        empty.className =
+            'calendar-cell empty';
+
+        calendar.appendChild(
+            empty
+        );
+    }
+
+
+    for (
+        let day = 1;
+        day <= daysInMonth;
+        day++
+    ) {
+
+        const cell =
+            document.createElement(
+                'div'
+            );
+
+
+        cell.className =
+            'calendar-cell';
+
+
+        const key =
+            `${year}-${String(month + 1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+
+
+        const today =
+            new Date();
+
+
+        if (
+            today.getFullYear() === year &&
+            today.getMonth() === month &&
+            today.getDate() === day
+        ) {
+
+            cell.classList.add(
+                'today'
+            );
+        }
+
+
+        const shift =
+            shifts.find(
+                s =>
+                    s.start.dateKey ===
+                    key
+            );
+
+
+        let html =
+            `
+            <div class="calendar-date">
+                ${day}
+            </div>
+            `;
+
+
+        if (shift) {
 
             if (
-                !day.calculation
+                shift.incomplete
             ) {
 
-                box.innerHTML = `
-
-                    <h3>
-                        📅
-                        ${escapeHTML(day.date)}
-                    </h3>
-
-                    <div>
-                        ⚠️
-                        ไม่พบเวลาเข้าและออกครบ 2 เวลา
+                html += `
+                    <div class="calendar-time">
+                        ⚠️ รูปไม่ครบ
                     </div>
-
-                    <div style="margin-top:8px;">
-                        เวลาที่พบ:
-                        ${
-                            day.times.length
-                                ? day.times
-                                    .map(
-                                        x =>
-                                            x.time
-                                    )
-                                    .join(', ')
-                                : '-'
-                        }
-                    </div>
-
                 `;
 
-                summary.appendChild(box);
+            } else {
+
+                html += `
+                    <div class="calendar-time">
+                        ${
+                            shift.isNight
+                                ? '🌙'
+                                : '☀️'
+                        }
+
+                        ${shift.start.time}
+                        →
+                        ${
+                            shift.end.time
+                        }
+
+                    </div>
+
+                    <div class="calendar-money">
+                        ฿${formatMoney(
+                            shift.pay
+                        )}
+                    </div>
+                `;
+            }
+        }
+
+
+        cell.innerHTML =
+            html;
+
+
+        calendar.appendChild(
+            cell
+        );
+    }
+}
+
+
+/* =====================================================
+   CHANGE MONTH
+===================================================== */
+
+function changeMonth(
+    amount
+) {
+
+    calendarDate.setMonth(
+        calendarDate.getMonth() +
+        amount
+    );
+
+
+    renderCalendar();
+}
+
+
+/* =====================================================
+   PAY PERIOD
+===================================================== */
+
+function getPayPeriod(
+    dateKey
+) {
+
+    const date =
+        new Date(
+            dateKey +
+            'T12:00:00'
+        );
+
+
+    const day =
+        date.getDate();
+
+
+    /*
+     * 26-31
+     * อยู่รอบ 01 ของเดือนถัดไป
+     */
+
+    if (
+        day >= 26
+    ) {
+
+        const next =
+            new Date(
+                date.getFullYear(),
+                date.getMonth() + 1,
+                1
+            );
+
+
+        return {
+
+            round:1,
+
+            year:
+                next.getFullYear(),
+
+            month:
+                next.getMonth(),
+
+            label:
+                `รอบ 01 / ${getThaiMonth(next.getMonth())}`,
+
+            start:
+                `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-26`,
+
+            end:
+                `${next.getFullYear()}-${String(next.getMonth()+1).padStart(2,'0')}-10`
+        };
+    }
+
+
+    /*
+     * 1-10
+     * อยู่รอบ 01 ของเดือนนั้น
+     */
+
+    if (
+        day <= 10
+    ) {
+
+        return {
+
+            round:1,
+
+            year:
+                date.getFullYear(),
+
+            month:
+                date.getMonth(),
+
+            label:
+                `รอบ 01 / ${getThaiMonth(date.getMonth())}`,
+
+            start:
+                `${date.getFullYear()}-${String(date.getMonth()).padStart(2,'0')}-26`,
+
+            end:
+                dateKey
+        };
+    }
+
+
+    /*
+     * 11-25
+     */
+
+    return {
+
+        round:2,
+
+        year:
+            date.getFullYear(),
+
+        month:
+            date.getMonth(),
+
+        label:
+            `รอบ 02 / ${getThaiMonth(date.getMonth())}`,
+
+        start:
+            `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-11`,
+
+        end:
+            `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-25`
+    };
+}
+
+
+/* =====================================================
+   RENDER PERIODS
+===================================================== */
+
+function renderPeriods() {
+
+    if (
+        !shifts.length
+    ) {
+
+        periods.innerHTML =
+            'ยังไม่มีข้อมูล';
+
+        return;
+    }
+
+
+    const groups = {};
+
+
+    shifts.forEach(
+        shift => {
+
+            if (
+                shift.incomplete
+            ) {
 
                 return;
             }
 
 
-            const c =
-                day.calculation;
-
-
-            totalPay +=
-                c.totalPay;
-
-
-            totalOT +=
-                c.otMinutes;
-
-
-            const normalText =
-                formatMoney(
-                    c.normalPay
+            const period =
+                getPayPeriod(
+                    shift.start.dateKey
                 );
 
 
-            const otText =
-                formatMoney(
-                    c.otPay
+            const key =
+                `${period.year}-${period.month}-${period.round}`;
+
+
+            if (
+                !groups[key]
+            ) {
+
+                groups[key] = {
+
+                    period:
+                        period,
+
+                    shifts:[],
+
+                    total:0
+                };
+            }
+
+
+            groups[key]
+                .shifts
+                .push(
+                    shift
                 );
 
 
-            const totalText =
-                formatMoney(
-                    c.totalPay
-                );
-
-
-            box.innerHTML = `
-
-                <h3>
-                    📅
-                    ${escapeHTML(day.date)}
-                    <small>
-                        (${c.dayName})
-                    </small>
-                </h3>
-
-
-                <div style="margin-top:10px;">
-
-                    🟢 เวลาเข้า:
-                    <b>
-                        ${c.adjustedCheckIn}
-                    </b>
-
-                </div>
-
-
-                <div style="margin-top:7px;">
-
-                    🔴 เวลาออก:
-                    <b>
-                        ${c.rawCheckOut}
-                    </b>
-
-                </div>
-
-
-                <hr>
-
-
-                <div>
-
-                    💵 ค่าแรงปกติ:
-                    <b>
-                        ฿${normalText}
-                    </b>
-
-                </div>
-
-
-                <div style="margin-top:7px;">
-
-                    ⏱️ OT:
-
-                    ${
-                        c.otMinutes > 0
-                            ? formatDuration(
-                                c.otMinutes
-                            )
-                            : 'ไม่มี'
-                    }
-
-                    ${
-                        c.otMinutes > 0
-                            ? `
-                                → ฿${otText}
-                              `
-                            : ''
-                    }
-
-                </div>
-
-
-                <div
-                    style="
-                        margin-top:15px;
-                        padding-top:12px;
-                        border-top:
-                        1px solid #ddd;
-                        font-size:20px;
-                        font-weight:bold;
-                    "
-                >
-
-                    💰 ค่าแรงวันนี้:
-                    ฿${totalText}
-
-                </div>
-
-            `;
-
-
-            summary.appendChild(box);
+            groups[key].total +=
+                shift.pay;
         }
     );
 
 
-    /*
-     * ยอดรวม
-     */
+    periods.innerHTML =
+        '';
 
-    const totalBox =
-        document.createElement(
-            'div'
+
+    Object.values(groups)
+        .sort(
+            (a,b) =>
+                a.period.year -
+                b.period.year ||
+                a.period.month -
+                b.period.month ||
+                a.period.round -
+                b.period.round
+        )
+        .forEach(
+            group => {
+
+                const div =
+                    document.createElement(
+                        'div'
+                    );
+
+
+                div.className =
+                    'pay-period';
+
+
+                const period =
+                    group.period;
+
+
+                div.innerHTML = `
+
+                    <h3>
+                        💰
+                        ${period.label}
+                    </h3>
+
+                    <div>
+                        วันที่
+                        ${formatPeriodDate(
+                            period
+                        )}
+                    </div>
+
+                    <div style="margin-top:8px;">
+                        จำนวนกะ:
+                        <b>
+                            ${group.shifts.length}
+                        </b>
+                    </div>
+
+                    <div
+                        class="pay-period-total"
+                    >
+                        ฿${formatMoney(
+                            group.total
+                        )}
+                    </div>
+
+                `;
+
+
+                periods.appendChild(
+                    div
+                );
+            }
         );
-
-
-    totalBox.style.padding =
-        '20px';
-
-    totalBox.style.marginTop =
-        '20px';
-
-    totalBox.style.borderRadius =
-        '15px';
-
-    totalBox.style.background =
-        '#eaf3ff';
-
-
-    totalBox.innerHTML = `
-
-        <h2>
-            💰 รวมทั้งหมด
-        </h2>
-
-        <div>
-            ⏱️ OT รวม:
-            <b>
-                ${formatDuration(totalOT)}
-            </b>
-        </div>
-
-        <div
-            style="
-                margin-top:10px;
-                font-size:28px;
-                font-weight:bold;
-            "
-        >
-            ฿${formatMoney(totalPay)}
-        </div>
-
-    `;
-
-
-    summary.appendChild(totalBox);
-
-
-    summaryCard.style.display =
-        'block';
 }
 
 
-/* =========================================================
-   TIME FUNCTIONS
-========================================================= */
+/* =====================================================
+   DETAILS
+===================================================== */
 
-function timeToMinutes(time) {
+function renderDetails() {
+
+    details.innerHTML =
+        '';
+
+
+    if (
+        !shifts.length
+    ) {
+
+        details.innerHTML =
+            'ยังไม่มีข้อมูล';
+
+        return;
+    }
+
+
+    shifts.forEach(
+        shift => {
+
+            const div =
+                document.createElement(
+                    'div'
+                );
+
+
+            div.className =
+                'shift-card';
+
+
+            const startDate =
+                shift.start.dateKey;
+
+
+            const dayName =
+                getThaiDay(
+                    new Date(
+                        startDate +
+                        'T12:00:00'
+                    ).getDay()
+                );
+
+
+            if (
+                shift.incomplete
+            ) {
+
+                div.innerHTML = `
+
+                    <h3>
+                        📅
+                        ${formatDateKey(
+                            startDate
+                        )}
+                        (${dayName})
+                    </h3>
+
+                    <div>
+                        ${
+                            shift.start.time
+                        }
+                    </div>
+
+                    <div
+                        class="error-box"
+                        style="margin-top:10px;"
+                    >
+                        ⚠️
+                        ยังไม่พบเวลาออกงาน
+                    </div>
+
+                `;
+
+            } else {
+
+                div.innerHTML = `
+
+                    <h3>
+                        ${
+                            shift.isNight
+                                ? '🌙'
+                                : '☀️'
+                        }
+
+                        ${formatDateKey(
+                            startDate
+                        )}
+
+                        (${dayName})
+                    </h3>
+
+
+                    <div>
+                        🟢 เข้า:
+                        <b>
+                            ${shift.start.time}
+                        </b>
+                    </div>
+
+
+                    <div>
+                        🔴 ออก:
+                        <b>
+                            ${shift.end.time}
+                        </b>
+
+                        ${
+                            shift.start.dateKey !==
+                            shift.end.dateKey
+                                ? `
+                                <small>
+                                (${formatDateKey(
+                                    shift.end.dateKey
+                                )})
+                                </small>
+                                `
+                                : ''
+                        }
+                    </div>
+
+
+                    <hr>
+
+
+                    <div>
+                        💵 ปกติ:
+                        ฿${formatMoney(
+                            shift.normalPay
+                        )}
+                    </div>
+
+
+                    <div style="margin-top:6px;">
+                        ⏱️ OT:
+
+                        ${
+                            shift.otMinutes > 0
+                                ? formatDuration(
+                                    shift.otMinutes
+                                )
+                                : 'ไม่มี'
+                        }
+
+                        ${
+                            shift.otMinutes > 0
+                                ? `
+                                =
+                                ฿${formatMoney(
+                                    shift.otPay
+                                )}
+                                `
+                                : ''
+                        }
+                    </div>
+
+
+                    <div
+                        class="shift-total"
+                    >
+                        💰
+                        ฿${formatMoney(
+                            shift.pay
+                        )}
+                    </div>
+
+                `;
+            }
+
+
+            details.appendChild(
+                div
+            );
+        }
+    );
+}
+
+
+/* =====================================================
+   HELPERS
+===================================================== */
+
+function timeToMinutes(
+    time
+) {
 
     const parts =
         time.split(':');
 
 
     return (
-        parseInt(parts[0], 10) *
-        60
+        parseInt(
+            parts[0],
+            10
+        ) * 60
         +
-        parseInt(parts[1], 10)
+        parseInt(
+            parts[1],
+            10
+        )
     );
 }
 
 
-function minutesToTime(minutes) {
+function formatMoney(
+    value
+) {
 
-    minutes =
-        Math.max(
-            0,
-            Math.min(
-                1439,
-                minutes
-            )
-        );
+    return Number(
+        value
+    ).toLocaleString(
+        'th-TH',
+        {
+            minimumFractionDigits:2,
+            maximumFractionDigits:2
+        }
+    );
+}
 
 
-    const hour =
+function formatDuration(
+    minutes
+) {
+
+    const h =
         Math.floor(
             minutes / 60
         );
 
 
-    const minute =
+    const m =
         minutes % 60;
 
 
-    return (
-        String(hour).padStart(2, '0') +
-        ':' +
-        String(minute).padStart(2, '0')
-    );
+    if (!h) {
+
+        return `${m} นาที`;
+    }
+
+
+    if (!m) {
+
+        return `${h} ชั่วโมง`;
+    }
+
+
+    return `${h} ชั่วโมง ${m} นาที`;
 }
 
 
-/* =========================================================
-   DATE FUNCTIONS
-========================================================= */
-
-function getDisplayDate(key) {
-
-    if (
-        !key ||
-        key.startsWith('unknown-')
-    ) {
-
-        return 'ไม่ทราบวันที่';
-    }
-
+function formatDateKey(
+    key
+) {
 
     const parts =
         key.split('-');
@@ -1394,10 +2178,33 @@ function getDisplayDate(key) {
 }
 
 
-function getThaiDay(day) {
+function formatPeriodDate(
+    period
+) {
 
-    const names = [
+    const start =
+        period.start
+            .split('-')
+            .reverse()
+            .join('/');
 
+
+    const end =
+        period.end
+            .split('-')
+            .reverse()
+            .join('/');
+
+
+    return `${start} - ${end}`;
+}
+
+
+function getThaiDay(
+    day
+) {
+
+    return [
         'อาทิตย์',
         'จันทร์',
         'อังคาร',
@@ -1405,88 +2212,127 @@ function getThaiDay(day) {
         'พฤหัสบดี',
         'ศุกร์',
         'เสาร์'
+    ][day];
+}
 
+
+function getThaiMonth(
+    month
+) {
+
+    return [
+        'มกราคม',
+        'กุมภาพันธ์',
+        'มีนาคม',
+        'เมษายน',
+        'พฤษภาคม',
+        'มิถุนายน',
+        'กรกฎาคม',
+        'สิงหาคม',
+        'กันยายน',
+        'ตุลาคม',
+        'พฤศจิกายน',
+        'ธันวาคม'
+    ][month];
+}
+
+
+function formatBytes(
+    bytes
+) {
+
+    if (!bytes) {
+        return '0 Bytes';
+    }
+
+
+    const units = [
+        'Bytes',
+        'KB',
+        'MB',
+        'GB'
     ];
 
 
-    return names[day];
-}
-
-
-/* =========================================================
-   FORMAT
-========================================================= */
-
-function formatMoney(value) {
-
-    return Number(value)
-        .toLocaleString(
-            'th-TH',
-            {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2
-            }
-        );
-}
-
-
-function formatDuration(minutes) {
-
-    const hours =
+    const i =
         Math.floor(
-            minutes / 60
+            Math.log(bytes) /
+            Math.log(1024)
         );
-
-
-    const mins =
-        minutes % 60;
-
-
-    if (
-        hours === 0
-    ) {
-
-        return `${mins} นาที`;
-    }
-
-
-    if (
-        mins === 0
-    ) {
-
-        return `${hours} ชั่วโมง`;
-    }
 
 
     return (
-        `${hours} ชั่วโมง ` +
-        `${mins} นาที`
+        parseFloat(
+            (
+                bytes /
+                Math.pow(
+                    1024,
+                    i
+                )
+            ).toFixed(2)
+        )
+        +
+        ' ' +
+        units[i]
     );
 }
 
 
-/* =========================================================
-   COMPRESS IMAGE
-========================================================= */
+function escapeHTML(
+    value
+) {
 
-function compressImage(file) {
+    return String(value)
+        .replace(
+            /&/g,
+            '&amp;'
+        )
+        .replace(
+            /</g,
+            '&lt;'
+        )
+        .replace(
+            />/g,
+            '&gt;'
+        )
+        .replace(
+            /"/g,
+            '&quot;'
+        )
+        .replace(
+            /'/g,
+            '&#039;'
+        );
+}
+
+
+/* =====================================================
+   IMAGE COMPRESS
+===================================================== */
+
+function compressImage(
+    file
+) {
 
     return new Promise(
-        (resolve, reject) => {
+        (
+            resolve,
+            reject
+        ) => {
 
             const reader =
                 new FileReader();
 
 
             reader.onload =
-                function (event) {
+                function(event) {
 
                     const img =
                         new Image();
 
 
                     img.onload =
-                        function () {
+                        function() {
 
                             const maxWidth =
                                 1600;
@@ -1561,7 +2407,7 @@ function compressImage(file) {
 
 
                             canvas.toBlob(
-                                function (blob) {
+                                function(blob) {
 
                                     if (!blob) {
 
@@ -1587,11 +2433,11 @@ function compressImage(file) {
 
 
                     img.onerror =
-                        function () {
+                        function() {
 
                             reject(
                                 new Error(
-                                    'ไม่สามารถอ่านรูปภาพได้'
+                                    'อ่านรูปไม่สำเร็จ'
                                 )
                             );
                         };
@@ -1603,87 +2449,29 @@ function compressImage(file) {
 
 
             reader.onerror =
-                function () {
+                function() {
 
                     reject(
                         new Error(
-                            'อ่านไฟล์รูปไม่สำเร็จ'
+                            'อ่านไฟล์ไม่สำเร็จ'
                         )
                     );
                 };
 
 
-            reader.readAsDataURL(file);
+            reader.readAsDataURL(
+                file
+            );
         }
     );
 }
 
 
-/* =========================================================
-   UTILS
-========================================================= */
+/* =====================================================
+   INITIAL CALENDAR
+===================================================== */
 
-function formatBytes(bytes) {
-
-    if (!bytes) {
-        return '0 Bytes';
-    }
-
-
-    const units = [
-        'Bytes',
-        'KB',
-        'MB',
-        'GB'
-    ];
-
-
-    const i =
-        Math.floor(
-            Math.log(bytes) /
-            Math.log(1024)
-        );
-
-
-    return (
-        parseFloat(
-            (
-                bytes /
-                Math.pow(1024, i)
-            ).toFixed(2)
-        )
-        +
-        ' '
-        +
-        units[i]
-    );
-}
-
-
-function escapeHTML(value) {
-
-    return String(value)
-        .replace(
-            /&/g,
-            '&amp;'
-        )
-        .replace(
-            /</g,
-            '&lt;'
-        )
-        .replace(
-            />/g,
-            '&gt;'
-        )
-        .replace(
-            /"/g,
-            '&quot;'
-        )
-        .replace(
-            /'/g,
-            '&#039;'
-        );
-}
+renderCalendar();
 
 </script>
 
