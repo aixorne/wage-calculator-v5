@@ -2,269 +2,165 @@
 
 header('Content-Type: application/json; charset=utf-8');
 
-require_once 'config.php';
+require_once __DIR__ . '/config.php';
 
-function responseJSON($data, $status = 200)
-{
-    http_response_code($status);
-
-    echo json_encode(
-        $data,
-        JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
-    );
-
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    echo json_encode([
+        'success' => false,
+        'error' => 'Method ไม่ถูกต้อง'
+    ], JSON_UNESCAPED_UNICODE);
     exit;
 }
 
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-
-    responseJSON([
+if (!$OCR_API_KEY) {
+    echo json_encode([
         'success' => false,
-        'error' => 'ต้องใช้ POST เท่านั้น'
-    ], 405);
+        'error' => 'ไม่พบ OCR_SPACE_API_KEY ใน Environment'
+    ], JSON_UNESCAPED_UNICODE);
+    exit;
 }
-
 
 if (!isset($_FILES['image'])) {
-
-    responseJSON([
+    echo json_encode([
         'success' => false,
-        'error' => 'ไม่พบไฟล์ image ที่ส่งมา'
-    ], 400);
+        'error' => 'ไม่พบไฟล์รูปภาพ'
+    ], JSON_UNESCAPED_UNICODE);
+    exit;
 }
-
 
 $file = $_FILES['image'];
 
-
-// ตรวจสอบ Upload Error
 if ($file['error'] !== UPLOAD_ERR_OK) {
-
-    $errors = [
-        UPLOAD_ERR_INI_SIZE =>
-            'ไฟล์ใหญ่เกิน upload_max_filesize ของ PHP',
-
-        UPLOAD_ERR_FORM_SIZE =>
-            'ไฟล์ใหญ่เกิน MAX_FILE_SIZE',
-
-        UPLOAD_ERR_PARTIAL =>
-            'อัปโหลดไฟล์มาไม่ครบ',
-
-        UPLOAD_ERR_NO_FILE =>
-            'ไม่ได้เลือกไฟล์',
-
-        UPLOAD_ERR_NO_TMP_DIR =>
-            'ไม่พบ Temporary Folder',
-
-        UPLOAD_ERR_CANT_WRITE =>
-            'PHP ไม่สามารถเขียนไฟล์ลง Disk',
-
-        UPLOAD_ERR_EXTENSION =>
-            'PHP Extension หยุดการอัปโหลด'
-    ];
-
-    responseJSON([
+    echo json_encode([
         'success' => false,
-        'error' =>
-            $errors[$file['error']]
-            ?? 'Upload Error ไม่ทราบสาเหตุ',
-
-        'error_code' => $file['error']
-    ], 400);
+        'error' => 'อัปโหลดรูปไม่สำเร็จ'
+    ], JSON_UNESCAPED_UNICODE);
+    exit;
 }
 
-
-// ตรวจสอบว่าเป็นไฟล์จริง
-if (!is_uploaded_file($file['tmp_name'])) {
-
-    responseJSON([
+if ($file['size'] > 10 * 1024 * 1024) {
+    echo json_encode([
         'success' => false,
-        'error' => 'ไฟล์ที่ได้รับไม่ใช่ไฟล์ Upload ที่ถูกต้อง'
-    ], 400);
+        'error' => 'ไฟล์ใหญ่เกิน 10MB'
+    ], JSON_UNESCAPED_UNICODE);
+    exit;
 }
 
+$tmp = $file['tmp_name'];
 
-// จำกัดชนิดไฟล์
-$allowedTypes = [
+$mime = mime_content_type($tmp);
+
+$allowed = [
     'image/jpeg',
     'image/png',
-    'image/webp'
+    'image/webp',
+    'image/jpg'
 ];
 
-if (!in_array($file['type'], $allowedTypes)) {
-
-    responseJSON([
+if (!in_array($mime, $allowed, true)) {
+    echo json_encode([
         'success' => false,
-        'error' => 'รองรับเฉพาะ JPG, PNG และ WEBP'
-    ], 400);
+        'error' => 'รองรับเฉพาะ JPG, PNG และ WebP'
+    ], JSON_UNESCAPED_UNICODE);
+    exit;
 }
 
+$ch = curl_init();
 
-// จำกัดขนาด 10 MB
-if ($file['size'] > 10 * 1024 * 1024) {
-
-    responseJSON([
-        'success' => false,
-        'error' => 'รูปใหญ่เกิน 10 MB'
-    ], 400);
-}
-
-
-// สร้าง CURL File
-$cfile = new CURLFile(
-    $file['tmp_name'],
-    $file['type'],
-    $file['name']
-);
-
-
-$postData = [
+$postFields = [
     'apikey' => $OCR_API_KEY,
     'language' => 'eng',
     'isOverlayRequired' => 'false',
     'detectOrientation' => 'true',
     'scale' => 'true',
     'OCREngine' => '2',
-    'file' => $cfile
+    'file' => new CURLFile(
+        $tmp,
+        $mime,
+        $file['name']
+    )
 ];
 
-
-$ch = curl_init();
-
 curl_setopt_array($ch, [
-
-    CURLOPT_URL =>
-        'https://api.ocr.space/parse/image',
-
+    CURLOPT_URL => 'https://api.ocr.space/parse/image',
     CURLOPT_POST => true,
-
-    CURLOPT_POSTFIELDS => $postData,
-
+    CURLOPT_POSTFIELDS => $postFields,
     CURLOPT_RETURNTRANSFER => true,
-
-    CURLOPT_TIMEOUT => 60,
-
-    CURLOPT_CONNECTTIMEOUT => 15,
-
-    CURLOPT_SSL_VERIFYPEER => true
-
+    CURLOPT_TIMEOUT => 90,
+    CURLOPT_CONNECTTIMEOUT => 20,
+    CURLOPT_HTTPHEADER => [
+        'Accept: application/json'
+    ]
 ]);
-
 
 $response = curl_exec($ch);
 
+$curlError = curl_error($ch);
 
-// ตรวจสอบ CURL Error
-if ($response === false) {
-
-    $curlError =
-        curl_error($ch);
-
-    $curlErrorNo =
-        curl_errno($ch);
-
-    curl_close($ch);
-
-    responseJSON([
-        'success' => false,
-        'error' => 'เชื่อมต่อ OCR.Space ไม่สำเร็จ',
-        'curl_error' => $curlError,
-        'curl_error_code' => $curlErrorNo
-    ], 500);
-}
-
-
-$httpCode =
-    curl_getinfo(
-        $ch,
-        CURLINFO_HTTP_CODE
-    );
+$httpCode = curl_getinfo(
+    $ch,
+    CURLINFO_HTTP_CODE
+);
 
 curl_close($ch);
 
-
-$data =
-    json_decode(
-        $response,
-        true
-    );
-
-
-if ($data === null) {
-
-    responseJSON([
+if ($response === false) {
+    echo json_encode([
         'success' => false,
-        'error' => 'OCR.Space ไม่ได้ส่ง JSON กลับมา',
-        'http_code' => $httpCode,
-        'response' => substr(
-            $response,
-            0,
-            1000
-        )
-    ], 500);
+        'error' => 'เชื่อมต่อ OCR.Space ไม่สำเร็จ: ' . $curlError
+    ], JSON_UNESCAPED_UNICODE);
+    exit;
 }
 
+$data = json_decode($response, true);
 
-if (
-    isset($data['IsErroredOnProcessing']) &&
-    $data['IsErroredOnProcessing'] === true
-) {
+if (!is_array($data)) {
+    echo json_encode([
+        'success' => false,
+        'error' => 'OCR.Space ส่งข้อมูลไม่ถูกต้อง'
+    ], JSON_UNESCAPED_UNICODE);
+    exit;
+}
 
-    $message =
-        'OCR ประมวลผลไม่สำเร็จ';
+if (!empty($data['IsErroredOnProcessing'])) {
 
-    if (isset($data['ErrorMessage'])) {
+    $message = 'OCR ไม่สำเร็จ';
+
+    if (!empty($data['ErrorMessage'])) {
 
         if (is_array($data['ErrorMessage'])) {
-
-            $message =
-                implode(
-                    ', ',
-                    $data['ErrorMessage']
-                );
-
+            $message = implode(
+                ' ',
+                $data['ErrorMessage']
+            );
         } else {
-
-            $message =
-                $data['ErrorMessage'];
+            $message = $data['ErrorMessage'];
         }
     }
 
-    responseJSON([
+    echo json_encode([
         'success' => false,
-        'error' => $message,
-        'http_code' => $httpCode
-    ], 400);
+        'error' => $message
+    ], JSON_UNESCAPED_UNICODE);
+    exit;
 }
-
 
 $text = '';
 
+if (!empty($data['ParsedResults'])) {
 
-if (isset($data['ParsedResults'])) {
+    foreach ($data['ParsedResults'] as $result) {
 
-    foreach (
-        $data['ParsedResults']
-        as $result
-    ) {
-
-        if (
-            isset($result['ParsedText'])
-        ) {
-
-            $text .=
-                $result['ParsedText']
-                . "\n";
+        if (isset($result['ParsedText'])) {
+            $text .= "\n" . $result['ParsedText'];
         }
     }
 }
 
-
 $text = trim($text);
 
-
-responseJSON([
+echo json_encode([
     'success' => true,
     'text' => $text,
-    'http_code' => $httpCode
-]);
+    'httpCode' => $httpCode
+], JSON_UNESCAPED_UNICODE);
