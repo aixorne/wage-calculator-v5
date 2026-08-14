@@ -271,6 +271,7 @@
         </div>
 
     </div>
+</section>
 
     <div id="periodsMoreModal" class="modal" onclick="closePeriodsMoreOutside(event)">
 
@@ -299,8 +300,6 @@
     </div>
 
 </div>
-
-</section>
 
     <!-- =====================================================
      SALARY SLIP
