@@ -415,7 +415,7 @@ body {
 
 .month-title {
     text-align: center;
-    font-size: 19px;
+    font-size: 18px;
     font-weight: 600;
 }
 
@@ -428,7 +428,7 @@ body {
     border-radius: 14px;
     color: var(--primary);
     background: var(--primary-soft);
-    font-size: 28px;
+    font-size: 24px;
     line-height: 1;
 }
 
@@ -442,36 +442,40 @@ body {
 .calendar {
     display: grid;
     grid-template-columns: repeat(7, minmax(0, 1fr));
-    gap: 7px;
-    padding: 5px;
+    gap: 6px;
+    padding: 2px;
 }
 
 .weekday {
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 34px;
+    min-height: 30px;
     color: var(--muted);
     font-size: 12px;
-    font-weight: 500;
+    font-weight: 600;
 }
 
 .day {
     position: relative;
-    min-height: 93px;
-    padding: 10px 8px;
+    min-height: 85px;
+    padding: 6px 4px;
     overflow: hidden;
-    border-radius: 15px;
+    border-radius: 12px;
     border: 1px solid var(--border);
     background: #fff;
     cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
     transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
 }
 
 .day:hover {
-    transform: translateY(-3px);
+    transform: translateY(-2px);
     border-color: #cdd0f4;
-    box-shadow: 0 8px 20px rgba(32,38,65,.08);
+    box-shadow: 0 6px 16px rgba(32,38,65,.08);
 }
 
 .day.empty {
@@ -485,36 +489,51 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 28px;
-    height: 28px;
+    width: 22px;
+    height: 22px;
     margin-bottom: 4px;
-    border-radius: 9px;
-    font-size: 13px;
+    border-radius: 6px;
+    font-size: 11px;
     font-weight: 600;
     background: #f4f5f9;
+    flex-shrink: 0;
 }
 
 .day-status {
-    display: inline-flex;
-    padding: 3px 6px;
-    margin-bottom: 4px;
-    border-radius: 6px;
+    display: inline-block;
+    max-width: 100%;
+    padding: 2px 4px;
+    margin-bottom: 3px;
+    border-radius: 4px;
     font-size: 9px;
-    line-weight: 1;
     font-weight: 500;
+    line-height: 1.1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .day-time {
+    width: 100%;
     color: #596176;
-    font-size: 10px;
+    font-size: 9.5px;
+    line-height: 1.2;
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-top: 1px;
 }
 
 .day-money {
-    margin-top: 2px;
+    width: 100%;
+    margin-top: auto;
+    padding-top: 2px;
     color: var(--primary);
-    font-size: 11px;
-    font-weight: 600;
+    font-size: 10.5px;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* DAY STATUS STATES */
@@ -531,7 +550,7 @@ body {
     background: linear-gradient(145deg, #f8fffc, #f0fbf6);
     border-color: #ccefe0;
 }
-.day.worked .day-number, .day.worked .day-status {
+.day.worked .day-number {
     color: #059669;
     background: var(--green-soft);
 }
@@ -550,30 +569,29 @@ body {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 15px;
-    margin-top: 16px;
-    padding-top: 15px;
+    gap: 12px;
+    margin-top: 14px;
+    padding-top: 12px;
     border-top: 1px solid var(--border);
 }
 
 .legend-item {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 5px;
     color: var(--muted);
     font-size: 11px;
 }
 
 .dot {
-    width: 9px;
-    height: 9px;
+    width: 8px;
+    height: 8px;
     display: inline-block;
     border-radius: 50%;
 }
 .dot.blue { background: var(--blue); }
 .dot.green { background: var(--green); }
 .dot.orange { background: var(--orange); }
-.dot.red { background: var(--red); }
 
 /* =====================================================
    PAY PERIOD SECTION
@@ -824,7 +842,7 @@ body {
 }
 
 /* =====================================================
-   SALARY SLIP PREVIEW MODAL DESIGN (IMAGE 1 MATCH)
+   SALARY SLIP PREVIEW MODAL DESIGN
 ===================================================== */
 .salary-preview {
     padding: 24px;
@@ -1163,9 +1181,12 @@ body {
     .hero { padding: 30px 23px; border-radius: 23px; }
     .card { padding: 18px; border-radius: 19px; }
     .summary-grid { grid-template-columns: 1fr; }
-    .calendar { gap: 4px; padding: 2px; }
-    .day { min-height: 75px; padding: 7px 4px; border-radius: 11px; }
-    .day-number { width: 25px; height: 25px; font-size: 12px; }
+    .calendar { gap: 3px; }
+    .day { min-height: 68px; padding: 4px 2px; border-radius: 8px; }
+    .day-number { width: 18px; height: 18px; font-size: 10px; margin-bottom: 2px; }
+    .day-status { font-size: 8px; padding: 1px 3px; }
+    .day-time { font-size: 8px; }
+    .day-money { font-size: 9px; }
     .slip-info { grid-template-columns: 1fr; gap: 0; }
     .delete-day-row { grid-template-columns: 1fr; }
     .danger-btn { width: 100%; }
