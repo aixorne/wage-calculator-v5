@@ -17,6 +17,9 @@
     href="style.css"
 >
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+
 </head>
 
 
@@ -271,6 +274,118 @@
 
 </section>
 
+    <!-- =====================================================
+     SALARY SLIP
+===================================================== -->
+
+<section class="card salary-slip-card">
+
+    <div class="card-title">
+        <span>🧾</span>
+        <h2>สลิปเงินเดือน</h2>
+    </div>
+
+    <div class="salary-slip-box">
+
+        <div class="slip-info">
+
+            <div class="slip-field">
+                <label>ชื่อพนักงาน</label>
+
+                <input
+                    id="employeeName"
+                    type="text"
+                    value="นายจิรวัฒน์ กาญจนบุรางกูร"
+                >
+            </div>
+
+            <div class="slip-field">
+                <label>รหัสพนักงาน</label>
+
+                <input
+                    id="employeeId"
+                    type="text"
+                    value="14187"
+                >
+            </div>
+
+        </div>
+
+
+        <div class="slip-field">
+
+            <label>เลือกรอบจ่าย</label>
+
+            <select id="salaryPeriod">
+                <option value="">
+                    -- เลือกรอบจ่าย --
+                </option>
+            </select>
+
+        </div>
+
+
+        <div class="slip-field">
+
+            <label>ค่าห้องเย็น</label>
+
+            <div class="money-input">
+
+                <input
+                    id="roomAllowance"
+                    type="number"
+                    value="120"
+                    min="0"
+                    step="0.01"
+                >
+
+                <span>บาท</span>
+
+            </div>
+
+        </div>
+
+
+        <div class="slip-field">
+
+            <label>ประกันสังคม</label>
+
+            <div class="money-input">
+
+                <input
+                    id="socialSecurityRate"
+                    type="number"
+                    value="3"
+                    min="0"
+                    max="100"
+                    step="0.1"
+                >
+
+                <span>%</span>
+
+            </div>
+
+        </div>
+
+
+        <button
+            class="salary-preview-btn"
+            onclick="previewSalarySlip()"
+        >
+            👁️ ดูตัวอย่างสลิป
+        </button>
+
+
+        <button
+            class="salary-pdf-btn"
+            onclick="generateSalaryPDF()"
+        >
+            📄 สร้าง PDF สลิปเงินเดือน
+        </button>
+
+    </div>
+
+</section>
 
 <!-- =====================================================
      DATA
