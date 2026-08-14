@@ -3079,6 +3079,10 @@ function getPeriodTotal(
    PERIOD RENDER
 ===================================================== */
 
+/* =====================================================
+   PERIOD RENDER
+===================================================== */
+
 function renderPeriods(){
 
     const completed =
@@ -3124,9 +3128,7 @@ function renderPeriods(){
 
 
             if(
-                !map.has(
-                    key
-                )
+                !map.has(key)
             ){
 
                 map.set(
@@ -3140,104 +3142,292 @@ function renderPeriods(){
     );
 
 
+    /*
+     * เรียงจากรอบล่าสุด -> รอบเก่า
+     */
+
+    const allPeriods =
+        Array.from(
+            map.values()
+        )
+        .sort(
+            (a,b)=>
+                b.start.localeCompare(
+                    a.start
+                )
+        );
+
+
+    /*
+     * แสดงแค่ 2 รอบล่าสุด
+     */
+
+    const latestPeriods =
+        allPeriods.slice(
+            0,
+            2
+        );
+
+
     periods.innerHTML =
         '';
 
 
-    Array.from(
-        map.values()
-    )
-    .sort(
-        (a,b)=>
-            a.start.localeCompare(
-                b.start
-            )
-    )
-    .reverse()
-    .forEach(
+    /*
+     * สร้างรายการรอบจ่าย
+     */
+
+    latestPeriods.forEach(
         period => {
 
-            const total =
-                getPeriodTotal(
-                    period
-                );
-
-
-            const days =
-                completed.filter(
-                    shift =>
-                        shift.dateKey >=
-                        period.start &&
-                        shift.dateKey <=
-                        period.end
-                ).length;
-
-
-            const div =
-                document.createElement(
-                    'div'
-                );
-
-
-            div.className =
-                'period';
-
-
-            div.innerHTML = `
-
-                <div class="period-head">
-
-                    <div>
-
-                        <div class="period-name">
-                            ${period.name}
-                        </div>
-
-                        <div class="period-range">
-
-                            ${formatShortDate(
-                                period.start
-                            )}
-
-                            –
-
-                            ${formatShortDate(
-                                period.end
-                            )}
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="period-money">
-
-                        ${money(
-                            total
-                        )}
-
-                    </div>
-
-                </div>
-
-
-                <div class="period-days">
-
-                    ทำงาน ${days} วัน
-
-                </div>
-
-            `;
-
-
-            periods.appendChild(
-                div
+            renderPeriodCard(
+                period,
+                periods
             );
 
         }
     );
+
+
+    /*
+     * ถ้ามากกว่า 2 รอบ
+     * แสดงปุ่ม ดูเพิ่มเติม
+     */
+
+    if(
+        allPeriods.length > 2
+    ){
+
+        const moreButton =
+            document.createElement(
+                'button'
+            );
+
+
+        moreButton.className =
+            'period-more-btn';
+
+
+        moreButton.innerHTML = `
+
+            <span>
+                📋 ดูเพิ่มเติม
+            </span>
+
+            <span>
+                ${allPeriods.length - 2} รอบ
+            </span>
+
+        `;
+
+
+        moreButton.onclick =
+            () =>
+                openPeriodsMore(
+                    allPeriods
+                );
+
+
+        periods.appendChild(
+            moreButton
+        );
+
+    }
+
 }
 
+
+/* =====================================================
+   PERIOD CARD
+===================================================== */
+
+function renderPeriodCard(
+    period,
+    container
+){
+
+    const completed =
+        shifts.filter(
+            shift =>
+                !shift.incomplete
+        );
+
+
+    const total =
+        getPeriodTotal(
+            period
+        );
+
+
+    const days =
+        completed.filter(
+            shift =>
+                shift.dateKey >=
+                period.start &&
+                shift.dateKey <=
+                period.end
+        ).length;
+
+
+    const div =
+        document.createElement(
+            'div'
+        );
+
+
+    div.className =
+        'period';
+
+
+    div.innerHTML = `
+
+        <div class="period-head">
+
+            <div>
+
+                <div class="period-name">
+                    ${period.name}
+                </div>
+
+                <div class="period-range">
+
+                    ${formatShortDate(
+                        period.start
+                    )}
+
+                    –
+
+                    ${formatShortDate(
+                        period.end
+                    )}
+
+                </div>
+
+            </div>
+
+
+            <div class="period-money">
+
+                ${money(
+                    total
+                )}
+
+            </div>
+
+        </div>
+
+
+        <div class="period-days">
+
+            ทำงาน ${days} วัน
+
+        </div>
+
+    `;
+
+
+    container.appendChild(
+        div
+    );
+
+}
+
+
+/* =====================================================
+   OPEN ALL PERIODS
+===================================================== */
+
+function openPeriodsMore(
+    allPeriods
+){
+
+    const modal =
+        document.getElementById(
+            'periodsMoreModal'
+        );
+
+
+    const list =
+        document.getElementById(
+            'allPeriodsList'
+        );
+
+
+    if(
+        !modal ||
+        !list
+    ){
+
+        return;
+    }
+
+
+    list.innerHTML =
+        '';
+
+
+    allPeriods.forEach(
+        period => {
+
+            renderPeriodCard(
+                period,
+                list
+            );
+
+        }
+    );
+
+
+    modal.classList.add(
+        'show'
+    );
+
+}
+
+
+/* =====================================================
+   CLOSE ALL PERIODS
+===================================================== */
+
+function closePeriodsMore(){
+
+    const modal =
+        document.getElementById(
+            'periodsMoreModal'
+        );
+
+
+    if(
+        modal
+    ){
+
+        modal.classList.remove(
+            'show'
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   CLOSE OUTSIDE
+===================================================== */
+
+function closePeriodsMoreOutside(
+    event
+){
+
+    if(
+        event.target.id ===
+        'periodsMoreModal'
+    ){
+
+        closePeriodsMore();
+
+    }
+
+}
 
 /* =====================================================
    DELETE SELECTED DATE
