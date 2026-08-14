@@ -2604,355 +2604,309 @@ function getShiftForDate(
     key
 ){
 
-    /*
-     * ใช้กะที่เริ่มวันนี้
-     *
-     * กะดึก 26 -> 27
-     * จะแสดงที่วันที่ 26
-     */
+ ก็แย่ละ ขอโค้ดแก้ ส่งข้อความมา แก้สลีปpdf ไง
+
 /* =================================================
-   EMPLOYEE INFO BOX
+EMPLOYEE INFO BOX
 ================================================= */
 
 /*
- * กล่องข้อมูลพนักงาน
- *
- * เพิ่มความสูงเป็น 38mm
- * เพื่อให้ภาษาไทยมีพื้นที่สำหรับ
- * สระและวรรณยุกต์ ไม่ชนขอบ
- */
 
-const infoBoxHeight = 38;
+เพิ่มความสูงเล็กน้อย
+
+เพื่อให้ข้อความและวรรณยุกต์ภาษาไทย
+
+ไม่ชิดขอบบน/ล่าง
+*/
+
+
+const infoBoxHeight = 34;
 
 const colWidth =
-    contentWidth / 2;
-
+contentWidth / 2;
 
 doc.setDrawColor(
-    226,
-    232,
-    240
+226,
+232,
+240
 );
 
 doc.setFillColor(
-    248,
-    250,
-    252
+248,
+250,
+252
 );
 
 doc.roundedRect(
-    margin,
-    y,
-    contentWidth,
-    infoBoxHeight,
-    3,
-    3,
-    'FD'
+margin,
+y,
+contentWidth,
+infoBoxHeight,
+3,
+3,
+'FD'
 );
 
-
 /* =================================================
-   CENTER DIVIDER
+CENTER DIVIDER
 ================================================= */
 
 doc.setDrawColor(
-    226,
-    232,
-    240
+226,
+232,
+240
 );
 
 doc.line(
-    margin + colWidth,
-    y + 5,
-    margin + colWidth,
-    y + infoBoxHeight - 5
+margin + colWidth,
+y + 5,
+margin + colWidth,
+y + infoBoxHeight - 5
 );
 
-
 /* =================================================
-   COLUMN CENTER
+COLUMN CENTER
 ================================================= */
 
 const leftCenter =
-    margin +
-    colWidth / 2;
+margin +
+colWidth / 2;
 
 const rightCenter =
-    margin +
-    colWidth +
-    colWidth / 2;
-
-
-/* =================================================
-   VERTICAL POSITION
-================================================= */
+margin +
+colWidth +
+colWidth / 2;
 
 /*
- * เว้นระยะจากขอบบนมากขึ้น
- */
+
+ตำแหน่งแนวตั้ง
+
+กลุ่มข้อมูลถูกจัดให้อยู่กึ่งกลาง
+
+ของกล่องมากขึ้น
+*/
+
 
 const labelY =
-    y + 10;
-
-
-/*
- * ค่าหลัก
- */
+y + 9;
 
 const valueY =
-    y + 18;
-
-
-/*
- * ข้อมูลแถวล่าง
- */
-
-const bottomLabelY =
-    y + 27;
-
-const bottomValueY =
-    y + 34;
-
+y + 18;
 
 /* =================================================
-   LEFT COLUMN
+LEFT COLUMN
 ================================================= */
 
 /*
- * ชื่อพนักงาน — LABEL
- */
 
-doc.setFont(
-    'NotoSansThai',
-    'normal'
-);
+Label
+*/
+
 
 doc.setFontSize(
-    8
+8
 );
 
 doc.setTextColor(
-    100,
-    116,
-    139
+100,
+116,
+139
 );
 
 doc.text(
-    'ชื่อพนักงาน',
-    leftCenter,
-    labelY,
-    {
-        align:'center'
-    }
+'ชื่อพนักงาน',
+leftCenter,
+labelY,
+{
+align:'center'
+}
 );
 
-
 /*
- * ชื่อพนักงาน — VALUE
- */
+
+Name
+*/
+
 
 let nameFontSize = 10;
 
 if(
-    String(data.name || '').length > 22
+String(data.name || '').length > 22
 ){
 
-    nameFontSize = 8.5;
+nameFontSize = 8.5;
 
 }else if(
-    String(data.name || '').length > 17
+String(data.name || '').length > 17
 ){
 
-    nameFontSize = 9;
+nameFontSize = 9;
+
 }
 
-
-doc.setFont(
-    'NotoSansThai',
-    'normal'
-);
-
 doc.setFontSize(
-    nameFontSize
+nameFontSize
 );
 
 doc.setTextColor(
-    30,
-    41,
-    59
+30,
+41,
+59
 );
 
 doc.text(
-    data.name || '-',
-    leftCenter,
-    valueY,
-    {
-        align:'center'
-    }
+data.name || '-',
+leftCenter,
+valueY,
+{
+align:'center'
+}
 );
 
-
 /* =================================================
-   RIGHT COLUMN
+RIGHT COLUMN
 ================================================= */
 
 /*
- * รหัสพนักงาน — LABEL
- */
 
-doc.setFont(
-    'NotoSansThai',
-    'normal'
-);
+Label
+*/
+
 
 doc.setFontSize(
-    8
+8
 );
 
 doc.setTextColor(
-    100,
-    116,
-    139
+100,
+116,
+139
 );
 
 doc.text(
-    'รหัสพนักงาน',
-    rightCenter,
-    labelY,
-    {
-        align:'center'
-    }
+'รหัสพนักงาน',
+rightCenter,
+labelY,
+{
+align:'center'
+}
 );
-
 
 /*
- * รหัสพนักงาน — VALUE
- */
 
-doc.setFont(
-    'NotoSansThai',
-    'normal'
-);
+Employee ID
+*/
+
 
 doc.setFontSize(
-    10
+10
 );
 
 doc.setTextColor(
-    30,
-    41,
-    59
+30,
+41,
+59
 );
 
 doc.text(
-    data.employeeId || '-',
-    rightCenter,
-    valueY,
-    {
-        align:'center'
-    }
+data.employeeId || '-',
+rightCenter,
+valueY,
+{
+align:'center'
+}
 );
 
-
 /* =================================================
-   BOTTOM INFORMATION
+BOTTOM INFORMATION
 ================================================= */
 
 /*
- * จำนวนวันทำงาน
- */
 
-doc.setFont(
-    'NotoSansThai',
-    'normal'
-);
+แยกข้อมูลด้านล่างออกมาอีกระดับ
+
+และเว้นระยะจากค่าด้านบน
+*/
+
+
+const bottomLabelY =
+y + 26;
+
+const bottomValueY =
+y + 31;
+
+/*
+
+Labels
+*/
+
 
 doc.setFontSize(
-    8
+8
 );
 
 doc.setTextColor(
-    100,
-    116,
-    139
+100,
+116,
+139
 );
 
 doc.text(
-    'จำนวนวันทำงาน',
-    leftCenter,
-    bottomLabelY,
-    {
-        align:'center'
-    }
+'จำนวนวันทำงาน',
+leftCenter,
+bottomLabelY,
+{
+align:'center'
+}
 );
 
+doc.text(
+'วันที่ออกเอกสาร',
+rightCenter,
+bottomLabelY,
+{
+align:'center'
+}
+);
 
 /*
- * วันที่ออกเอกสาร
- */
 
-doc.text(
-    'วันที่ออกเอกสาร',
-    rightCenter,
-    bottomLabelY,
-    {
-        align:'center'
-    }
-);
+Values
+*/
 
-
-/* =================================================
-   BOTTOM VALUES
-================================================= */
-
-doc.setFont(
-    'NotoSansThai',
-    'normal'
-);
 
 doc.setFontSize(
-    9
+9
 );
 
 doc.setTextColor(
-    30,
-    41,
-    59
+30,
+41,
+59
 );
-
-
-/*
- * จำนวนวัน
- */
 
 doc.text(
-    `${data.workDays} วัน`,
-    leftCenter,
-    bottomValueY,
-    {
-        align:'center'
-    }
+${data.workDays} วัน,
+leftCenter,
+bottomValueY,
+{
+align:'center'
+}
 );
-
-
-/*
- * วันที่ออกเอกสาร
- */
 
 const today =
-    new Date();
+new Date();
 
 const todayKey =
-    `${today.getFullYear()}-${pad(today.getMonth()+1)}-${pad(today.getDate())}`;
-
+${today.getFullYear()}-${pad(today.getMonth()+1)}-${pad(today.getDate())};
 
 doc.text(
-    formatThaiDate(todayKey),
-    rightCenter,
-    bottomValueY,
-    {
-        align:'center'
-    }
+formatThaiDate(todayKey),
+rightCenter,
+bottomValueY,
+{
+align:'center'
+}
 );
 
 
