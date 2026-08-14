@@ -4543,10 +4543,39 @@ y += 7;
 
 
 /* =================================================
+   EMPLOYEE INFORMATION
+================================================= */
+
+doc.setFontSize(
+    11
+);
+
+doc.setTextColor(
+    13,
+    52,
+    144
+);
+
+doc.text(
+    'ข้อมูลพนักงาน',
+    margin,
+    y
+);
+
+y += 7;
+
+
+/* =================================================
    EMPLOYEE INFO BOX
 ================================================= */
 
-const infoBoxHeight = 30;
+/*
+ * เพิ่มความสูงเล็กน้อย
+ * เพื่อให้ข้อความและวรรณยุกต์ภาษาไทย
+ * ไม่ชิดขอบบน/ล่าง
+ */
+
+const infoBoxHeight = 34;
 
 const colWidth =
     contentWidth / 2;
@@ -4575,7 +4604,9 @@ doc.roundedRect(
 );
 
 
-/* เส้นแบ่งตรงกลาง */
+/* =================================================
+   CENTER DIVIDER
+================================================= */
 
 doc.setDrawColor(
     226,
@@ -4592,13 +4623,36 @@ doc.line(
 
 
 /* =================================================
-   LEFT COLUMN
+   COLUMN CENTER
 ================================================= */
 
 const leftCenter =
     margin +
     colWidth / 2;
 
+const rightCenter =
+    margin +
+    colWidth +
+    colWidth / 2;
+
+
+/*
+ * ตำแหน่งแนวตั้ง
+ *
+ * กลุ่มข้อมูลถูกจัดให้อยู่กึ่งกลาง
+ * ของกล่องมากขึ้น
+ */
+
+const labelY =
+    y + 9;
+
+const valueY =
+    y + 18;
+
+
+/* =================================================
+   LEFT COLUMN
+================================================= */
 
 /*
  * Label
@@ -4617,7 +4671,7 @@ doc.setTextColor(
 doc.text(
     'ชื่อพนักงาน',
     leftCenter,
-    y + 8,
+    labelY,
     {
         align:'center'
     }
@@ -4628,8 +4682,23 @@ doc.text(
  * Name
  */
 
+let nameFontSize = 10;
+
+if(
+    String(data.name || '').length > 22
+){
+
+    nameFontSize = 8.5;
+
+}else if(
+    String(data.name || '').length > 17
+){
+
+    nameFontSize = 9;
+}
+
 doc.setFontSize(
-    10
+    nameFontSize
 );
 
 doc.setTextColor(
@@ -4638,33 +4707,10 @@ doc.setTextColor(
     59
 );
 
-
-/*
- * ถ้าชื่อยาว ให้ลดขนาดอัตโนมัติ
- */
-
-let nameFontSize = 10;
-
-if(
-    String(data.name || '').length > 22
-){
-    nameFontSize = 8.5;
-}
-
-else if(
-    String(data.name || '').length > 17
-){
-    nameFontSize = 9;
-}
-
-doc.setFontSize(
-    nameFontSize
-);
-
 doc.text(
     data.name || '-',
     leftCenter,
-    y + 17,
+    valueY,
     {
         align:'center'
     }
@@ -4674,12 +4720,6 @@ doc.text(
 /* =================================================
    RIGHT COLUMN
 ================================================= */
-
-const rightCenter =
-    margin +
-    colWidth +
-    colWidth / 2;
-
 
 /*
  * Label
@@ -4698,7 +4738,7 @@ doc.setTextColor(
 doc.text(
     'รหัสพนักงาน',
     rightCenter,
-    y + 8,
+    labelY,
     {
         align:'center'
     }
@@ -4722,7 +4762,7 @@ doc.setTextColor(
 doc.text(
     data.employeeId || '-',
     rightCenter,
-    y + 17,
+    valueY,
     {
         align:'center'
     }
@@ -4732,6 +4772,22 @@ doc.text(
 /* =================================================
    BOTTOM INFORMATION
 ================================================= */
+
+/*
+ * แยกข้อมูลด้านล่างออกมาอีกระดับ
+ * และเว้นระยะจากค่าด้านบน
+ */
+
+const bottomLabelY =
+    y + 26;
+
+const bottomValueY =
+    y + 31;
+
+
+/*
+ * Labels
+ */
 
 doc.setFontSize(
     8
@@ -4746,7 +4802,7 @@ doc.setTextColor(
 doc.text(
     'จำนวนวันทำงาน',
     leftCenter,
-    y + 24,
+    bottomLabelY,
     {
         align:'center'
     }
@@ -4755,7 +4811,7 @@ doc.text(
 doc.text(
     'วันที่ออกเอกสาร',
     rightCenter,
-    y + 24,
+    bottomLabelY,
     {
         align:'center'
     }
@@ -4779,7 +4835,7 @@ doc.setTextColor(
 doc.text(
     `${data.workDays} วัน`,
     leftCenter,
-    y + 29,
+    bottomValueY,
     {
         align:'center'
     }
@@ -4796,16 +4852,20 @@ const todayKey =
 doc.text(
     formatThaiDate(todayKey),
     rightCenter,
-    y + 29,
+    bottomValueY,
     {
         align:'center'
     }
 );
 
 
+/* =================================================
+   MOVE TO NEXT SECTION
+================================================= */
+
 y +=
     infoBoxHeight +
-    9;
+    10;
 
 
         /* =================================================
@@ -5096,9 +5156,9 @@ y +=
         ================================================= */
 
         doc.setFillColor(
-            30,
-            41,
-            59
+            13,
+            52,
+            144
         );
 
 
