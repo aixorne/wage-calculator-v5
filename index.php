@@ -10,7 +10,7 @@
     content="width=device-width, initial-scale=1.0"
 >
 
-<title>Wage Calculator V6</title>
+<title>Wage Calculator V7</title>
 
 <link
     rel="stylesheet"
@@ -43,7 +43,7 @@
     </p>
 
     <span class="version">
-        WAGE CALCULATOR V6
+        WAGE CALCULATOR V7
     </span>
 
 </section>
