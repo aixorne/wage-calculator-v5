@@ -1,0 +1,23 @@
+
+/* V6 PAYSLIP BUTTON */
+.pdf-slip-btn{
+    width:100%;
+    margin-top:14px;
+    border:0;
+    border-radius:14px;
+    padding:13px 16px;
+    background:linear-gradient(135deg,#111827,#374151);
+    color:#fff;
+    font-size:14px;
+    font-weight:800;
+    cursor:pointer;
+    box-shadow:0 8px 20px rgba(17,24,39,.16);
+    transition:transform .15s ease, box-shadow .15s ease;
+}
+.pdf-slip-btn:hover{
+    transform:translateY(-1px);
+    box-shadow:0 11px 25px rgba(17,24,39,.22);
+}
+.pdf-slip-btn:active{
+    transform:translateY(0);
+}
