@@ -272,6 +272,34 @@
 
     </div>
 
+    <div id="periodsMoreModal" class="modal" onclick="closePeriodsMoreOutside(event)">
+
+    <div class="modal-box periods-more-box">
+
+        <div class="modal-header">
+
+            <h3>
+                📋 รอบจ่ายทั้งหมด
+            </h3>
+
+            <button
+                class="modal-close"
+                onclick="closePeriodsMore()"
+            >
+                ×
+            </button>
+
+        </div>
+
+        <div
+            id="allPeriodsList"
+            class="modal-body"
+        ></div>
+
+    </div>
+
+</div>
+
 </section>
 
     <!-- =====================================================
