@@ -655,6 +655,12 @@ const modalBody =
     document.getElementById(
         'modalBody'
     );
+    
+
+const salaryPeriod =
+    document.getElementById(
+        'salaryPeriod'
+    );
 
 
 /* =====================================================
@@ -3699,15 +3705,6 @@ function escapeHTML(
 })();
 
 renderAll();
-
-    /* =====================================================
-   SALARY SLIP
-===================================================== */
-
-const salaryPeriod =
-    document.getElementById(
-        'salaryPeriod'
-    );
 
 
 /* =====================================================
