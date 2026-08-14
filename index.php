@@ -10,14 +10,15 @@
     content="width=device-width, initial-scale=1.0"
 >
 
-<title>Wage Calculator V1</title>
+<title>Wage Calculator V6</title>
 
 <link
     rel="stylesheet"
     href="style.css"
 >
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 
 </head>
@@ -43,7 +44,7 @@
     </p>
 
     <span class="version">
-        WAGE CALCULATOR V1
+        WAGE CALCULATOR V6
     </span>
 
 </section>
@@ -104,7 +105,7 @@
                 class="summary-value"
                 id="summaryMoney"
             >
-                ฿0
+                ฿0.00
             </div>
 
         </div>
@@ -271,9 +272,19 @@
         </div>
 
     </div>
+
 </section>
 
-    <div id="periodsMoreModal" class="modal" onclick="closePeriodsMoreOutside(event)">
+
+<!-- =====================================================
+     ALL PERIODS MODAL
+===================================================== -->
+
+<div
+    id="periodsMoreModal"
+    class="modal"
+    onclick="closePeriodsMoreOutside(event)"
+>
 
     <div class="modal-box periods-more-box">
 
@@ -301,7 +312,8 @@
 
 </div>
 
-    <!-- =====================================================
+
+<!-- =====================================================
      SALARY SLIP
 ===================================================== -->
 
@@ -312,28 +324,38 @@
         <h2>สลิปเงินเดือน</h2>
     </div>
 
+
     <div class="salary-slip-box">
 
         <div class="slip-info">
 
             <div class="slip-field">
-                <label>ชื่อพนักงาน</label>
+
+                <label>
+                    ชื่อพนักงาน
+                </label>
 
                 <input
                     id="employeeName"
                     type="text"
                     value="นายจิรวัฒน์ กาญจนบุรางกูร"
                 >
+
             </div>
 
+
             <div class="slip-field">
-                <label>รหัสพนักงาน</label>
+
+                <label>
+                    รหัสพนักงาน
+                </label>
 
                 <input
                     id="employeeId"
                     type="text"
                     value="14187"
                 >
+
             </div>
 
         </div>
@@ -341,12 +363,16 @@
 
         <div class="slip-field">
 
-            <label>เลือกรอบจ่าย</label>
+            <label>
+                เลือกรอบจ่าย
+            </label>
 
             <select id="salaryPeriod">
+
                 <option value="">
                     -- เลือกรอบจ่าย --
                 </option>
+
             </select>
 
         </div>
@@ -354,7 +380,9 @@
 
         <div class="slip-field">
 
-            <label>ค่าห้องเย็น</label>
+            <label>
+                ค่าห้องเย็น
+            </label>
 
             <div class="money-input">
 
@@ -366,7 +394,9 @@
                     step="0.01"
                 >
 
-                <span>บาท</span>
+                <span>
+                    บาท
+                </span>
 
             </div>
 
@@ -375,7 +405,9 @@
 
         <div class="slip-field">
 
-            <label>ประกันสังคม</label>
+            <label>
+                ประกันสังคม
+            </label>
 
             <div class="money-input">
 
@@ -388,7 +420,9 @@
                     step="0.1"
                 >
 
-                <span>%</span>
+                <span>
+                    %
+                </span>
 
             </div>
 
@@ -414,6 +448,7 @@
 
 </section>
 
+
 <!-- =====================================================
      DATA
 ===================================================== -->
@@ -421,8 +456,15 @@
 <section class="card">
 
     <div class="card-title">
-        <span>💾</span>
-        <h2>จัดการข้อมูล</h2>
+
+        <span>
+            💾
+        </span>
+
+        <h2>
+            จัดการข้อมูล
+        </h2>
+
     </div>
 
 
@@ -433,22 +475,29 @@
             line-height:1.7;
         "
     >
+
         ข้อมูลค่าแรงถูกเก็บไว้ใน LocalStorage
         ของเบราว์เซอร์เครื่องนี้
         การเพิ่มข้อมูลวันใหม่จะไม่ลบข้อมูลวันเก่า
+
     </p>
 
 
     <div class="delete-day-box">
 
-        <label for="deleteDate">เลือกวันที่ที่ต้องการลบ</label>
+        <label for="deleteDate">
+            เลือกวันที่ที่ต้องการลบ
+        </label>
+
 
         <div class="delete-day-row">
+
             <input
                 id="deleteDate"
                 type="date"
                 class="date-delete-input"
             >
+
 
             <button
                 class="danger-btn"
@@ -456,10 +505,15 @@
             >
                 🗑️ ลบข้อมูลวันนี้
             </button>
+
         </div>
 
+
         <div class="delete-day-hint">
-            ลบเฉพาะกะที่เริ่มในวันที่เลือกเท่านั้น ข้อมูลวันอื่นจะไม่ถูกลบ
+
+            ลบเฉพาะกะที่เริ่มในวันที่เลือกเท่านั้น
+            ข้อมูลวันอื่นจะไม่ถูกลบ
+
         </div>
 
     </div>
@@ -471,7 +525,7 @@
 
 
 <!-- =====================================================
-     MODAL
+     DAY MODAL
 ===================================================== -->
 
 <div
@@ -487,6 +541,7 @@
             <h3 id="modalTitle">
                 รายละเอียด
             </h3>
+
 
             <button
                 class="modal-close"
@@ -508,7 +563,49 @@
 </div>
 
 
+<!-- =====================================================
+     SALARY PREVIEW MODAL
+===================================================== -->
+
+<div
+    id="salaryPreviewModal"
+    class="modal"
+    onclick="closeSalaryPreviewOutside(event)"
+>
+
+    <div class="modal-box">
+
+        <div class="modal-header">
+
+            <h3>
+                🧾 ตัวอย่างสลิปเงินเดือน
+            </h3>
+
+            <button
+                class="modal-close"
+                onclick="closeSalaryPreview()"
+            >
+                ×
+            </button>
+
+        </div>
+
+
+        <div
+            id="salaryPreviewBody"
+            class="modal-body"
+        ></div>
+
+    </div>
+
+</div>
+
+
 <script>
+
+/* =====================================================
+   THAI FONT
+===================================================== */
 
 async function loadThaiFont(doc){
 
@@ -517,21 +614,32 @@ async function loadThaiFont(doc){
             'NotoSansThai-Regular.ttf'
         );
 
+
     if(!response.ok){
+
         throw new Error(
-            'ไม่พบไฟล์ฟอนต์ภาษาไทย'
+            'ไม่พบไฟล์ NotoSansThai-Regular.ttf'
         );
+
     }
+
 
     const buffer =
         await response.arrayBuffer();
 
+
     const bytes =
-        new Uint8Array(buffer);
+        new Uint8Array(
+            buffer
+        );
+
 
     let binary = '';
 
-    const chunkSize = 0x8000;
+
+    const chunkSize =
+        0x8000;
+
 
     for(
         let i = 0;
@@ -551,13 +659,16 @@ async function loadThaiFont(doc){
 
     }
 
+
     const base64 =
         btoa(binary);
+
 
     doc.addFileToVFS(
         'NotoSansThai-Regular.ttf',
         base64
     );
+
 
     doc.addFont(
         'NotoSansThai-Regular.ttf',
@@ -565,11 +676,14 @@ async function loadThaiFont(doc){
         'normal'
     );
 
+
     doc.setFont(
         'NotoSansThai',
         'normal'
     );
+
 }
+
 
 /* =====================================================
    CONFIG
@@ -682,7 +796,7 @@ const modalBody =
     document.getElementById(
         'modalBody'
     );
-    
+
 
 const salaryPeriod =
     document.getElementById(
@@ -691,7 +805,7 @@ const salaryPeriod =
 
 
 /* =====================================================
-   LOAD
+   INIT
 ===================================================== */
 
 loadData();
@@ -795,9 +909,6 @@ function addFiles(files){
         ...files
     ];
 
-    /*
-     * ป้องกันชื่อซ้ำ
-     */
 
     const map =
         new Map();
@@ -809,6 +920,7 @@ function addFiles(files){
             const key =
                 file.name +
                 file.size;
+
 
             map.set(
                 key,
@@ -826,6 +938,7 @@ function addFiles(files){
 
 
     renderPreviews();
+
 }
 
 
@@ -873,9 +986,7 @@ function renderPreviews(){
                 </button>
 
                 <div class="preview-name">
-                    ${escapeHTML(
-                        file.name
-                    )}
+                    ${escapeHTML(file.name)}
                 </div>
 
             `;
@@ -897,11 +1008,12 @@ function renderPreviews(){
         selectedFiles.length
         ? `เลือกรูปแล้ว ${selectedFiles.length} รูป`
         : 'ยังไม่ได้เลือกรูป';
+
 }
 
 
 /* =====================================================
-   REMOVE
+   REMOVE FILE
 ===================================================== */
 
 function removeFile(index){
@@ -911,7 +1023,9 @@ function removeFile(index){
         1
     );
 
+
     renderPreviews();
+
 }
 
 
@@ -926,6 +1040,7 @@ async function runOCR(){
     ){
 
         return;
+
     }
 
 
@@ -939,8 +1054,8 @@ async function runOCR(){
     try{
 
         for(
-            let i=0;
-            i<selectedFiles.length;
+            let i = 0;
+            i < selectedFiles.length;
             i++
         ){
 
@@ -949,7 +1064,7 @@ async function runOCR(){
 
 
             loading.textContent =
-                `🔍 กำลังอ่านรูป ${i+1}/${selectedFiles.length}`;
+                `🔍 กำลังอ่านรูป ${i + 1}/${selectedFiles.length}`;
 
 
             const compressed =
@@ -979,6 +1094,17 @@ async function runOCR(){
                 );
 
 
+            if(
+                !response.ok
+            ){
+
+                throw new Error(
+                    `OCR Server Error ${response.status}`
+                );
+
+            }
+
+
             const data =
                 await response.json();
 
@@ -991,6 +1117,7 @@ async function runOCR(){
                     data.error ||
                     'OCR ไม่สำเร็จ'
                 );
+
             }
 
 
@@ -1062,6 +1189,7 @@ async function runOCR(){
             '❌ ' +
             error.message;
 
+
         alert(
             error.message
         );
@@ -1072,6 +1200,147 @@ async function runOCR(){
             selectedFiles.length === 0;
 
     }
+
+}
+
+
+/* =====================================================
+   COMPRESS IMAGE
+===================================================== */
+
+function compressImage(
+    file
+){
+
+    return new Promise(
+        (resolve,reject)=>{
+
+            const img =
+                new Image();
+
+
+            const url =
+                URL.createObjectURL(
+                    file
+                );
+
+
+            img.onload = () => {
+
+                URL.revokeObjectURL(
+                    url
+                );
+
+
+                const maxWidth =
+                    1800;
+
+
+                let width =
+                    img.width;
+
+
+                let height =
+                    img.height;
+
+
+                if(
+                    width > maxWidth
+                ){
+
+                    height =
+                        Math.round(
+                            height *
+                            maxWidth /
+                            width
+                        );
+
+
+                    width =
+                        maxWidth;
+
+                }
+
+
+                const canvas =
+                    document.createElement(
+                        'canvas'
+                    );
+
+
+                canvas.width =
+                    width;
+
+
+                canvas.height =
+                    height;
+
+
+                const ctx =
+                    canvas.getContext(
+                        '2d'
+                    );
+
+
+                ctx.drawImage(
+                    img,
+                    0,
+                    0,
+                    width,
+                    height
+                );
+
+
+                canvas.toBlob(
+                    blob => {
+
+                        if(!blob){
+
+                            reject(
+                                new Error(
+                                    'ไม่สามารถบีบอัดรูปได้'
+                                )
+                            );
+
+                            return;
+
+                        }
+
+
+                        resolve(
+                            blob
+                        );
+
+                    },
+                    'image/jpeg',
+                    0.88
+                );
+
+            };
+
+
+            img.onerror = () => {
+
+                URL.revokeObjectURL(
+                    url
+                );
+
+
+                reject(
+                    new Error(
+                        'ไม่สามารถอ่านรูปได้'
+                    )
+                );
+
+            };
+
+
+            img.src =
+                url;
+
+        }
+    );
+
 }
 
 
@@ -1094,6 +1363,7 @@ function parseOCR(text){
             )
 
     };
+
 }
 
 
@@ -1105,10 +1375,6 @@ function extractDate(text){
 
     let m;
 
-
-    /*
-     * YYYY-MM-DD
-     */
 
     m =
         text.match(
@@ -1124,13 +1390,13 @@ function extractDate(text){
             );
 
 
-        let month =
+        const month =
             Number(
                 m[2]
             );
 
 
-        let day =
+        const day =
             Number(
                 m[3]
             );
@@ -1141,6 +1407,7 @@ function extractDate(text){
         ){
 
             year -= 543;
+
         }
 
 
@@ -1149,12 +1416,9 @@ function extractDate(text){
             month,
             day
         );
+
     }
 
-
-    /*
-     * DD/MM/YYYY
-     */
 
     m =
         text.match(
@@ -1187,6 +1451,7 @@ function extractDate(text){
         ){
 
             year += 2000;
+
         }
 
 
@@ -1195,6 +1460,7 @@ function extractDate(text){
         ){
 
             year -= 543;
+
         }
 
 
@@ -1203,12 +1469,9 @@ function extractDate(text){
             month,
             day
         );
+
     }
 
-
-    /*
-     * YYYY MM DD
-     */
 
     m =
         text.match(
@@ -1223,10 +1486,12 @@ function extractDate(text){
             Number(m[2]),
             Number(m[3])
         );
+
     }
 
 
     return null;
+
 }
 
 
@@ -1274,12 +1539,14 @@ function extractTimes(text){
             found.push(
                 time
             );
+
         }
 
     }
 
 
     return found;
+
 }
 
 
@@ -1287,9 +1554,7 @@ function extractTimes(text){
    CREATE SHIFTS
 ===================================================== */
 
-function createShifts(
-    records
-){
+function createShifts(records){
 
     const events = [];
 
@@ -1302,6 +1567,7 @@ function createShifts(
             ){
 
                 return;
+
             }
 
 
@@ -1356,8 +1622,8 @@ function createShifts(
 
 
     for(
-        let i=0;
-        i<events.length;
+        let i = 0;
+        i < events.length;
         i++
     ){
 
@@ -1366,6 +1632,7 @@ function createShifts(
         ){
 
             continue;
+
         }
 
 
@@ -1378,8 +1645,8 @@ function createShifts(
 
 
         for(
-            let j=i+1;
-            j<events.length;
+            let j = i + 1;
+            j < events.length;
             j++
         ){
 
@@ -1388,6 +1655,7 @@ function createShifts(
             ){
 
                 continue;
+
             }
 
 
@@ -1407,6 +1675,7 @@ function createShifts(
             ){
 
                 continue;
+
             }
 
 
@@ -1416,6 +1685,7 @@ function createShifts(
             ){
 
                 break;
+
             }
 
 
@@ -1430,6 +1700,7 @@ function createShifts(
                     j;
 
                 break;
+
             }
 
         }
@@ -1463,10 +1734,6 @@ function createShifts(
             );
 
         }else{
-
-            /*
-             * ถ้าไม่มีเวลาออก
-             */
 
             used.add(
                 i
@@ -1523,6 +1790,7 @@ function createShifts(
 
 
     return result;
+
 }
 
 
@@ -1549,13 +1817,6 @@ function validPair(
         end.minutes;
 
 
-    /*
-     * Sunday
-     *
-     * สามารถทำงานช่วงใดก็ได้
-     * แต่ต้องไม่เกิน 16 ชั่วโมง
-     */
-
     if(
         day === 0
     ){
@@ -1565,18 +1826,13 @@ function validPair(
             end.dateKey !==
             start.dateKey
         );
+
     }
 
 
-    /*
-     * Night shift
-     *
-     * 19:00 เป็นต้นไป
-     * สามารถออกวันถัดไปได้
-     */
-
     if(
-        s >= 19 * 60
+        s >=
+        19 * 60
     ){
 
         if(
@@ -1588,37 +1844,33 @@ function validPair(
                 e <=
                 12 * 60
             );
+
         }
+
 
         return (
             e > s
         );
+
     }
 
 
-    /*
-     * Day shift
-     */
-
     if(
-        s >=
-        7 * 60 + 30
-        &&
-        s <=
-        12 * 60
+        s >= 7 * 60 + 30 &&
+        s <= 12 * 60
     ){
 
         return (
             start.dateKey ===
-            end.dateKey
-            &&
-            e >=
-            16 * 60
+            end.dateKey &&
+            e >= 16 * 60
         );
+
     }
 
 
     return false;
+
 }
 
 
@@ -1645,6 +1897,7 @@ function buildShift(
             start,
             end
         );
+
     }
 
 
@@ -1657,6 +1910,7 @@ function buildShift(
             start,
             end
         );
+
     }
 
 
@@ -1664,6 +1918,7 @@ function buildShift(
         start,
         end
     );
+
 }
 
 
@@ -1684,26 +1939,18 @@ function calculateSunday(
         end.minutes;
 
 
-    /*
-     * 16:53 -> 17:00
-     */
-
     if(
         s >=
-        16 * 60 + 30
-        &&
+        16 * 60 + 30 &&
         s <=
         17 * 60
     ){
 
         s =
             17 * 60;
+
     }
 
-
-    /*
-     * ปัดเวลาออกลง 30 นาที
-     */
 
     e =
         Math.floor(
@@ -1711,19 +1958,15 @@ function calculateSunday(
         ) * 30;
 
 
-    /*
-     * ข้ามวัน
-     */
-
     if(
         end.dateKey !==
-        start.dateKey
-        &&
+        start.dateKey &&
         e < s
     ){
 
         e +=
             24 * 60;
+
     }
 
 
@@ -1783,6 +2026,7 @@ function calculateSunday(
         pay
 
     };
+
 }
 
 
@@ -1799,37 +2043,22 @@ function calculateDay(
         start.minutes;
 
 
-    /*
-     * 07:30 - 08:00
-     * = 08:00
-     */
-
     if(
         s >=
-        7 * 60 + 30
-        &&
+        7 * 60 + 30 &&
         s <=
         8 * 60
     ){
 
         s =
             8 * 60;
+
     }
 
-
-    /*
-     * ค่าแรงปกติ = 352
-     */
 
     const normalPay =
         NORMAL_WAGE;
 
-
-    /*
-     * OT
-     *
-     * เริ่ม 17:30
-     */
 
     let otMinutes =
         0;
@@ -1852,6 +2081,7 @@ function calculateDay(
                 roundedEnd -
                 OT_START
             );
+
     }
 
 
@@ -1905,6 +2135,7 @@ function calculateDay(
             otPay
 
     };
+
 }
 
 
@@ -1925,59 +2156,35 @@ function calculateNight(
         end.minutes;
 
 
-    /*
-     * 19:30 - 20:00
-     * = 20:00
-     */
-
     if(
         s >=
-        19 * 60 + 30
-        &&
+        19 * 60 + 30 &&
         s <=
         20 * 60
     ){
 
         s =
             20 * 60;
+
     }
 
 
-    /*
-     * ออกวันถัดไป
-     */
-
     if(
         end.dateKey !==
-        start.dateKey
-        &&
-        e <
-        s
+        start.dateKey &&
+        e < s
     ){
 
         e +=
             24 * 60;
+
     }
 
 
-    /*
-     * กะปกติคิด 8 ชั่วโมง
-     *
-     * OT เริ่ม 05:30
-     */
-
-    const nightNormalEnd =
-        5 * 60;
-
-
-    let normalEnd =
-        nightNormalEnd +
+    const normalEnd =
+        5 * 60 +
         24 * 60;
 
-
-    /*
-     * ปกติ 20:00 -> 05:00
-     */
 
     let normalMinutes =
         Math.max(
@@ -1990,12 +2197,9 @@ function calculateNight(
         );
 
 
-    /*
-     * OT 05:30 เป็นต้นไป
-     */
-
     const otStart =
-        5 * 60 + 30 +
+        5 * 60 +
+        30 +
         24 * 60;
 
 
@@ -2019,12 +2223,9 @@ function calculateNight(
                 roundedEnd -
                 otStart
             );
+
     }
 
-
-    /*
-     * กะดึกปกติไม่เกิน 8 ชั่วโมง
-     */
 
     normalMinutes =
         Math.min(
@@ -2088,6 +2289,7 @@ function calculateNight(
             otPay
 
     };
+
 }
 
 
@@ -2103,10 +2305,6 @@ function mergeShifts(
         new Map();
 
 
-    /*
-     * เก่าก่อน
-     */
-
     shifts.forEach(
         shift => {
 
@@ -2118,10 +2316,6 @@ function mergeShifts(
         }
     );
 
-
-    /*
-     * ใหม่ทับเฉพาะ ID เดียวกัน
-     */
 
     newShifts.forEach(
         shift => {
@@ -2151,11 +2345,12 @@ function mergeShifts(
 
 
     saveData();
+
 }
 
 
 /* =====================================================
-   LOCAL STORAGE
+   STORAGE
 ===================================================== */
 
 function saveData(){
@@ -2163,12 +2358,17 @@ function saveData(){
     localStorage.setItem(
         STORAGE_KEY,
         JSON.stringify({
+
             version:6,
+
             updatedAt:
                 new Date().toISOString(),
+
             shifts
+
         })
     );
+
 }
 
 
@@ -2192,6 +2392,7 @@ function loadData(){
             renderAll();
 
             return;
+
         }
 
 
@@ -2217,11 +2418,15 @@ function loadData(){
             error
         );
 
+
         shifts =
             [];
 
+
         renderAll();
+
     }
+
 }
 
 
@@ -2238,6 +2443,7 @@ function renderAll(){
     renderPeriods();
 
     renderSalaryPeriods();
+
 }
 
 
@@ -2292,6 +2498,7 @@ function renderSummary(){
         money(
             total
         );
+
 }
 
 
@@ -2370,8 +2577,8 @@ function renderCalendar(){
 
 
     for(
-        let i=0;
-        i<first;
+        let i = 0;
+        i < first;
         i++
     ){
 
@@ -2393,13 +2600,13 @@ function renderCalendar(){
 
 
     for(
-        let day=1;
-        day<=max;
+        let day = 1;
+        day <= max;
         day++
     ){
 
         const key =
-            `${year}-${pad(month+1)}-${pad(day)}`;
+            `${year}-${pad(month + 1)}-${pad(day)}`;
 
 
         const cell =
@@ -2450,27 +2657,20 @@ function renderCalendar(){
 
 
         if(
-            shift
-            &&
+            shift &&
             !shift.incomplete
         ){
 
             html += `
 
                 <div class="day-time">
-
-                    ${shift.startTime}
+                    ${escapeHTML(shift.startTime)}
                     –
-                    ${shift.endTime}
-
+                    ${escapeHTML(shift.endTime)}
                 </div>
 
                 <div class="day-money">
-
-                    ${money(
-                        shift.pay
-                    )}
-
+                    ${money(shift.pay)}
                 </div>
 
             `;
@@ -2494,6 +2694,7 @@ function renderCalendar(){
         );
 
     }
+
 }
 
 
@@ -2518,10 +2719,6 @@ function getDayStatus(
         );
 
 
-    /*
-     * Future
-     */
-
     if(
         date > today
     ){
@@ -2535,12 +2732,9 @@ function getDayStatus(
                 'ยังไม่ถึง'
 
         };
+
     }
 
-
-    /*
-     * Worked
-     */
 
     if(
         shift
@@ -2559,6 +2753,7 @@ function getDayStatus(
                     'ลืมอัป'
 
             };
+
         }
 
 
@@ -2571,18 +2766,9 @@ function getDayStatus(
                 'อัปแล้ว'
 
         };
+
     }
 
-
-    /*
-     * Sunday = ไม่ทำงาน
-     *
-     * แต่ไม่ให้ถือเป็นวันหยุด
-     * เพราะอาทิตย์สามารถทำงานได้
-     *
-     * หากไม่มีข้อมูล
-     * ถือเป็นลืมอัป
-     */
 
     return {
 
@@ -2593,6 +2779,7 @@ function getDayStatus(
             'ลืมอัป'
 
     };
+
 }
 
 
@@ -2604,319 +2791,1373 @@ function getShiftForDate(
     key
 ){
 
- ก็แย่ละ ขอโค้ดแก้ ส่งข้อความมา แก้สลีปpdf ไง
-
-/* =================================================
-EMPLOYEE INFO BOX
-================================================= */
-
-/*
-
-เพิ่มความสูงเล็กน้อย
-
-เพื่อให้ข้อความและวรรณยุกต์ภาษาไทย
-
-ไม่ชิดขอบบน/ล่าง
-*/
+    const found =
+        shifts.filter(
+            s =>
+                s.startDateKey === key ||
+                s.dateKey === key
+        );
 
 
-const infoBoxHeight = 34;
+    if(
+        !found.length
+    ){
 
-const colWidth =
-contentWidth / 2;
+        return null;
 
-doc.setDrawColor(
-226,
-232,
-240
-);
-
-doc.setFillColor(
-248,
-250,
-252
-);
-
-doc.roundedRect(
-margin,
-y,
-contentWidth,
-infoBoxHeight,
-3,
-3,
-'FD'
-);
-
-/* =================================================
-CENTER DIVIDER
-================================================= */
-
-doc.setDrawColor(
-226,
-232,
-240
-);
-
-doc.line(
-margin + colWidth,
-y + 5,
-margin + colWidth,
-y + infoBoxHeight - 5
-);
-
-/* =================================================
-COLUMN CENTER
-================================================= */
-
-const leftCenter =
-margin +
-colWidth / 2;
-
-const rightCenter =
-margin +
-colWidth +
-colWidth / 2;
-
-/*
-
-ตำแหน่งแนวตั้ง
-
-กลุ่มข้อมูลถูกจัดให้อยู่กึ่งกลาง
-
-ของกล่องมากขึ้น
-*/
+    }
 
 
-const labelY =
-y + 9;
+    return found[0];
 
-const valueY =
-y + 18;
-
-/* =================================================
-LEFT COLUMN
-================================================= */
-
-/*
-
-Label
-*/
-
-
-doc.setFontSize(
-8
-);
-
-doc.setTextColor(
-100,
-116,
-139
-);
-
-doc.text(
-'ชื่อพนักงาน',
-leftCenter,
-labelY,
-{
-align:'center'
 }
-);
-
-/*
-
-Name
-*/
 
 
-let nameFontSize = 10;
+/* =====================================================
+   CHANGE MONTH
+===================================================== */
 
-if(
-String(data.name || '').length > 22
+function changeMonth(
+    amount
 ){
 
-nameFontSize = 8.5;
+    viewDate =
+        new Date(
+            viewDate.getFullYear(),
+            viewDate.getMonth() + amount,
+            1
+        );
 
-}else if(
-String(data.name || '').length > 17
+
+    renderCalendar();
+
+}
+
+
+/* =====================================================
+   OPEN DAY
+===================================================== */
+
+function openDay(
+    key
 ){
 
-nameFontSize = 9;
+    const list =
+        shifts.filter(
+            s =>
+                s.startDateKey === key ||
+                s.dateKey === key
+        );
+
+
+    modalTitle.textContent =
+        `รายละเอียด ${formatThaiDate(key)}`;
+
+
+    if(
+        !list.length
+    ){
+
+        modalBody.innerHTML = `
+
+            <div class="empty-state">
+                ไม่มีข้อมูลการทำงานวันนี้
+            </div>
+
+        `;
+
+        dayModal.classList.add(
+            'show'
+        );
+
+        return;
+
+    }
+
+
+    modalBody.innerHTML =
+        list.map(
+            shift => `
+
+                <div class="shift-detail">
+
+                    <div>
+                        <strong>
+                            ${shift.isNight
+                                ? '🌙 กะดึก'
+                                : shift.isSunday
+                                    ? '☀️ วันอาทิตย์'
+                                    : '☀️ กะกลางวัน'}
+                        </strong>
+                    </div>
+
+                    <div>
+                        เวลา:
+                        ${escapeHTML(shift.startTime || '-')}
+                        –
+                        ${escapeHTML(shift.endTime || '-')}
+                    </div>
+
+                    ${
+                        shift.incomplete
+                        ? `
+                            <div class="warning">
+                                ⚠️ ยังไม่มีเวลาออก
+                            </div>
+                        `
+                        : `
+                            <div>
+                                ค่าแรง:
+                                <strong>
+                                    ${money(shift.pay)}
+                                </strong>
+                            </div>
+
+                            <div>
+                                OT:
+                                ${Number(shift.otHours || 0).toFixed(1)}
+                                ชั่วโมง
+                            </div>
+                        `
+                    }
+
+                </div>
+
+            `
+        )
+        .join('');
+
+
+    dayModal.classList.add(
+        'show'
+    );
 
 }
 
-doc.setFontSize(
-nameFontSize
-);
 
-doc.setTextColor(
-30,
-41,
-59
-);
+/* =====================================================
+   CLOSE DAY MODAL
+===================================================== */
 
-doc.text(
-data.name || '-',
-leftCenter,
-valueY,
-{
-align:'center'
+function closeModal(){
+
+    dayModal.classList.remove(
+        'show'
+    );
+
 }
-);
-
-/* =================================================
-RIGHT COLUMN
-================================================= */
-
-/*
-
-Label
-*/
 
 
-doc.setFontSize(
-8
-);
+function closeModalOutside(
+    event
+){
 
-doc.setTextColor(
-100,
-116,
-139
-);
+    if(
+        event.target === dayModal
+    ){
 
-doc.text(
-'รหัสพนักงาน',
-rightCenter,
-labelY,
-{
-align:'center'
+        closeModal();
+
+    }
+
 }
-);
-
-/*
-
-Employee ID
-*/
 
 
-doc.setFontSize(
-10
-);
+/* =====================================================
+   PAY PERIODS
+===================================================== */
 
-doc.setTextColor(
-30,
-41,
-59
-);
+function getPayPeriods(){
 
-doc.text(
-data.employeeId || '-',
-rightCenter,
-valueY,
-{
-align:'center'
+    const year =
+        viewDate.getFullYear();
+
+
+    const month =
+        viewDate.getMonth();
+
+
+    const lastDay =
+        new Date(
+            year,
+            month + 1,
+            0
+        ).getDate();
+
+
+    return [
+
+        {
+            id:
+                `${year}-${pad(month + 1)}-01_15`,
+
+            name:
+                `01–15/${pad(month + 1)}`,
+
+            start:
+                `${year}-${pad(month + 1)}-01`,
+
+            end:
+                `${year}-${pad(month + 1)}-15`
+
+        },
+
+        {
+            id:
+                `${year}-${pad(month + 1)}-16_${lastDay}`,
+
+            name:
+                `16–${lastDay}/${pad(month + 1)}`,
+
+            start:
+                `${year}-${pad(month + 1)}-16`,
+
+            end:
+                `${year}-${pad(month + 1)}-${pad(lastDay)}`
+
+        }
+
+    ];
+
 }
-);
-
-/* =================================================
-BOTTOM INFORMATION
-================================================= */
-
-/*
-
-แยกข้อมูลด้านล่างออกมาอีกระดับ
-
-และเว้นระยะจากค่าด้านบน
-*/
 
 
-const bottomLabelY =
-y + 26;
+/* =====================================================
+   PERIOD DATA
+===================================================== */
 
-const bottomValueY =
-y + 31;
+function getPeriodData(
+    period
+){
 
-/*
+    const list =
+        shifts.filter(
+            shift =>
+                !shift.incomplete &&
+                shift.dateKey >= period.start &&
+                shift.dateKey <= period.end
+        );
 
-Labels
-*/
+
+    const wage =
+        list.reduce(
+            (sum,shift)=>
+                sum +
+                Number(
+                    shift.pay || 0
+                ),
+            0
+        );
 
 
-doc.setFontSize(
-8
-);
+    const workDays =
+        new Set(
+            list.map(
+                shift =>
+                    shift.dateKey
+            )
+        ).size;
 
-doc.setTextColor(
-100,
-116,
-139
-);
 
-doc.text(
-'จำนวนวันทำงาน',
-leftCenter,
-bottomLabelY,
-{
-align:'center'
+    const otHours =
+        list.reduce(
+            (sum,shift)=>
+                sum +
+                Number(
+                    shift.otHours || 0
+                ),
+            0
+        );
+
+
+    return {
+
+        shifts:list,
+
+        wage,
+
+        workDays,
+
+        otHours
+
+    };
+
 }
-);
 
-doc.text(
-'วันที่ออกเอกสาร',
-rightCenter,
-bottomLabelY,
-{
-align:'center'
+
+/* =====================================================
+   RENDER PERIODS
+===================================================== */
+
+function renderPeriods(){
+
+    const periodList =
+        getPayPeriods();
+
+
+    const allPeriods =
+        periodList.map(
+            period => ({
+
+                period,
+
+                data:
+                    getPeriodData(
+                        period
+                    )
+
+            })
+        );
+
+
+    if(
+        !shifts.length
+    ){
+
+        periods.innerHTML = `
+
+            <div class="empty-state">
+                ยังไม่มีข้อมูลรอบจ่าย
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    periods.innerHTML =
+        allPeriods.map(
+            item => `
+
+                <div class="period-card">
+
+                    <div class="period-title">
+                        💵 รอบ ${item.period.name}
+                    </div>
+
+                    <div class="period-info">
+
+                        <span>
+                            วันทำงาน
+                            <strong>
+                                ${item.data.workDays}
+                            </strong>
+                        </span>
+
+                        <span>
+                            OT
+                            <strong>
+                                ${item.data.otHours.toFixed(1)}
+                            </strong>
+                            ชม.
+                        </span>
+
+                        <span>
+                            ค่าแรง
+                            <strong>
+                                ${money(item.data.wage)}
+                            </strong>
+                        </span>
+
+                    </div>
+
+                </div>
+
+            `
+        )
+        .join('');
+
 }
-);
-
-/*
-
-Values
-*/
 
 
-doc.setFontSize(
-9
-);
+/* =====================================================
+   RENDER SALARY PERIOD SELECT
+===================================================== */
 
-doc.setTextColor(
-30,
-41,
-59
-);
+function renderSalaryPeriods(){
 
-doc.text(
-${data.workDays} วัน,
-leftCenter,
-bottomValueY,
-{
-align:'center'
+    const current =
+        salaryPeriod.value;
+
+
+    const periodList =
+        getPayPeriods();
+
+
+    salaryPeriod.innerHTML = `
+
+        <option value="">
+            -- เลือกรอบจ่าย --
+        </option>
+
+    `;
+
+
+    periodList.forEach(
+        period => {
+
+            const option =
+                document.createElement(
+                    'option'
+                );
+
+
+            option.value =
+                period.id;
+
+
+            option.textContent =
+                `รอบ ${period.name}`;
+
+
+            salaryPeriod.appendChild(
+                option
+            );
+
+        }
+    );
+
+
+    if(
+        periodList.some(
+            p =>
+                p.id === current
+        )
+    ){
+
+        salaryPeriod.value =
+            current;
+
+    }
+
 }
-);
 
-const today =
-new Date();
 
-const todayKey =
-${today.getFullYear()}-${pad(today.getMonth()+1)}-${pad(today.getDate())};
+/* =====================================================
+   ALL PERIODS
+===================================================== */
 
-doc.text(
-formatThaiDate(todayKey),
-rightCenter,
-bottomValueY,
-{
-align:'center'
+function openPeriodsMore(){
+
+    const periodList =
+        getPayPeriods();
+
+
+    document.getElementById(
+        'allPeriodsList'
+    ).innerHTML =
+        periodList.map(
+            period => {
+
+                const data =
+                    getPeriodData(
+                        period
+                    );
+
+
+                return `
+
+                    <div class="period-card">
+
+                        <div class="period-title">
+                            รอบ ${period.name}
+                        </div>
+
+                        <div>
+                            วันทำงาน:
+                            <strong>
+                                ${data.workDays}
+                            </strong>
+                        </div>
+
+                        <div>
+                            OT:
+                            <strong>
+                                ${data.otHours.toFixed(1)}
+                            </strong>
+                            ชั่วโมง
+                        </div>
+
+                        <div>
+                            ค่าแรง:
+                            <strong>
+                                ${money(data.wage)}
+                            </strong>
+                        </div>
+
+                    </div>
+
+                `;
+
+            }
+        )
+        .join('');
+
+
+    document.getElementById(
+        'periodsMoreModal'
+    ).classList.add(
+        'show'
+    );
+
 }
-);
 
 
-/* =================================================
-   MOVE TO NEXT SECTION
-================================================= */
+function closePeriodsMore(){
 
-y +=
-    infoBoxHeight +
-    9;
+    document.getElementById(
+        'periodsMoreModal'
+    ).classList.remove(
+        'show'
+    );
+
+}
+
+
+function closePeriodsMoreOutside(
+    event
+){
+
+    const modal =
+        document.getElementById(
+            'periodsMoreModal'
+        );
+
+
+    if(
+        event.target === modal
+    ){
+
+        closePeriodsMore();
+
+    }
+
+}
+
+
+/* =====================================================
+   DELETE SELECTED DATE
+===================================================== */
+
+function deleteSelectedDate(){
+
+    const input =
+        document.getElementById(
+            'deleteDate'
+        );
+
+
+    const key =
+        input.value;
+
+
+    if(
+        !key
+    ){
+
+        alert(
+            'กรุณาเลือกวันที่ก่อน'
+        );
+
+        return;
+
+    }
+
+
+    const count =
+        shifts.filter(
+            s =>
+                s.startDateKey === key ||
+                s.dateKey === key
+        ).length;
+
+
+    if(
+        !count
+    ){
+
+        alert(
+            'ไม่พบข้อมูลของวันที่เลือก'
+        );
+
+        return;
+
+    }
+
+
+    const ok =
+        confirm(
+            `ต้องการลบข้อมูลวันที่ ${formatThaiDate(key)} จำนวน ${count} รายการหรือไม่?`
+        );
+
+
+    if(
+        !ok
+    ){
+
+        return;
+
+    }
+
+
+    shifts =
+        shifts.filter(
+            s =>
+                s.startDateKey !== key &&
+                s.dateKey !== key
+        );
+
+
+    saveData();
+
+    renderAll();
+
+
+    alert(
+        'ลบข้อมูลเรียบร้อยแล้ว'
+    );
+
+}
+
+
+/* =====================================================
+   SALARY DATA
+===================================================== */
+
+function getSalaryData(){
+
+    const periodId =
+        salaryPeriod.value;
+
+
+    if(
+        !periodId
+    ){
+
+        throw new Error(
+            'กรุณาเลือกรอบจ่ายก่อน'
+        );
+
+    }
+
+
+    const period =
+        getPayPeriods().find(
+            p =>
+                p.id === periodId
+        );
+
+
+    if(
+        !period
+    ){
+
+        throw new Error(
+            'ไม่พบข้อมูลรอบจ่าย'
+        );
+
+    }
+
+
+    const periodData =
+        getPeriodData(
+            period
+        );
+
+
+    const name =
+        document.getElementById(
+            'employeeName'
+        ).value.trim();
+
+
+    const employeeId =
+        document.getElementById(
+            'employeeId'
+        ).value.trim();
+
+
+    const room =
+        Number(
+            document.getElementById(
+                'roomAllowance'
+            ).value || 0
+        );
+
+
+    const rate =
+        Number(
+            document.getElementById(
+                'socialSecurityRate'
+            ).value || 0
+        );
+
+
+    const wage =
+        Number(
+            periodData.wage || 0
+        );
+
+
+    const beforeDeduction =
+        wage +
+        room;
+
+
+    const socialSecurity =
+        beforeDeduction *
+        rate /
+        100;
+
+
+    const total =
+        beforeDeduction -
+        socialSecurity;
+
+
+    return {
+
+        name,
+
+        employeeId,
+
+        period,
+
+        workDays:
+            periodData.workDays,
+
+        otHours:
+            periodData.otHours,
+
+        wage,
+
+        room,
+
+        rate,
+
+        socialSecurity,
+
+        beforeDeduction,
+
+        total
+
+    };
+
+}
+
+
+/* =====================================================
+   SALARY PREVIEW
+===================================================== */
+
+function previewSalarySlip(){
+
+    try{
+
+        const data =
+            getSalaryData();
+
+
+        const body =
+            document.getElementById(
+                'salaryPreviewBody'
+            );
+
+
+        body.innerHTML = `
+
+            <div class="salary-preview">
+
+                <div class="salary-preview-title">
+                    สลิปเงินเดือน
+                </div>
+
+                <div class="salary-preview-period">
+                    รอบ ${escapeHTML(data.period.name)}
+                </div>
+
+                <hr>
+
+                <div class="preview-row">
+                    <span>ชื่อพนักงาน</span>
+                    <strong>
+                        ${escapeHTML(data.name || '-')}
+                    </strong>
+                </div>
+
+                <div class="preview-row">
+                    <span>รหัสพนักงาน</span>
+                    <strong>
+                        ${escapeHTML(data.employeeId || '-')}
+                    </strong>
+                </div>
+
+                <div class="preview-row">
+                    <span>จำนวนวันทำงาน</span>
+                    <strong>
+                        ${data.workDays} วัน
+                    </strong>
+                </div>
+
+                <hr>
+
+                <div class="preview-row">
+                    <span>ค่าแรง</span>
+                    <strong>
+                        ${formatNumber(data.wage)} บาท
+                    </strong>
+                </div>
+
+                <div class="preview-row">
+                    <span>ค่าห้องเย็น</span>
+                    <strong>
+                        ${formatNumber(data.room)} บาท
+                    </strong>
+                </div>
+
+                <div class="preview-row">
+                    <span>
+                        ประกันสังคม ${data.rate}%
+                    </span>
+
+                    <strong>
+                        -${formatNumber(data.socialSecurity)} บาท
+                    </strong>
+                </div>
+
+                <div class="preview-total">
+
+                    <span>
+                        เงินรับสุทธิ
+                    </span>
+
+                    <strong>
+                        ฿ ${formatNumber(data.total)}
+                    </strong>
+
+                </div>
+
+            </div>
+
+        `;
+
+
+        document.getElementById(
+            'salaryPreviewModal'
+        ).classList.add(
+            'show'
+        );
+
+    }catch(error){
+
+        alert(
+            error.message
+        );
+
+    }
+
+}
+
+
+function closeSalaryPreview(){
+
+    document.getElementById(
+        'salaryPreviewModal'
+    ).classList.remove(
+        'show'
+    );
+
+}
+
+
+function closeSalaryPreviewOutside(
+    event
+){
+
+    const modal =
+        document.getElementById(
+            'salaryPreviewModal'
+        );
+
+
+    if(
+        event.target === modal
+    ){
+
+        closeSalaryPreview();
+
+    }
+
+}
+
+
+/* =====================================================
+   GENERATE SALARY PDF
+===================================================== */
+
+async function generateSalaryPDF(){
+
+    try{
+
+        const data =
+            getSalaryData();
+
+
+        const {
+            jsPDF
+        } =
+            window.jspdf;
+
+
+        const doc =
+            new jsPDF({
+
+                orientation:
+                    'portrait',
+
+                unit:
+                    'mm',
+
+                format:
+                    'a4'
+
+            });
+
+
+        /* =================================================
+           LOAD THAI FONT
+        ================================================= */
+
+        await loadThaiFont(
+            doc
+        );
+
+
+        const pageWidth =
+            doc.internal.pageSize.getWidth();
+
+
+        const pageHeight =
+            doc.internal.pageSize.getHeight();
+
+
+        const margin =
+            18;
+
+
+        const contentWidth =
+            pageWidth -
+            margin * 2;
+
+
+        const right =
+            pageWidth -
+            margin;
+
+
+        let y =
+            17;
+
+
+        /* =================================================
+           HEADER
+        ================================================= */
+
+        doc.setFont(
+            'NotoSansThai',
+            'normal'
+        );
+
+
+        doc.setTextColor(
+            15,
+            23,
+            42
+        );
+
+
+        doc.setFontSize(
+            20
+        );
+
+
+        doc.text(
+            'สลิปเงินเดือน',
+            margin,
+            y
+        );
+
+
+        doc.setFontSize(
+            9
+        );
+
+
+        doc.setTextColor(
+            100,
+            116,
+            139
+        );
+
+
+        doc.text(
+            `รอบจ่าย ${data.period.name}`,
+            right,
+            y,
+            {
+                align:'right'
+            }
+        );
+
+
+        y +=
+            7;
+
+
+        doc.setDrawColor(
+            13,
+            52,
+            144
+        );
+
+
+        doc.setLineWidth(
+            1
+        );
+
+
+        doc.line(
+            margin,
+            y,
+            right,
+            y
+        );
+
+
+        y +=
+            8;
+
+
+        /* =================================================
+           EMPLOYEE INFO BOX
+        ================================================= */
+
+        /*
+         * เพิ่มความสูงเพื่อให้ภาษาไทย
+         * และวรรณยุกต์ไม่ชิดขอบ
+         */
+
+        const infoBoxHeight =
+            34;
+
+
+        const colWidth =
+            contentWidth / 2;
+
+
+        doc.setDrawColor(
+            226,
+            232,
+            240
+        );
+
+
+        doc.setFillColor(
+            248,
+            250,
+            252
+        );
+
+
+        doc.roundedRect(
+            margin,
+            y,
+            contentWidth,
+            infoBoxHeight,
+            3,
+            3,
+            'FD'
+        );
+
+
+        /* =================================================
+           CENTER DIVIDER
+        ================================================= */
+
+        doc.setDrawColor(
+            226,
+            232,
+            240
+        );
+
+
+        doc.line(
+            margin + colWidth,
+            y + 5,
+            margin + colWidth,
+            y + infoBoxHeight - 5
+        );
+
+
+        /* =================================================
+           COLUMN CENTER
+        ================================================= */
+
+        const leftCenter =
+            margin +
+            colWidth / 2;
+
+
+        const rightCenter =
+            margin +
+            colWidth +
+            colWidth / 2;
+
+
+        /*
+         * ตำแหน่งแนวตั้ง
+         */
+
+        const labelY =
+            y + 9;
+
+
+        const valueY =
+            y + 18;
+
+
+        const bottomLabelY =
+            y + 26;
+
+
+        const bottomValueY =
+            y + 31;
+
+
+        /* =================================================
+           LEFT COLUMN
+        ================================================= */
+
+        doc.setFontSize(
+            8
+        );
+
+
+        doc.setTextColor(
+            100,
+            116,
+            139
+        );
+
+
+        doc.text(
+            'ชื่อพนักงาน',
+            leftCenter,
+            labelY,
+            {
+                align:'center'
+            }
+        );
+
+
+        let nameFontSize =
+            10;
+
+
+        const employeeName =
+            String(
+                data.name || '-'
+            );
+
+
+        if(
+            employeeName.length > 24
+        ){
+
+            nameFontSize =
+                8;
+
+        }else if(
+            employeeName.length > 19
+        ){
+
+            nameFontSize =
+                8.5;
+
+        }else if(
+            employeeName.length > 15
+        ){
+
+            nameFontSize =
+                9;
+
+        }
+
+
+        doc.setFontSize(
+            nameFontSize
+        );
+
+
+        doc.setTextColor(
+            30,
+            41,
+            59
+        );
+
+
+        doc.text(
+            employeeName,
+            leftCenter,
+            valueY,
+            {
+                align:'center',
+                maxWidth:
+                    colWidth - 8
+            }
+        );
+
+
+        /* =================================================
+           RIGHT COLUMN
+        ================================================= */
+
+        doc.setFontSize(
+            8
+        );
+
+
+        doc.setTextColor(
+            100,
+            116,
+            139
+        );
+
+
+        doc.text(
+            'รหัสพนักงาน',
+            rightCenter,
+            labelY,
+            {
+                align:'center'
+            }
+        );
+
+
+        doc.setFontSize(
+            10
+        );
+
+
+        doc.setTextColor(
+            30,
+            41,
+            59
+        );
+
+
+        doc.text(
+            String(
+                data.employeeId || '-'
+            ),
+            rightCenter,
+            valueY,
+            {
+                align:'center'
+            }
+        );
+
+
+        /* =================================================
+           BOTTOM INFORMATION
+        ================================================= */
+
+        doc.setFontSize(
+            8
+        );
+
+
+        doc.setTextColor(
+            100,
+            116,
+            139
+        );
+
+
+        doc.text(
+            'จำนวนวันทำงาน',
+            leftCenter,
+            bottomLabelY,
+            {
+                align:'center'
+            }
+        );
+
+
+        doc.text(
+            'วันที่ออกเอกสาร',
+            rightCenter,
+            bottomLabelY,
+            {
+                align:'center'
+            }
+        );
+
+
+        doc.setFontSize(
+            9
+        );
+
+
+        doc.setTextColor(
+            30,
+            41,
+            59
+        );
+
+
+        /*
+         * FIX:
+         * ต้องใช้ template string
+         */
+
+        doc.text(
+            `${data.workDays} วัน`,
+            leftCenter,
+            bottomValueY,
+            {
+                align:'center'
+            }
+        );
+
+
+        const today =
+            new Date();
+
+
+        const todayKey =
+            `${today.getFullYear()}-${pad(today.getMonth() + 1)}-${pad(today.getDate())}`;
+
+
+        doc.text(
+            formatThaiDate(todayKey),
+            rightCenter,
+            bottomValueY,
+            {
+                align:'center'
+            }
+        );
+
+
+        /* =================================================
+           MOVE TO NEXT SECTION
+        ================================================= */
+
+        y +=
+            infoBoxHeight +
+            9;
 
 
         /* =================================================
@@ -2928,6 +4169,13 @@ y +=
         );
 
 
+        doc.setTextColor(
+            30,
+            41,
+            59
+        );
+
+
         doc.text(
             'รายได้',
             margin,
@@ -2935,19 +4183,25 @@ y +=
         );
 
 
-        y += 5;
+        y +=
+            5;
 
 
         doc.autoTable({
 
-            startY:y,
+            startY:
+                y,
 
             margin:{
-                left:margin,
-                right:margin
+                left:
+                    margin,
+
+                right:
+                    margin
             },
 
-            theme:'grid',
+            theme:
+                'grid',
 
             styles:{
 
@@ -2973,7 +4227,10 @@ y +=
                     30,
                     41,
                     59
-                ]
+                ],
+
+                valign:
+                    'middle'
 
             },
 
@@ -2992,19 +4249,26 @@ y +=
                 ],
 
                 fontStyle:
-                    'normal'
+                    'normal',
+
+                valign:
+                    'middle'
 
             },
 
             columnStyles:{
 
                 0:{
-                    halign:'left',
-                    cellWidth:contentWidth * .65
+                    halign:
+                        'left',
+
+                    cellWidth:
+                        contentWidth * .65
                 },
 
                 1:{
-                    halign:'right'
+                    halign:
+                        'right'
                 }
 
             },
@@ -3022,13 +4286,17 @@ y +=
 
                 [
                     'ค่าแรง',
-                    formatNumber(data.wage) +
+                    formatNumber(
+                        data.wage
+                    ) +
                     ' บาท'
                 ],
 
                 [
                     'ค่าห้องเย็น',
-                    formatNumber(data.room) +
+                    formatNumber(
+                        data.room
+                    ) +
                     ' บาท'
                 ]
 
@@ -3108,7 +4376,8 @@ y +=
         );
 
 
-        y += 22;
+        y +=
+            22;
 
 
         /* =================================================
@@ -3127,19 +4396,25 @@ y +=
         );
 
 
-        y += 5;
+        y +=
+            5;
 
 
         doc.autoTable({
 
-            startY:y,
+            startY:
+                y,
 
             margin:{
-                left:margin,
-                right:margin
+                left:
+                    margin,
+
+                right:
+                    margin
             },
 
-            theme:'grid',
+            theme:
+                'grid',
 
             styles:{
 
@@ -3165,19 +4440,26 @@ y +=
                     30,
                     41,
                     59
-                ]
+                ],
+
+                valign:
+                    'middle'
 
             },
 
             columnStyles:{
 
                 0:{
-                    halign:'left',
-                    cellWidth:contentWidth * .65
+                    halign:
+                        'left',
+
+                    cellWidth:
+                        contentWidth * .65
                 },
 
                 1:{
-                    halign:'right'
+                    halign:
+                        'right'
                 }
 
             },
@@ -3186,6 +4468,7 @@ y +=
 
                 [
                     `ประกันสังคม ${data.rate}%`,
+
                     formatNumber(
                         data.socialSecurity
                     ) +
@@ -3266,14 +4549,15 @@ y +=
                 data.total
             ),
             right - 8,
-            y + 16,
+            y + 17,
             {
                 align:'right'
             }
         );
 
 
-        y += 42;
+        y +=
+            42;
 
 
         /* =================================================
@@ -3284,6 +4568,11 @@ y +=
             226,
             232,
             240
+        );
+
+
+        doc.setLineWidth(
+            0.2
         );
 
 
@@ -3328,15 +4617,23 @@ y +=
            SAVE
         ================================================= */
 
+        const safePeriodName =
+            String(
+                data.period.name
+            ).replace(
+                /[\/\\:*?"<>| ]/g,
+                '_'
+            );
+
+
         const filename =
             'SalarySlip_' +
-            data.period.name
-                .replace(
-                    /[\/\\:*?"<>| ]/g,
-                    '_'
-                ) +
+            safePeriodName +
             '_' +
-            (data.employeeId || 'employee') +
+            (
+                data.employeeId ||
+                'employee'
+            ) +
             '.pdf';
 
 
@@ -3374,11 +4671,376 @@ function formatNumber(
     ).toLocaleString(
         'en-US',
         {
-            minimumFractionDigits:2,
-            maximumFractionDigits:2
+            minimumFractionDigits:
+                2,
+
+            maximumFractionDigits:
+                2
         }
     );
+
 }
+
+
+/* =====================================================
+   MONEY
+===================================================== */
+
+function money(
+    value
+){
+
+    return '฿' +
+        Number(
+            value || 0
+        ).toLocaleString(
+            'en-US',
+            {
+                minimumFractionDigits:
+                    2,
+
+                maximumFractionDigits:
+                    2
+            }
+        );
+
+}
+
+
+/* =====================================================
+   DATE OBJECT
+===================================================== */
+
+function dateObject(
+    year,
+    month,
+    day
+){
+
+    const date =
+        new Date(
+            year,
+            month - 1,
+            day
+        );
+
+
+    if(
+        date.getFullYear() !== year ||
+        date.getMonth() !== month - 1 ||
+        date.getDate() !== day
+    ){
+
+        return null;
+
+    }
+
+
+    return {
+
+        year,
+
+        month,
+
+        day,
+
+        key:
+            `${year}-${pad(month)}-${pad(day)}`
+
+    };
+
+}
+
+
+/* =====================================================
+   PARSE DATE KEY
+===================================================== */
+
+function parseDateKey(
+    key
+){
+
+    const [
+        y,
+        m,
+        d
+    ] =
+        key
+        .split('-')
+        .map(
+            Number
+        );
+
+
+    return new Date(
+        y,
+        m - 1,
+        d
+    );
+
+}
+
+
+/* =====================================================
+   START OF DAY
+===================================================== */
+
+function startOfDay(
+    date
+){
+
+    return new Date(
+        date.getFullYear(),
+        date.getMonth(),
+        date.getDate()
+    );
+
+}
+
+
+/* =====================================================
+   DAY OF WEEK
+===================================================== */
+
+function getDay(
+    key
+){
+
+    return parseDateKey(
+        key
+    ).getDay();
+
+}
+
+
+/* =====================================================
+   TIMESTAMP
+===================================================== */
+
+function timestamp(
+    dateKey,
+    time
+){
+
+    const date =
+        parseDateKey(
+            dateKey
+        );
+
+
+    const minutes =
+        toMinutes(
+            time
+        );
+
+
+    date.setHours(
+        Math.floor(
+            minutes / 60
+        ),
+        minutes % 60,
+        0,
+        0
+    );
+
+
+    return date.getTime();
+
+}
+
+
+/* =====================================================
+   TIME TO MINUTES
+===================================================== */
+
+function toMinutes(
+    time
+){
+
+    const [
+        h,
+        m
+    ] =
+        time
+        .split(':')
+        .map(
+            Number
+        );
+
+
+    return (
+        h * 60
+    ) +
+    m;
+
+}
+
+
+/* =====================================================
+   MAKE SHIFT ID
+===================================================== */
+
+function makeId(
+    start,
+    end
+){
+
+    return (
+        start.dateKey +
+        '_' +
+        start.time +
+        '_' +
+        end.dateKey +
+        '_' +
+        end.time
+    );
+
+}
+
+
+/* =====================================================
+   PAD
+===================================================== */
+
+function pad(
+    value
+){
+
+    return String(
+        value
+    ).padStart(
+        2,
+        '0'
+    );
+
+}
+
+
+/* =====================================================
+   THAI MONTH
+===================================================== */
+
+function thaiMonth(
+    month
+){
+
+    const months = [
+
+        'มกราคม',
+        'กุมภาพันธ์',
+        'มีนาคม',
+        'เมษายน',
+        'พฤษภาคม',
+        'มิถุนายน',
+        'กรกฎาคม',
+        'สิงหาคม',
+        'กันยายน',
+        'ตุลาคม',
+        'พฤศจิกายน',
+        'ธันวาคม'
+
+    ];
+
+
+    return months[
+        month
+    ];
+
+}
+
+
+/* =====================================================
+   THAI DATE
+===================================================== */
+
+function formatThaiDate(
+    key
+){
+
+    const date =
+        parseDateKey(
+            key
+        );
+
+
+    const day =
+        date.getDate();
+
+
+    const month =
+        thaiMonth(
+            date.getMonth()
+        );
+
+
+    const year =
+        date.getFullYear() +
+        543;
+
+
+    return `${day} ${month} ${year}`;
+
+}
+
+
+/* =====================================================
+   ESCAPE HTML
+===================================================== */
+
+function escapeHTML(
+    value
+){
+
+    return String(
+        value ?? ''
+    )
+    .replace(
+        /&/g,
+        '&amp;'
+    )
+    .replace(
+        /</g,
+        '&lt;'
+    )
+    .replace(
+        />/g,
+        '&gt;'
+    )
+    .replace(
+        /"/g,
+        '&quot;'
+    )
+    .replace(
+        /'/g,
+        '&#039;'
+    );
+
+}
+
+
+/* =====================================================
+   KEYBOARD
+===================================================== */
+
+document.addEventListener(
+    'keydown',
+    event => {
+
+        if(
+            event.key ===
+            'Escape'
+        ){
+
+            closeModal();
+
+            closePeriodsMore();
+
+            closeSalaryPreview();
+
+        }
+
+    }
+);
 
 </script>
 
