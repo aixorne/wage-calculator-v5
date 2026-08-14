@@ -251,23 +251,38 @@
 
 </section>
 
-
 <!-- =====================================================
      PAY PERIOD
 ===================================================== -->
 
-<section class="card">
+<section class="card pay-period-card">
 
-    <div class="card-title">
-        <span>💵</span>
-        <h2>รอบจ่าย</h2>
+    <div class="card-title pay-period-title">
+
+        <div class="title-left">
+            <span class="title-icon">💵</span>
+
+            <div>
+                <h2>รอบจ่าย</h2>
+                <p>สรุปค่าแรงตามรอบการจ่ายเงิน</p>
+            </div>
+        </div>
+
     </div>
 
 
-    <div id="periods">
+    <div id="periods" class="periods-container">
 
         <div class="empty-state">
-            ยังไม่มีข้อมูลรอบจ่าย
+            <div class="empty-icon">💰</div>
+
+            <div class="empty-title">
+                ยังไม่มีข้อมูลรอบจ่าย
+            </div>
+
+            <div class="empty-sub">
+                เมื่อมีข้อมูลค่าแรง รอบจ่ายจะแสดงที่นี่
+            </div>
         </div>
 
     </div>
@@ -276,7 +291,7 @@
 
 
 <!-- =====================================================
-     ALL PERIODS MODAL
+     ALL PAY PERIODS MODAL
 ===================================================== -->
 
 <div
@@ -289,13 +304,26 @@
 
         <div class="modal-header">
 
-            <h3>
-                📋 รอบจ่ายทั้งหมด
-            </h3>
+            <div class="modal-header-title">
+
+                <div class="modal-header-icon">
+                    💵
+                </div>
+
+                <div>
+                    <h3>รอบจ่ายทั้งหมด</h3>
+
+                    <span>
+                        ประวัติรอบจ่ายของคุณ
+                    </span>
+                </div>
+
+            </div>
 
             <button
                 class="modal-close"
                 onclick="closePeriodsMore()"
+                aria-label="ปิด"
             >
                 ×
             </button>
@@ -305,13 +333,12 @@
 
         <div
             id="allPeriodsList"
-            class="modal-body"
+            class="modal-body periods-modal-body"
         ></div>
 
     </div>
 
 </div>
-
 
 <!-- =====================================================
      SALARY SLIP
