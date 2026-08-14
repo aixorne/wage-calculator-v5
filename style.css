@@ -1,23 +1,798 @@
+/* =========================================================
+   V6 - MODERN UI CSS
+   ========================================================= */
 
-/* V6 PAYSLIP BUTTON */
-.pdf-slip-btn{
-    width:100%;
-    margin-top:14px;
-    border:0;
-    border-radius:14px;
-    padding:13px 16px;
-    background:linear-gradient(135deg,#111827,#374151);
-    color:#fff;
-    font-size:14px;
-    font-weight:800;
-    cursor:pointer;
-    box-shadow:0 8px 20px rgba(17,24,39,.16);
-    transition:transform .15s ease, box-shadow .15s ease;
+@import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap');
+
+:root {
+    --bg: #f4f7fb;
+    --card: #ffffff;
+    --text: #172033;
+    --muted: #748096;
+
+    --primary: #5b5cf0;
+    --primary-dark: #4546d8;
+    --primary-light: #eef0ff;
+
+    --danger: #ef4444;
+    --danger-dark: #dc2626;
+    --danger-light: #fff1f2;
+
+    --success: #10b981;
+    --success-light: #ecfdf5;
+
+    --border: #e5e9f2;
+    --shadow: 0 12px 35px rgba(25, 35, 60, 0.08);
+    --radius: 18px;
 }
-.pdf-slip-btn:hover{
-    transform:translateY(-1px);
-    box-shadow:0 11px 25px rgba(17,24,39,.22);
+
+/* =========================
+   RESET
+   ========================= */
+
+* {
+    box-sizing: border-box;
 }
-.pdf-slip-btn:active{
-    transform:translateY(0);
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background:
+        radial-gradient(circle at top left, rgba(91,92,240,.08), transparent 30%),
+        var(--bg);
+    color: var(--text);
+    font-family: 'Kanit', sans-serif;
+    min-height: 100vh;
+}
+
+/* =========================
+   MAIN CONTAINER
+   ========================= */
+
+.container,
+.main-container {
+    width: min(1100px, calc(100% - 30px));
+    margin: 30px auto;
+}
+
+/* =========================
+   HEADER
+   ========================= */
+
+.page-header {
+    position: relative;
+    overflow: hidden;
+    padding: 30px;
+    margin-bottom: 22px;
+
+    background:
+        linear-gradient(135deg, #5b5cf0, #7677ff);
+
+    border-radius: 24px;
+    color: white;
+    box-shadow: 0 15px 35px rgba(91, 92, 240, .25);
+}
+
+.page-header::before {
+    content: "";
+    position: absolute;
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.08);
+    right: -50px;
+    top: -70px;
+}
+
+.page-header::after {
+    content: "";
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.06);
+    right: 100px;
+    bottom: -50px;
+}
+
+.page-header h1 {
+    position: relative;
+    z-index: 2;
+    margin: 0;
+    font-size: clamp(24px, 5vw, 36px);
+    font-weight: 700;
+}
+
+.page-header p {
+    position: relative;
+    z-index: 2;
+    margin: 5px 0 0;
+    opacity: .85;
+    font-weight: 300;
+}
+
+/* =========================
+   CARD
+   ========================= */
+
+.card,
+.form-card,
+.delete-card,
+.data-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 24px;
+    margin-bottom: 20px;
+}
+
+.card-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    margin: 0 0 20px;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.card-title::before {
+    content: "";
+    width: 5px;
+    height: 24px;
+    border-radius: 10px;
+    background: var(--primary);
+}
+
+/* =========================
+   FORM
+   ========================= */
+
+.form-group {
+    margin-bottom: 18px;
+}
+
+.form-group label,
+label {
+    display: block;
+    margin-bottom: 7px;
+    color: #3f4a60;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* INPUT / SELECT / TEXTAREA */
+
+input,
+select,
+textarea {
+    width: 100%;
+    border: 1.5px solid var(--border);
+    border-radius: 13px;
+
+    background: #fbfcff;
+    color: var(--text);
+
+    font-family: 'Kanit', sans-serif;
+    font-size: 15px;
+
+    padding: 12px 14px;
+    outline: none;
+
+    transition:
+        border-color .2s ease,
+        box-shadow .2s ease,
+        background .2s ease,
+        transform .2s ease;
+}
+
+input:hover,
+select:hover,
+textarea:hover {
+    border-color: #c9cef0;
+    background: #fff;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    border-color: var(--primary);
+    background: #fff;
+
+    box-shadow:
+        0 0 0 4px rgba(91,92,240,.10);
+}
+
+textarea {
+    min-height: 110px;
+    resize: vertical;
+}
+
+/* =========================
+   DATE INPUT
+   ========================= */
+
+input[type="date"] {
+    position: relative;
+    min-height: 48px;
+    cursor: pointer;
+    color: var(--text);
+    padding-right: 14px;
+}
+
+/* Chrome / Edge */
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+
+    padding: 5px;
+    border-radius: 8px;
+
+    opacity: .75;
+
+    transition: .2s;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator:hover {
+    opacity: 1;
+    background: var(--primary-light);
+}
+
+/* =========================
+   SELECT
+   ========================= */
+
+select {
+    min-height: 48px;
+    cursor: pointer;
+}
+
+/* =========================
+   NUMBER
+   ========================= */
+
+input[type="number"] {
+    min-height: 48px;
+}
+
+/* =========================
+   BUTTON AREA
+   ========================= */
+
+.button-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+/* =========================
+   BUTTON
+   ========================= */
+
+button,
+.btn {
+    border: none;
+    border-radius: 12px;
+
+    padding: 11px 18px;
+
+    font-family: 'Kanit', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+
+    cursor: pointer;
+
+    transition:
+        transform .15s ease,
+        box-shadow .15s ease,
+        background .15s ease;
+}
+
+button:hover,
+.btn:hover {
+    transform: translateY(-2px);
+}
+
+button:active,
+.btn:active {
+    transform: translateY(0);
+}
+
+/* PRIMARY */
+
+.btn-primary,
+button.primary {
+    color: white;
+    background: linear-gradient(
+        135deg,
+        var(--primary),
+        #7778ff
+    );
+
+    box-shadow:
+        0 7px 18px rgba(91,92,240,.22);
+}
+
+.btn-primary:hover,
+button.primary:hover {
+    background: linear-gradient(
+        135deg,
+        var(--primary-dark),
+        #6263eb
+    );
+}
+
+/* SUCCESS */
+
+.btn-success {
+    color: white;
+    background: linear-gradient(
+        135deg,
+        #10b981,
+        #16c79a
+    );
+
+    box-shadow:
+        0 7px 18px rgba(16,185,129,.18);
+}
+
+/* DANGER */
+
+.btn-danger,
+.delete-btn {
+    color: white;
+    background: linear-gradient(
+        135deg,
+        var(--danger),
+        #f45b5b
+    );
+
+    box-shadow:
+        0 7px 18px rgba(239,68,68,.18);
+}
+
+.btn-danger:hover,
+.delete-btn:hover {
+    background: linear-gradient(
+        135deg,
+        var(--danger-dark),
+        #ef4444
+    );
+}
+
+/* SECONDARY */
+
+.btn-secondary {
+    color: #4b5563;
+    background: #eef1f7;
+}
+
+.btn-secondary:hover {
+    background: #e3e7ef;
+}
+
+/* =========================
+   DELETE BY DATE SECTION
+   ========================= */
+
+.delete-card {
+    border: 1px solid #fee2e2;
+    background:
+        linear-gradient(
+            135deg,
+            #fff,
+            #fff8f8
+        );
+}
+
+.delete-card .card-title::before {
+    background: var(--danger);
+}
+
+/* Date + Delete */
+
+.delete-date-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 12px;
+    align-items: end;
+}
+
+.delete-date-row .form-group {
+    margin: 0;
+}
+
+.delete-date-row button {
+    min-height: 48px;
+}
+
+/* =========================
+   DATA LIST
+   ========================= */
+
+.data-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.data-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+
+    padding: 16px;
+
+    border: 1px solid var(--border);
+    border-radius: 14px;
+
+    background: #fbfcff;
+
+    transition:
+        transform .2s ease,
+        box-shadow .2s ease,
+        border-color .2s ease;
+}
+
+.data-item:hover {
+    transform: translateY(-2px);
+
+    border-color: #d6d9f5;
+
+    box-shadow:
+        0 8px 22px rgba(25,35,60,.07);
+}
+
+.data-info {
+    min-width: 0;
+}
+
+.data-info strong {
+    display: block;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.data-info span {
+    display: block;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+/* =========================
+   BADGE
+   ========================= */
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+
+    padding: 5px 10px;
+
+    border-radius: 999px;
+
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.badge-primary {
+    color: var(--primary);
+    background: var(--primary-light);
+}
+
+.badge-success {
+    color: #059669;
+    background: var(--success-light);
+}
+
+.badge-danger {
+    color: #dc2626;
+    background: var(--danger-light);
+}
+
+/* =========================
+   EMPTY STATE
+   ========================= */
+
+.empty-state {
+    text-align: center;
+    padding: 45px 20px;
+    color: var(--muted);
+}
+
+.empty-state .icon {
+    width: 60px;
+    height: 60px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin: 0 auto 12px;
+
+    border-radius: 18px;
+
+    background: var(--primary-light);
+
+    font-size: 25px;
+}
+
+.empty-state h3 {
+    margin: 0 0 5px;
+    color: var(--text);
+    font-size: 18px;
+}
+
+.empty-state p {
+    margin: 0;
+    font-size: 14px;
+}
+
+/* =========================
+   ALERT
+   ========================= */
+
+.alert {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    padding: 13px 15px;
+    margin-bottom: 18px;
+
+    border-radius: 12px;
+
+    font-size: 14px;
+}
+
+.alert-success {
+    color: #047857;
+    background: #ecfdf5;
+    border: 1px solid #a7f3d0;
+}
+
+.alert-danger {
+    color: #b91c1c;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+}
+
+.alert-warning {
+    color: #92400e;
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+}
+
+/* =========================
+   TABLE
+   ========================= */
+
+.table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+
+    border: 1px solid var(--border);
+    border-radius: 14px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 600px;
+}
+
+thead {
+    background: #f6f7ff;
+}
+
+th {
+    padding: 13px 15px;
+
+    text-align: left;
+
+    color: #59647a;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    border-bottom: 1px solid var(--border);
+}
+
+td {
+    padding: 13px 15px;
+
+    border-bottom: 1px solid #edf0f5;
+
+    font-size: 14px;
+}
+
+tbody tr {
+    transition: background .2s ease;
+}
+
+tbody tr:hover {
+    background: #fafbff;
+}
+
+tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* =========================
+   FILE UPLOAD
+   ========================= */
+
+input[type="file"] {
+    padding: 10px;
+    cursor: pointer;
+    background: #fbfcff;
+}
+
+input[type="file"]::file-selector-button {
+    border: none;
+    border-radius: 9px;
+
+    padding: 8px 13px;
+    margin-right: 10px;
+
+    background: var(--primary-light);
+    color: var(--primary);
+
+    font-family: 'Kanit', sans-serif;
+    font-weight: 500;
+
+    cursor: pointer;
+
+    transition: .2s;
+}
+
+input[type="file"]::file-selector-button:hover {
+    background: #e2e4ff;
+}
+
+/* =========================
+   FOOTER
+   ========================= */
+
+footer {
+    text-align: center;
+
+    padding: 25px 15px;
+
+    color: var(--muted);
+
+    font-size: 13px;
+}
+
+/* =========================
+   SCROLLBAR
+   ========================= */
+
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #cfd4e3;
+    border-radius: 20px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #aeb5c8;
+}
+
+/* =========================
+   LOADING
+   ========================= */
+
+.loading {
+    width: 22px;
+    height: 22px;
+
+    border: 3px solid rgba(91,92,240,.2);
+    border-top-color: var(--primary);
+
+    border-radius: 50%;
+
+    animation: spin .7s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* =========================
+   MOBILE
+   ========================= */
+
+@media (max-width: 768px) {
+
+    .container,
+    .main-container {
+        width: min(100% - 20px, 1100px);
+        margin: 15px auto;
+    }
+
+    .page-header {
+        padding: 24px 20px;
+        border-radius: 20px;
+    }
+
+    .card,
+    .form-card,
+    .delete-card,
+    .data-card {
+        padding: 18px;
+        border-radius: 16px;
+    }
+
+    .card-title {
+        font-size: 18px;
+    }
+
+    .delete-date-row {
+        grid-template-columns: 1fr;
+    }
+
+    .delete-date-row button {
+        width: 100%;
+    }
+
+    .button-group {
+        flex-direction: column;
+    }
+
+    .button-group button,
+    .button-group .btn {
+        width: 100%;
+    }
+
+    .data-item {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .data-item button {
+        width: 100%;
+    }
+}
+
+/* =========================
+   SMALL MOBILE
+   ========================= */
+
+@media (max-width: 420px) {
+
+    body {
+        font-size: 14px;
+    }
+
+    .page-header h1 {
+        font-size: 25px;
+    }
+
+    input,
+    select,
+    textarea {
+        font-size: 14px;
+    }
+
+    button,
+    .btn {
+        font-size: 14px;
+    }
 }
