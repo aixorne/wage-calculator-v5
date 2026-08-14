@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wage Calculator V1</title>
+    <title>Wage Calculator V.Beta</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
@@ -16,7 +16,7 @@
     <section class="hero">
         <h1>💰 ระบบคำนวณค่าแรง</h1>
         <p>OCR • ค่าแรง • OT • ปฏิทิน • รอบจ่าย</p>
-        <span class="version">WAGE CALCULATOR V1</span>
+        <span class="version">WAGE CALCULATOR V.Beta</span>
     </section>
 
     <!-- SUMMARY -->
