@@ -10,7 +10,7 @@
     content="width=device-width, initial-scale=1.0"
 >
 
-<title>Wage Calculator V1.1</title>
+<title>Wage Calculator V1</title>
 
 <link
     rel="stylesheet"
@@ -28,7 +28,6 @@
 
 <div class="app">
 
-
 <!-- =====================================================
      HERO
 ===================================================== -->
@@ -44,7 +43,7 @@
     </p>
 
     <span class="version">
-        WAGE CALCULATOR V1.1
+        WAGE CALCULATOR V1
     </span>
 
 </section>
@@ -303,6 +302,7 @@
 
         </div>
 
+
         <div
             id="allPeriodsList"
             class="modal-body"
@@ -456,25 +456,12 @@
 <section class="card">
 
     <div class="card-title">
-
-        <span>
-            💾
-        </span>
-
-        <h2>
-            จัดการข้อมูล
-        </h2>
-
+        <span>💾</span>
+        <h2>จัดการข้อมูล</h2>
     </div>
 
 
-    <p
-        style="
-            color:#778096;
-            font-size:13px;
-            line-height:1.7;
-        "
-    >
+    <p class="data-description">
 
         ข้อมูลค่าแรงถูกเก็บไว้ใน LocalStorage
         ของเบราว์เซอร์เครื่องนี้
@@ -520,12 +507,11 @@
 
 </section>
 
-
 </div>
 
 
 <!-- =====================================================
-     DAY MODAL
+     DAY DETAIL MODAL
 ===================================================== -->
 
 <div
@@ -541,7 +527,6 @@
             <h3 id="modalTitle">
                 รายละเอียด
             </h3>
-
 
             <button
                 class="modal-close"
@@ -573,7 +558,7 @@
     onclick="closeSalaryPreviewOutside(event)"
 >
 
-    <div class="modal-box">
+    <div class="modal-box salary-preview-modal-box">
 
         <div class="modal-header">
 
@@ -604,88 +589,6 @@
 <script>
 
 /* =====================================================
-   THAI FONT
-===================================================== */
-
-async function loadThaiFont(doc){
-
-    const response =
-        await fetch(
-            'NotoSansThai-Regular.ttf'
-        );
-
-
-    if(!response.ok){
-
-        throw new Error(
-            'ไม่พบไฟล์ NotoSansThai-Regular.ttf'
-        );
-
-    }
-
-
-    const buffer =
-        await response.arrayBuffer();
-
-
-    const bytes =
-        new Uint8Array(
-            buffer
-        );
-
-
-    let binary = '';
-
-
-    const chunkSize =
-        0x8000;
-
-
-    for(
-        let i = 0;
-        i < bytes.length;
-        i += chunkSize
-    ){
-
-        binary += String.fromCharCode(
-            ...bytes.subarray(
-                i,
-                Math.min(
-                    i + chunkSize,
-                    bytes.length
-                )
-            )
-        );
-
-    }
-
-
-    const base64 =
-        btoa(binary);
-
-
-    doc.addFileToVFS(
-        'NotoSansThai-Regular.ttf',
-        base64
-    );
-
-
-    doc.addFont(
-        'NotoSansThai-Regular.ttf',
-        'NotoSansThai',
-        'normal'
-    );
-
-
-    doc.setFont(
-        'NotoSansThai',
-        'normal'
-    );
-
-}
-
-
-/* =====================================================
    CONFIG
 ===================================================== */
 
@@ -703,14 +606,6 @@ const OT_RATE =
 
 const SUNDAY_RATE =
     88;
-
-
-const DAY_START =
-    8 * 60;
-
-
-const NORMAL_END =
-    17 * 60;
 
 
 const OT_START =
@@ -805,97 +700,126 @@ const salaryPeriod =
 
 
 /* =====================================================
-   INIT
+   START
 ===================================================== */
 
-loadData();
+document.addEventListener(
+    'DOMContentLoaded',
+    () => {
+
+        loadData();
+
+        renderAll();
+
+        setupFileInput();
+
+        setupDragDrop();
+
+    }
+);
 
 
 /* =====================================================
    FILE INPUT
 ===================================================== */
 
-imageInput.addEventListener(
-    'change',
-    function(){
+function setupFileInput(){
 
-        addFiles(
-            Array.from(
-                this.files
-            )
-        );
+    imageInput.addEventListener(
+        'change',
+        function(){
 
-    }
-);
+            addFiles(
+                Array.from(
+                    this.files || []
+                )
+            );
+
+        }
+    );
+
+}
 
 
 /* =====================================================
    DRAG DROP
 ===================================================== */
 
-[
-    'dragenter',
-    'dragover'
-].forEach(
-    eventName => {
+function setupDragDrop(){
 
-        uploadZone.addEventListener(
-            eventName,
-            e => {
+    [
+        'dragenter',
+        'dragover'
+    ].forEach(
+        eventName => {
 
-                e.preventDefault();
+            uploadZone.addEventListener(
+                eventName,
+                event => {
 
-                uploadZone.classList.add(
-                    'dragover'
+                    event.preventDefault();
+
+                    event.stopPropagation();
+
+                    uploadZone.classList.add(
+                        'dragover'
+                    );
+
+                }
+            );
+
+        }
+    );
+
+
+    [
+        'dragleave',
+        'drop'
+    ].forEach(
+        eventName => {
+
+            uploadZone.addEventListener(
+                eventName,
+                event => {
+
+                    event.preventDefault();
+
+                    event.stopPropagation();
+
+                    uploadZone.classList.remove(
+                        'dragover'
+                    );
+
+                }
+            );
+
+        }
+    );
+
+
+    uploadZone.addEventListener(
+        'drop',
+        event => {
+
+            const files =
+                Array.from(
+                    event.dataTransfer.files || []
+                ).filter(
+                    file =>
+                        file.type.startsWith(
+                            'image/'
+                        )
                 );
 
-            }
-        );
 
-    }
-);
+            addFiles(
+                files
+            );
 
+        }
+    );
 
-[
-    'dragleave',
-    'drop'
-].forEach(
-    eventName => {
-
-        uploadZone.addEventListener(
-            eventName,
-            e => {
-
-                e.preventDefault();
-
-                uploadZone.classList.remove(
-                    'dragover'
-                );
-
-            }
-        );
-
-    }
-);
-
-
-uploadZone.addEventListener(
-    'drop',
-    e => {
-
-        addFiles(
-            Array.from(
-                e.dataTransfer.files
-            ).filter(
-                file =>
-                    file.type.startsWith(
-                        'image/'
-                    )
-            )
-        );
-
-    }
-);
+}
 
 
 /* =====================================================
@@ -919,7 +843,10 @@ function addFiles(files){
 
             const key =
                 file.name +
-                file.size;
+                '_' +
+                file.size +
+                '_' +
+                file.lastModified;
 
 
             map.set(
@@ -953,7 +880,7 @@ function renderPreviews(){
 
 
     selectedFiles.forEach(
-        (file,index)=>{
+        (file,index) => {
 
             const item =
                 document.createElement(
@@ -979,6 +906,7 @@ function renderPreviews(){
                 >
 
                 <button
+                    type="button"
                     class="remove-file"
                     onclick="removeFile(${index})"
                 >
@@ -1005,9 +933,9 @@ function renderPreviews(){
 
 
     loading.textContent =
-        selectedFiles.length
-        ? `เลือกรูปแล้ว ${selectedFiles.length} รูป`
-        : 'ยังไม่ได้เลือกรูป';
+        selectedFiles.length > 0
+            ? `เลือกรูปแล้ว ${selectedFiles.length} รูป`
+            : 'ยังไม่ได้เลือกรูป';
 
 }
 
@@ -1036,7 +964,7 @@ function removeFile(index){
 async function runOCR(){
 
     if(
-        !selectedFiles.length
+        selectedFiles.length === 0
     ){
 
         return;
@@ -1099,7 +1027,7 @@ async function runOCR(){
             ){
 
                 throw new Error(
-                    `OCR Server Error ${response.status}`
+                    `OCR Server Error: ${response.status}`
                 );
 
             }
@@ -1155,6 +1083,17 @@ async function runOCR(){
             );
 
 
+        if(
+            newShifts.length === 0
+        ){
+
+            throw new Error(
+                'ไม่พบวันที่หรือเวลาในรูป'
+            );
+
+        }
+
+
         mergeShifts(
             newShifts
         );
@@ -1172,7 +1111,7 @@ async function runOCR(){
 
 
         loading.textContent =
-            '✅ บันทึกข้อมูลเรียบร้อย';
+            `✅ บันทึกข้อมูล ${newShifts.length} กะเรียบร้อย`;
 
 
         renderAll();
@@ -1205,15 +1144,13 @@ async function runOCR(){
 
 
 /* =====================================================
-   COMPRESS IMAGE
+   IMAGE COMPRESS
 ===================================================== */
 
-function compressImage(
-    file
-){
+function compressImage(file){
 
     return new Promise(
-        (resolve,reject)=>{
+        (resolve,reject) => {
 
             const img =
                 new Image();
@@ -1225,114 +1162,122 @@ function compressImage(
                 );
 
 
-            img.onload = () => {
+            img.onload =
+                () => {
 
-                URL.revokeObjectURL(
-                    url
-                );
-
-
-                const maxWidth =
-                    1800;
+                    URL.revokeObjectURL(
+                        url
+                    );
 
 
-                let width =
-                    img.width;
+                    const maxWidth =
+                        1800;
 
 
-                let height =
-                    img.height;
+                    let width =
+                        img.width;
 
 
-                if(
-                    width > maxWidth
-                ){
+                    let height =
+                        img.height;
 
-                    height =
-                        Math.round(
-                            height *
+
+                    if(
+                        width > maxWidth
+                    ){
+
+                        const ratio =
                             maxWidth /
-                            width
-                        );
+                            width;
 
 
-                    width =
-                        maxWidth;
-
-                }
+                        width =
+                            maxWidth;
 
 
-                const canvas =
-                    document.createElement(
-                        'canvas'
-                    );
-
-
-                canvas.width =
-                    width;
-
-
-                canvas.height =
-                    height;
-
-
-                const ctx =
-                    canvas.getContext(
-                        '2d'
-                    );
-
-
-                ctx.drawImage(
-                    img,
-                    0,
-                    0,
-                    width,
-                    height
-                );
-
-
-                canvas.toBlob(
-                    blob => {
-
-                        if(!blob){
-
-                            reject(
-                                new Error(
-                                    'ไม่สามารถบีบอัดรูปได้'
-                                )
+                        height =
+                            Math.round(
+                                height *
+                                ratio
                             );
 
-                            return;
-
-                        }
+                    }
 
 
-                        resolve(
-                            blob
+                    const canvas =
+                        document.createElement(
+                            'canvas'
                         );
 
-                    },
-                    'image/jpeg',
-                    0.88
-                );
 
-            };
+                    canvas.width =
+                        width;
 
 
-            img.onerror = () => {
-
-                URL.revokeObjectURL(
-                    url
-                );
+                    canvas.height =
+                        height;
 
 
-                reject(
-                    new Error(
-                        'ไม่สามารถอ่านรูปได้'
-                    )
-                );
+                    const ctx =
+                        canvas.getContext(
+                            '2d'
+                        );
 
-            };
+
+                    ctx.drawImage(
+                        img,
+                        0,
+                        0,
+                        width,
+                        height
+                    );
+
+
+                    canvas.toBlob(
+                        blob => {
+
+                            if(
+                                !blob
+                            ){
+
+                                reject(
+                                    new Error(
+                                        'ไม่สามารถบีบอัดรูปได้'
+                                    )
+                                );
+
+                                return;
+
+                            }
+
+
+                            resolve(
+                                blob
+                            );
+
+                        },
+                        'image/jpeg',
+                        0.88
+                    );
+
+                };
+
+
+            img.onerror =
+                () => {
+
+                    URL.revokeObjectURL(
+                        url
+                    );
+
+
+                    reject(
+                        new Error(
+                            'ไม่สามารถเปิดรูปได้'
+                        )
+                    );
+
+                };
 
 
             img.src =
@@ -1368,17 +1313,28 @@ function parseOCR(text){
 
 
 /* =====================================================
-   DATE
+   DATE PARSER
 ===================================================== */
 
 function extractDate(text){
 
+    if(
+        !text
+    ){
+
+        return null;
+
+    }
+
+
     let m;
 
 
+    /* YYYY-MM-DD */
+
     m =
         text.match(
-            /\b(20\d{2})[-\/](\d{1,2})[-\/](\d{1,2})\b/
+            /\b(20\d{2}|25\d{2})[-\/](\d{1,2})[-\/](\d{1,2})\b/
         );
 
 
@@ -1419,6 +1375,8 @@ function extractDate(text){
 
     }
 
+
+    /* DD/MM/YYYY */
 
     m =
         text.match(
@@ -1473,16 +1431,33 @@ function extractDate(text){
     }
 
 
+    /* YYYY MM DD */
+
     m =
         text.match(
-            /\b(20\d{2})\s+(\d{1,2})\s+(\d{1,2})\b/
+            /\b(20\d{2}|25\d{2})\s+(\d{1,2})\s+(\d{1,2})\b/
         );
 
 
     if(m){
 
+        let year =
+            Number(
+                m[1]
+            );
+
+
+        if(
+            year > 2400
+        ){
+
+            year -= 543;
+
+        }
+
+
         return dateObject(
-            Number(m[1]),
+            year,
             Number(m[2]),
             Number(m[3])
         );
@@ -1496,7 +1471,7 @@ function extractDate(text){
 
 
 /* =====================================================
-   TIME
+   TIME PARSER
 ===================================================== */
 
 function extractTimes(text){
@@ -1504,21 +1479,30 @@ function extractTimes(text){
     const found = [];
 
 
+    if(
+        !text
+    ){
+
+        return found;
+
+    }
+
+
     const regex =
         /\b([01]?\d|2[0-3])[\.:]([0-5]\d)\b/g;
 
 
-    let m;
+    let match;
 
 
     while(
-        (m = regex.exec(text)) !== null
+        (match = regex.exec(text)) !== null
     ){
 
-        const h =
+        const hour =
             String(
                 Number(
-                    m[1]
+                    match[1]
                 )
             ).padStart(
                 2,
@@ -1527,7 +1511,7 @@ function extractTimes(text){
 
 
         const time =
-            `${h}:${m[2]}`;
+            `${hour}:${match[2]}`;
 
 
         if(
@@ -1608,14 +1592,13 @@ function createShifts(records){
 
 
     events.sort(
-        (a,b)=>
+        (a,b) =>
             a.timestamp -
             b.timestamp
     );
 
 
     const result = [];
-
 
     const used =
         new Set();
@@ -1711,9 +1694,7 @@ function createShifts(records){
         ){
 
             const end =
-                events[
-                    pairIndex
-                ];
+                events[pairIndex];
 
 
             used.add(
@@ -1798,10 +1779,7 @@ function createShifts(records){
    VALID PAIR
 ===================================================== */
 
-function validPair(
-    start,
-    end
-){
+function validPair(start,end){
 
     const day =
         getDay(
@@ -1817,6 +1795,8 @@ function validPair(
         end.minutes;
 
 
+    /* Sunday */
+
     if(
         day === 0
     ){
@@ -1829,6 +1809,8 @@ function validPair(
 
     }
 
+
+    /* Night */
 
     if(
         s >=
@@ -1848,22 +1830,27 @@ function validPair(
         }
 
 
-        return (
-            e > s
-        );
+        return e > s;
 
     }
 
 
+    /* Day */
+
     if(
-        s >= 7 * 60 + 30 &&
-        s <= 12 * 60
+        s >=
+        7 * 60 + 30
+        &&
+        s <=
+        12 * 60
     ){
 
         return (
             start.dateKey ===
-            end.dateKey &&
-            e >= 16 * 60
+            end.dateKey
+            &&
+            e >=
+            16 * 60
         );
 
     }
@@ -1878,10 +1865,7 @@ function validPair(
    BUILD SHIFT
 ===================================================== */
 
-function buildShift(
-    start,
-    end
-){
+function buildShift(start,end){
 
     const day =
         getDay(
@@ -1926,10 +1910,7 @@ function buildShift(
    SUNDAY
 ===================================================== */
 
-function calculateSunday(
-    start,
-    end
-){
+function calculateSunday(start,end){
 
     let s =
         start.minutes;
@@ -1941,7 +1922,8 @@ function calculateSunday(
 
     if(
         s >=
-        16 * 60 + 30 &&
+        16 * 60 + 30
+        &&
         s <=
         17 * 60
     ){
@@ -1960,7 +1942,8 @@ function calculateSunday(
 
     if(
         end.dateKey !==
-        start.dateKey &&
+        start.dateKey
+        &&
         e < s
     ){
 
@@ -2031,13 +2014,10 @@ function calculateSunday(
 
 
 /* =====================================================
-   DAY
+   DAY SHIFT
 ===================================================== */
 
-function calculateDay(
-    start,
-    end
-){
+function calculateDay(start,end){
 
     let s =
         start.minutes;
@@ -2045,7 +2025,8 @@ function calculateDay(
 
     if(
         s >=
-        7 * 60 + 30 &&
+        7 * 60 + 30
+        &&
         s <=
         8 * 60
     ){
@@ -2140,13 +2121,10 @@ function calculateDay(
 
 
 /* =====================================================
-   NIGHT
+   NIGHT SHIFT
 ===================================================== */
 
-function calculateNight(
-    start,
-    end
-){
+function calculateNight(start,end){
 
     let s =
         start.minutes;
@@ -2158,7 +2136,8 @@ function calculateNight(
 
     if(
         s >=
-        19 * 60 + 30 &&
+        19 * 60 + 30
+        &&
         s <=
         20 * 60
     ){
@@ -2171,7 +2150,8 @@ function calculateNight(
 
     if(
         end.dateKey !==
-        start.dateKey &&
+        start.dateKey
+        &&
         e < s
     ){
 
@@ -2208,7 +2188,8 @@ function calculateNight(
 
 
     if(
-        e >= otStart
+        e >=
+        otStart
     ){
 
         const roundedEnd =
@@ -2297,9 +2278,7 @@ function calculateNight(
    MERGE
 ===================================================== */
 
-function mergeShifts(
-    newShifts
-){
+function mergeShifts(newShifts){
 
     const map =
         new Map();
@@ -2336,11 +2315,11 @@ function mergeShifts(
 
 
     shifts.sort(
-        (a,b)=>
+        (a,b) =>
             `${a.dateKey} ${a.startTime}`
-            .localeCompare(
-                `${b.dateKey} ${b.startTime}`
-            )
+                .localeCompare(
+                    `${b.dateKey} ${b.startTime}`
+                )
     );
 
 
@@ -2389,8 +2368,6 @@ function loadData(){
             shifts =
                 [];
 
-            renderAll();
-
             return;
 
         }
@@ -2409,9 +2386,6 @@ function loadData(){
             ? data.shifts
             : [];
 
-
-        renderAll();
-
     }catch(error){
 
         console.error(
@@ -2421,9 +2395,6 @@ function loadData(){
 
         shifts =
             [];
-
-
-        renderAll();
 
     }
 
@@ -2455,26 +2426,26 @@ function renderSummary(){
 
     const completed =
         shifts.filter(
-            s =>
-                !s.incomplete
+            shift =>
+                !shift.incomplete
         );
 
 
     const dates =
         new Set(
             completed.map(
-                s =>
-                    s.dateKey
+                shift =>
+                    shift.dateKey
             )
         );
 
 
     const total =
         completed.reduce(
-            (sum,s)=>
+            (sum,shift) =>
                 sum +
                 Number(
-                    s.pay || 0
+                    shift.pay || 0
                 ),
             0
         );
@@ -2699,13 +2670,64 @@ function renderCalendar(){
 
 
 /* =====================================================
+   CHANGE MONTH
+===================================================== */
+
+function changeMonth(delta){
+
+    viewDate =
+        new Date(
+            viewDate.getFullYear(),
+            viewDate.getMonth() + delta,
+            1
+        );
+
+
+    renderCalendar();
+
+}
+
+
+/* =====================================================
+   GET SHIFT
+===================================================== */
+
+function getShiftForDate(key){
+
+    const list =
+        shifts.filter(
+            shift =>
+                shift.startDateKey === key ||
+                shift.dateKey === key
+        );
+
+
+    if(
+        list.length === 0
+    ){
+
+        return null;
+
+    }
+
+
+    return list
+        .sort(
+            (a,b) =>
+                String(a.startTime)
+                    .localeCompare(
+                        String(b.startTime)
+                    )
+        )[0];
+
+}
+
+
+/* =====================================================
    DAY STATUS
 ===================================================== */
 
-function getDayStatus(
-    key,
-    shift
-){
+function getDayStatus(key,shift){
 
     const today =
         startOfDay(
@@ -2725,11 +2747,9 @@ function getDayStatus(
 
         return {
 
-            className:
-                'future',
+            className:'future',
 
-            label:
-                'ยังไม่ถึง'
+            label:'ยังไม่ถึง'
 
         };
 
@@ -2746,11 +2766,9 @@ function getDayStatus(
 
             return {
 
-                className:
-                    'missed',
+                className:'missed',
 
-                label:
-                    'ลืมอัป'
+                label:'ลืมอัป'
 
             };
 
@@ -2759,11 +2777,9 @@ function getDayStatus(
 
         return {
 
-            className:
-                'worked',
+            className:'worked',
 
-            label:
-                'อัปแล้ว'
+            label:'อัปแล้ว'
 
         };
 
@@ -2772,11 +2788,9 @@ function getDayStatus(
 
     return {
 
-        className:
-            'missed',
+        className:'missed',
 
-        label:
-            'ลืมอัป'
+        label:'ลืมอัป'
 
     };
 
@@ -2784,78 +2798,25 @@ function getDayStatus(
 
 
 /* =====================================================
-   GET SHIFT
+   DAY MODAL
 ===================================================== */
 
-function getShiftForDate(
-    key
-){
+function openDay(key){
 
-    const found =
+    const dayShifts =
         shifts.filter(
-            s =>
-                s.startDateKey === key ||
-                s.dateKey === key
-        );
-
-
-    if(
-        !found.length
-    ){
-
-        return null;
-
-    }
-
-
-    return found[0];
-
-}
-
-
-/* =====================================================
-   CHANGE MONTH
-===================================================== */
-
-function changeMonth(
-    amount
-){
-
-    viewDate =
-        new Date(
-            viewDate.getFullYear(),
-            viewDate.getMonth() + amount,
-            1
-        );
-
-
-    renderCalendar();
-
-}
-
-
-/* =====================================================
-   OPEN DAY
-===================================================== */
-
-function openDay(
-    key
-){
-
-    const list =
-        shifts.filter(
-            s =>
-                s.startDateKey === key ||
-                s.dateKey === key
+            shift =>
+                shift.startDateKey === key ||
+                shift.dateKey === key
         );
 
 
     modalTitle.textContent =
-        `รายละเอียด ${formatThaiDate(key)}`;
+        `📅 ${formatThaiDate(key)}`;
 
 
     if(
-        !list.length
+        dayShifts.length === 0
     ){
 
         modalBody.innerHTML = `
@@ -2866,66 +2827,19 @@ function openDay(
 
         `;
 
-        dayModal.classList.add(
-            'show'
-        );
+    }else{
 
-        return;
+        modalBody.innerHTML =
+            dayShifts
+                .map(
+                    shift =>
+                        createShiftHTML(
+                            shift
+                        )
+                )
+                .join('');
 
     }
-
-
-    modalBody.innerHTML =
-        list.map(
-            shift => `
-
-                <div class="shift-detail">
-
-                    <div>
-                        <strong>
-                            ${shift.isNight
-                                ? '🌙 กะดึก'
-                                : shift.isSunday
-                                    ? '☀️ วันอาทิตย์'
-                                    : '☀️ กะกลางวัน'}
-                        </strong>
-                    </div>
-
-                    <div>
-                        เวลา:
-                        ${escapeHTML(shift.startTime || '-')}
-                        –
-                        ${escapeHTML(shift.endTime || '-')}
-                    </div>
-
-                    ${
-                        shift.incomplete
-                        ? `
-                            <div class="warning">
-                                ⚠️ ยังไม่มีเวลาออก
-                            </div>
-                        `
-                        : `
-                            <div>
-                                ค่าแรง:
-                                <strong>
-                                    ${money(shift.pay)}
-                                </strong>
-                            </div>
-
-                            <div>
-                                OT:
-                                ${Number(shift.otHours || 0).toFixed(1)}
-                                ชั่วโมง
-                            </div>
-                        `
-                    }
-
-                </div>
-
-            `
-        )
-        .join('');
 
 
     dayModal.classList.add(
@@ -2935,9 +2849,93 @@ function openDay(
 }
 
 
-/* =====================================================
-   CLOSE DAY MODAL
-===================================================== */
+function createShiftHTML(shift){
+
+    if(
+        shift.incomplete
+    ){
+
+        return `
+
+            <div class="shift-detail incomplete-detail">
+
+                <div class="shift-detail-title">
+                    ⚠️ พบเวลาเข้า แต่ยังจับคู่เวลาออกไม่ได้
+                </div>
+
+                <div>
+                    เวลาเข้า:
+                    <strong>
+                        ${escapeHTML(shift.startTime)}
+                    </strong>
+                </div>
+
+            </div>
+
+        `;
+
+    }
+
+
+    return `
+
+        <div class="shift-detail">
+
+            <div class="shift-detail-title">
+
+                ${shift.isSunday
+                    ? '🟠 วันอาทิตย์'
+                    : shift.isNight
+                        ? '🌙 กะกลางคืน'
+                        : '☀️ กะกลางวัน'
+                }
+
+            </div>
+
+            <div>
+                เวลา:
+                <strong>
+                    ${escapeHTML(shift.startTime)}
+                    –
+                    ${escapeHTML(shift.endTime)}
+                </strong>
+            </div>
+
+            <div>
+                ค่าแรงปกติ:
+                <strong>
+                    ${money(shift.normalPay)}
+                </strong>
+            </div>
+
+            <div>
+                OT:
+                <strong>
+                    ${Number(shift.otHours || 0).toFixed(2)}
+                    ชม.
+                </strong>
+            </div>
+
+            <div>
+                ค่า OT:
+                <strong>
+                    ${money(shift.otPay)}
+                </strong>
+            </div>
+
+            <div class="shift-total">
+                รวม:
+                <strong>
+                    ${money(shift.pay)}
+                </strong>
+            </div>
+
+        </div>
+
+    `;
+
+}
+
 
 function closeModal(){
 
@@ -2948,9 +2946,7 @@ function closeModal(){
 }
 
 
-function closeModalOutside(
-    event
-){
+function closeModalOutside(event){
 
     if(
         event.target === dayModal
@@ -2964,60 +2960,188 @@ function closeModalOutside(
 
 
 /* =====================================================
-   PAY PERIODS
+   PAY PERIOD SYSTEM
 ===================================================== */
 
-function getPayPeriods(){
+/*
+    รอบ 26–10
+
+    ตัวอย่าง:
+    26/07/2026 - 10/08/2026
+
+    รอบ 11–25
+
+    ตัวอย่าง:
+    11/08/2026 - 25/08/2026
+*/
+
+
+function getPayPeriod(dateKey){
+
+    const date =
+        parseDateKey(
+            dateKey
+        );
+
 
     const year =
-        viewDate.getFullYear();
+        date.getFullYear();
 
 
     const month =
-        viewDate.getMonth();
+        date.getMonth();
 
 
-    const lastDay =
-        new Date(
-            year,
-            month + 1,
-            0
-        ).getDate();
+    const day =
+        date.getDate();
 
 
-    return [
+    let start;
 
-        {
-            id:
-                `${year}-${pad(month + 1)}-01_15`,
+    let end;
 
-            name:
-                `01–15/${pad(month + 1)}`,
+    let type;
 
-            start:
-                `${year}-${pad(month + 1)}-01`,
 
-            end:
-                `${year}-${pad(month + 1)}-15`
+    if(
+        day >= 26
+    ){
 
-        },
+        type =
+            '26-10';
 
-        {
-            id:
-                `${year}-${pad(month + 1)}-16_${lastDay}`,
 
-            name:
-                `16–${lastDay}/${pad(month + 1)}`,
+        start =
+            new Date(
+                year,
+                month,
+                26
+            );
 
-            start:
-                `${year}-${pad(month + 1)}-16`,
 
-            end:
-                `${year}-${pad(month + 1)}-${pad(lastDay)}`
+        end =
+            new Date(
+                year,
+                month + 1,
+                10
+            );
+
+    }else if(
+        day <= 10
+    ){
+
+        type =
+            '26-10';
+
+
+        start =
+            new Date(
+                year,
+                month - 1,
+                26
+            );
+
+
+        end =
+            new Date(
+                year,
+                month,
+                10
+            );
+
+    }else{
+
+        type =
+            '11-25';
+
+
+        start =
+            new Date(
+                year,
+                month,
+                11
+            );
+
+
+        end =
+            new Date(
+                year,
+                month,
+                25
+            );
+
+    }
+
+
+    const key =
+        `${formatDateKey(start)}_${formatDateKey(end)}`;
+
+
+    return {
+
+        key,
+
+        type,
+
+        startDate:
+            formatDateKey(start),
+
+        endDate:
+            formatDateKey(end),
+
+        name:
+            `${formatThaiDate(formatDateKey(start))} – ${formatThaiDate(formatDateKey(end))}`
+
+    };
+
+}
+
+
+/* =====================================================
+   BUILD ALL PERIODS
+===================================================== */
+
+function getAllPayPeriods(){
+
+    const map =
+        new Map();
+
+
+    shifts.forEach(
+        shift => {
+
+            const period =
+                getPayPeriod(
+                    shift.startDateKey ||
+                    shift.dateKey
+                );
+
+
+            if(
+                !map.has(
+                    period.key
+                )
+            ){
+
+                map.set(
+                    period.key,
+                    period
+                );
+
+            }
 
         }
+    );
 
-    ];
+
+    return Array.from(
+        map.values()
+    ).sort(
+        (a,b) =>
+            b.startDate.localeCompare(
+                a.startDate
+            )
+    );
 
 }
 
@@ -3026,22 +3150,77 @@ function getPayPeriods(){
    PERIOD DATA
 ===================================================== */
 
-function getPeriodData(
-    period
-){
+function getPeriodShifts(period){
 
-    const list =
-        shifts.filter(
-            shift =>
-                !shift.incomplete &&
-                shift.dateKey >= period.start &&
-                shift.dateKey <= period.end
+    return shifts.filter(
+        shift => {
+
+            const date =
+                shift.startDateKey ||
+                shift.dateKey;
+
+
+            return (
+                date >= period.startDate &&
+                date <= period.endDate
+            );
+
+        }
+    );
+
+}
+
+
+function getPeriodSummary(period){
+
+    const periodShifts =
+        getPeriodShifts(
+            period
         );
 
 
+    const completed =
+        periodShifts.filter(
+            shift =>
+                !shift.incomplete
+        );
+
+
+    const workDays =
+        new Set(
+            completed.map(
+                shift =>
+                    shift.startDateKey ||
+                    shift.dateKey
+            )
+        ).size;
+
+
     const wage =
-        list.reduce(
-            (sum,shift)=>
+        completed.reduce(
+            (sum,shift) =>
+                sum +
+                Number(
+                    shift.normalPay || 0
+                ),
+            0
+        );
+
+
+    const ot =
+        completed.reduce(
+            (sum,shift) =>
+                sum +
+                Number(
+                    shift.otPay || 0
+                ),
+            0
+        );
+
+
+    const total =
+        completed.reduce(
+            (sum,shift) =>
                 sum +
                 Number(
                     shift.pay || 0
@@ -3050,35 +3229,22 @@ function getPeriodData(
         );
 
 
-    const workDays =
-        new Set(
-            list.map(
-                shift =>
-                    shift.dateKey
-            )
-        ).size;
-
-
-    const otHours =
-        list.reduce(
-            (sum,shift)=>
-                sum +
-                Number(
-                    shift.otHours || 0
-                ),
-            0
-        );
-
-
     return {
 
-        shifts:list,
+        period,
 
-        wage,
+        shifts:
+            periodShifts,
+
+        completed,
 
         workDays,
 
-        otHours
+        wage,
+
+        ot,
+
+        total
 
     };
 
@@ -3091,27 +3257,12 @@ function getPeriodData(
 
 function renderPeriods(){
 
-    const periodList =
-        getPayPeriods();
-
-
     const allPeriods =
-        periodList.map(
-            period => ({
-
-                period,
-
-                data:
-                    getPeriodData(
-                        period
-                    )
-
-            })
-        );
+        getAllPayPeriods();
 
 
     if(
-        !shifts.length
+        allPeriods.length === 0
     ){
 
         periods.innerHTML = `
@@ -3127,63 +3278,208 @@ function renderPeriods(){
     }
 
 
+    const visible =
+        allPeriods.slice(
+            0,
+            2
+        );
+
+
+    let html =
+        visible
+            .map(
+                period =>
+                    renderPeriodCard(
+                        period
+                    )
+            )
+            .join('');
+
+
+    if(
+        allPeriods.length > 2
+    ){
+
+        html += `
+
+            <button
+                type="button"
+                class="more-periods-btn"
+                onclick="openPeriodsMore()"
+            >
+                📋 ดูเพิ่มเติม
+                <span>
+                    (${allPeriods.length - 2} รอบ)
+                </span>
+            </button>
+
+        `;
+
+    }
+
+
     periods.innerHTML =
-        allPeriods.map(
-            item => `
-
-                <div class="period-card">
-
-                    <div class="period-title">
-                        💵 รอบ ${item.period.name}
-                    </div>
-
-                    <div class="period-info">
-
-                        <span>
-                            วันทำงาน
-                            <strong>
-                                ${item.data.workDays}
-                            </strong>
-                        </span>
-
-                        <span>
-                            OT
-                            <strong>
-                                ${item.data.otHours.toFixed(1)}
-                            </strong>
-                            ชม.
-                        </span>
-
-                        <span>
-                            ค่าแรง
-                            <strong>
-                                ${money(item.data.wage)}
-                            </strong>
-                        </span>
-
-                    </div>
-
-                </div>
-
-            `
-        )
-        .join('');
+        html;
 
 }
 
 
 /* =====================================================
-   RENDER SALARY PERIOD SELECT
+   PERIOD CARD
+===================================================== */
+
+function renderPeriodCard(period){
+
+    const data =
+        getPeriodSummary(
+            period
+        );
+
+
+    return `
+
+        <div class="period-card">
+
+            <div class="period-card-header">
+
+                <div>
+
+                    <div class="period-type">
+                        รอบ ${period.type}
+                    </div>
+
+                    <div class="period-name">
+                        ${escapeHTML(period.name)}
+                    </div>
+
+                </div>
+
+                <div class="period-total">
+                    ${money(data.total)}
+                </div>
+
+            </div>
+
+
+            <div class="period-stats">
+
+                <div>
+                    <span>วันทำงาน</span>
+                    <strong>
+                        ${data.workDays} วัน
+                    </strong>
+                </div>
+
+
+                <div>
+                    <span>ค่าแรง</span>
+                    <strong>
+                        ${money(data.wage)}
+                    </strong>
+                </div>
+
+
+                <div>
+                    <span>OT</span>
+                    <strong>
+                        ${money(data.ot)}
+                    </strong>
+                </div>
+
+            </div>
+
+        </div>
+
+    `;
+
+}
+
+
+/* =====================================================
+   ALL PERIODS MODAL
+===================================================== */
+
+function openPeriodsMore(){
+
+    const allPeriods =
+        getAllPayPeriods();
+
+
+    const allPeriodsList =
+        document.getElementById(
+            'allPeriodsList'
+        );
+
+
+    allPeriodsList.innerHTML =
+        allPeriods.length
+            ? allPeriods
+                .map(
+                    period =>
+                        renderPeriodCard(
+                            period
+                        )
+                )
+                .join('')
+            : `
+
+                <div class="empty-state">
+                    ยังไม่มีรอบจ่าย
+                </div>
+
+            `;
+
+
+    document
+        .getElementById(
+            'periodsMoreModal'
+        )
+        .classList.add(
+            'show'
+        );
+
+}
+
+
+function closePeriodsMore(){
+
+    document
+        .getElementById(
+            'periodsMoreModal'
+        )
+        .classList.remove(
+            'show'
+        );
+
+}
+
+
+function closePeriodsMoreOutside(event){
+
+    if(
+        event.target.id ===
+        'periodsMoreModal'
+    ){
+
+        closePeriodsMore();
+
+    }
+
+}
+
+
+/* =====================================================
+   SALARY PERIOD SELECT
 ===================================================== */
 
 function renderSalaryPeriods(){
 
-    const current =
+    const allPeriods =
+        getAllPayPeriods();
+
+
+    const currentValue =
         salaryPeriod.value;
-
-
-    const periodList =
-        getPayPeriods();
 
 
     salaryPeriod.innerHTML = `
@@ -3195,7 +3491,7 @@ function renderSalaryPeriods(){
     `;
 
 
-    periodList.forEach(
+    allPeriods.forEach(
         period => {
 
             const option =
@@ -3205,11 +3501,11 @@ function renderSalaryPeriods(){
 
 
             option.value =
-                period.id;
+                period.key;
 
 
             option.textContent =
-                `รอบ ${period.name}`;
+                `รอบ ${period.type} • ${period.name}`;
 
 
             salaryPeriod.appendChild(
@@ -3221,116 +3517,22 @@ function renderSalaryPeriods(){
 
 
     if(
-        periodList.some(
-            p =>
-                p.id === current
+        allPeriods.some(
+            period =>
+                period.key ===
+                currentValue
         )
     ){
 
         salaryPeriod.value =
-            current;
+            currentValue;
 
-    }
-
-}
-
-
-/* =====================================================
-   ALL PERIODS
-===================================================== */
-
-function openPeriodsMore(){
-
-    const periodList =
-        getPayPeriods();
-
-
-    document.getElementById(
-        'allPeriodsList'
-    ).innerHTML =
-        periodList.map(
-            period => {
-
-                const data =
-                    getPeriodData(
-                        period
-                    );
-
-
-                return `
-
-                    <div class="period-card">
-
-                        <div class="period-title">
-                            รอบ ${period.name}
-                        </div>
-
-                        <div>
-                            วันทำงาน:
-                            <strong>
-                                ${data.workDays}
-                            </strong>
-                        </div>
-
-                        <div>
-                            OT:
-                            <strong>
-                                ${data.otHours.toFixed(1)}
-                            </strong>
-                            ชั่วโมง
-                        </div>
-
-                        <div>
-                            ค่าแรง:
-                            <strong>
-                                ${money(data.wage)}
-                            </strong>
-                        </div>
-
-                    </div>
-
-                `;
-
-            }
-        )
-        .join('');
-
-
-    document.getElementById(
-        'periodsMoreModal'
-    ).classList.add(
-        'show'
-    );
-
-}
-
-
-function closePeriodsMore(){
-
-    document.getElementById(
-        'periodsMoreModal'
-    ).classList.remove(
-        'show'
-    );
-
-}
-
-
-function closePeriodsMoreOutside(
-    event
-){
-
-    const modal =
-        document.getElementById(
-            'periodsMoreModal'
-        );
-
-
-    if(
-        event.target === modal
+    }else if(
+        allPeriods.length > 0
     ){
 
-        closePeriodsMore();
+        salaryPeriod.value =
+            allPeriods[0].key;
 
     }
 
@@ -3338,102 +3540,17 @@ function closePeriodsMoreOutside(
 
 
 /* =====================================================
-   DELETE SELECTED DATE
+   GET SELECTED SALARY DATA
 ===================================================== */
 
-function deleteSelectedDate(){
-
-    const input =
-        document.getElementById(
-            'deleteDate'
-        );
-
+function getSelectedSalaryData(){
 
     const key =
-        input.value;
-
-
-    if(
-        !key
-    ){
-
-        alert(
-            'กรุณาเลือกวันที่ก่อน'
-        );
-
-        return;
-
-    }
-
-
-    const count =
-        shifts.filter(
-            s =>
-                s.startDateKey === key ||
-                s.dateKey === key
-        ).length;
-
-
-    if(
-        !count
-    ){
-
-        alert(
-            'ไม่พบข้อมูลของวันที่เลือก'
-        );
-
-        return;
-
-    }
-
-
-    const ok =
-        confirm(
-            `ต้องการลบข้อมูลวันที่ ${formatThaiDate(key)} จำนวน ${count} รายการหรือไม่?`
-        );
-
-
-    if(
-        !ok
-    ){
-
-        return;
-
-    }
-
-
-    shifts =
-        shifts.filter(
-            s =>
-                s.startDateKey !== key &&
-                s.dateKey !== key
-        );
-
-
-    saveData();
-
-    renderAll();
-
-
-    alert(
-        'ลบข้อมูลเรียบร้อยแล้ว'
-    );
-
-}
-
-
-/* =====================================================
-   SALARY DATA
-===================================================== */
-
-function getSalaryData(){
-
-    const periodId =
         salaryPeriod.value;
 
 
     if(
-        !periodId
+        !key
     ){
 
         throw new Error(
@@ -3444,10 +3561,12 @@ function getSalaryData(){
 
 
     const period =
-        getPayPeriods().find(
-            p =>
-                p.id === periodId
-        );
+        getAllPayPeriods()
+            .find(
+                item =>
+                    item.key ===
+                    key
+            );
 
 
     if(
@@ -3461,48 +3580,39 @@ function getSalaryData(){
     }
 
 
-    const periodData =
-        getPeriodData(
+    const summary =
+        getPeriodSummary(
             period
         );
 
 
-    const name =
-        document.getElementById(
-            'employeeName'
-        ).value.trim();
-
-
-    const employeeId =
-        document.getElementById(
-            'employeeId'
-        ).value.trim();
-
-
     const room =
-        Number(
-            document.getElementById(
-                'roomAllowance'
-            ).value || 0
+        Math.max(
+            0,
+            Number(
+                document.getElementById(
+                    'roomAllowance'
+                ).value || 0
+            )
         );
 
 
     const rate =
-        Number(
-            document.getElementById(
-                'socialSecurityRate'
-            ).value || 0
-        );
-
-
-    const wage =
-        Number(
-            periodData.wage || 0
+        Math.min(
+            100,
+            Math.max(
+                0,
+                Number(
+                    document.getElementById(
+                        'socialSecurityRate'
+                    ).value || 0
+                )
+            )
         );
 
 
     const beforeDeduction =
-        wage +
+        summary.total +
         room;
 
 
@@ -3513,33 +3623,45 @@ function getSalaryData(){
 
 
     const total =
-        beforeDeduction -
-        socialSecurity;
+        Math.max(
+            0,
+            beforeDeduction -
+            socialSecurity
+        );
 
 
     return {
 
-        name,
-
-        employeeId,
-
         period,
 
+        name:
+            document.getElementById(
+                'employeeName'
+            ).value.trim() ||
+            '-',
+
+        employeeId:
+            document.getElementById(
+                'employeeId'
+            ).value.trim() ||
+            '-',
+
         workDays:
-            periodData.workDays,
+            summary.workDays,
 
-        otHours:
-            periodData.otHours,
+        wage:
+            summary.wage,
 
-        wage,
+        ot:
+            summary.ot,
 
         room,
 
         rate,
 
-        socialSecurity,
-
         beforeDeduction,
+
+        socialSecurity,
 
         total
 
@@ -3557,7 +3679,7 @@ function previewSalarySlip(){
     try{
 
         const data =
-            getSalaryData();
+            getSelectedSalaryData();
 
 
         const body =
@@ -3575,59 +3697,80 @@ function previewSalarySlip(){
                 </div>
 
                 <div class="salary-preview-period">
-                    รอบ ${escapeHTML(data.period.name)}
+                    ${escapeHTML(data.period.name)}
                 </div>
 
-                <hr>
 
-                <div class="preview-row">
-                    <span>ชื่อพนักงาน</span>
-                    <strong>
-                        ${escapeHTML(data.name || '-')}
-                    </strong>
+                <div class="salary-preview-info">
+
+                    <div>
+                        <span>ชื่อพนักงาน</span>
+                        <strong>
+                            ${escapeHTML(data.name)}
+                        </strong>
+                    </div>
+
+                    <div>
+                        <span>รหัสพนักงาน</span>
+                        <strong>
+                            ${escapeHTML(data.employeeId)}
+                        </strong>
+                    </div>
+
+                    <div>
+                        <span>วันทำงาน</span>
+                        <strong>
+                            ${data.workDays} วัน
+                        </strong>
+                    </div>
+
                 </div>
 
-                <div class="preview-row">
-                    <span>รหัสพนักงาน</span>
-                    <strong>
-                        ${escapeHTML(data.employeeId || '-')}
-                    </strong>
+
+                <div class="salary-preview-table">
+
+                    <div>
+                        <span>ค่าแรง</span>
+                        <strong>
+                            ${money(data.wage)}
+                        </strong>
+                    </div>
+
+                    <div>
+                        <span>OT</span>
+                        <strong>
+                            ${money(data.ot)}
+                        </strong>
+                    </div>
+
+                    <div>
+                        <span>ค่าห้องเย็น</span>
+                        <strong>
+                            ${money(data.room)}
+                        </strong>
+                    </div>
+
+                    <div class="gross-row">
+                        <span>รวมก่อนหัก</span>
+                        <strong>
+                            ${money(data.beforeDeduction)}
+                        </strong>
+                    </div>
+
+                    <div>
+                        <span>
+                            ประกันสังคม ${data.rate}%
+                        </span>
+
+                        <strong>
+                            - ${money(data.socialSecurity)}
+                        </strong>
+                    </div>
+
                 </div>
 
-                <div class="preview-row">
-                    <span>จำนวนวันทำงาน</span>
-                    <strong>
-                        ${data.workDays} วัน
-                    </strong>
-                </div>
 
-                <hr>
-
-                <div class="preview-row">
-                    <span>ค่าแรง</span>
-                    <strong>
-                        ${formatNumber(data.wage)} บาท
-                    </strong>
-                </div>
-
-                <div class="preview-row">
-                    <span>ค่าห้องเย็น</span>
-                    <strong>
-                        ${formatNumber(data.room)} บาท
-                    </strong>
-                </div>
-
-                <div class="preview-row">
-                    <span>
-                        ประกันสังคม ${data.rate}%
-                    </span>
-
-                    <strong>
-                        -${formatNumber(data.socialSecurity)} บาท
-                    </strong>
-                </div>
-
-                <div class="preview-total">
+                <div class="salary-net-preview">
 
                     <span>
                         เงินรับสุทธิ
@@ -3644,11 +3787,13 @@ function previewSalarySlip(){
         `;
 
 
-        document.getElementById(
-            'salaryPreviewModal'
-        ).classList.add(
-            'show'
-        );
+        document
+            .getElementById(
+                'salaryPreviewModal'
+            )
+            .classList.add(
+                'show'
+            );
 
     }catch(error){
 
@@ -3663,32 +3808,115 @@ function previewSalarySlip(){
 
 function closeSalaryPreview(){
 
-    document.getElementById(
-        'salaryPreviewModal'
-    ).classList.remove(
-        'show'
-    );
+    document
+        .getElementById(
+            'salaryPreviewModal'
+        )
+        .classList.remove(
+            'show'
+        );
 
 }
 
 
-function closeSalaryPreviewOutside(
-    event
-){
-
-    const modal =
-        document.getElementById(
-            'salaryPreviewModal'
-        );
-
+function closeSalaryPreviewOutside(event){
 
     if(
-        event.target === modal
+        event.target.id ===
+        'salaryPreviewModal'
     ){
 
         closeSalaryPreview();
 
     }
+
+}
+
+
+/* =====================================================
+   PDF FONT
+===================================================== */
+
+async function loadThaiFont(doc){
+
+    const response =
+        await fetch(
+            'NotoSansThai-Regular.ttf'
+        );
+
+
+    if(
+        !response.ok
+    ){
+
+        throw new Error(
+            'ไม่พบไฟล์ NotoSansThai-Regular.ttf'
+        );
+
+    }
+
+
+    const buffer =
+        await response.arrayBuffer();
+
+
+    const bytes =
+        new Uint8Array(
+            buffer
+        );
+
+
+    let binary =
+        '';
+
+
+    const chunkSize =
+        0x8000;
+
+
+    for(
+        let i = 0;
+        i < bytes.length;
+        i += chunkSize
+    ){
+
+        binary +=
+            String.fromCharCode(
+                ...bytes.subarray(
+                    i,
+                    Math.min(
+                        i + chunkSize,
+                        bytes.length
+                    )
+                )
+            );
+
+    }
+
+
+    const base64 =
+        btoa(
+            binary
+        );
+
+
+    doc.addFileToVFS(
+        'NotoSansThai-Regular.ttf',
+        base64
+    );
+
+
+    doc.addFont(
+        'NotoSansThai-Regular.ttf',
+        'NotoSansThai',
+        'normal'
+    );
+
+
+    doc.setFont(
+        'NotoSansThai',
+        'normal'
+    );
 
 }
 
@@ -3701,8 +3929,19 @@ async function generateSalaryPDF(){
 
     try{
 
+        if(
+            !window.jspdf
+        ){
+
+            throw new Error(
+                'ไม่พบ jsPDF'
+            );
+
+        }
+
+
         const data =
-            getSalaryData();
+            getSelectedSalaryData();
 
 
         const {
@@ -3713,22 +3952,11 @@ async function generateSalaryPDF(){
 
         const doc =
             new jsPDF({
-
-                orientation:
-                    'portrait',
-
-                unit:
-                    'mm',
-
-                format:
-                    'a4'
-
+                orientation:'portrait',
+                unit:'mm',
+                format:'a4'
             });
 
-
-        /* =================================================
-           LOAD THAI FONT
-        ================================================= */
 
         await loadThaiFont(
             doc
@@ -3744,12 +3972,7 @@ async function generateSalaryPDF(){
 
 
         const margin =
-            18;
-
-
-        const contentWidth =
-            pageWidth -
-            margin * 2;
+            16;
 
 
         const right =
@@ -3757,8 +3980,13 @@ async function generateSalaryPDF(){
             margin;
 
 
+        const contentWidth =
+            pageWidth -
+            margin * 2;
+
+
         let y =
-            17;
+            18;
 
 
         /* =================================================
@@ -3771,15 +3999,15 @@ async function generateSalaryPDF(){
         );
 
 
+        doc.setFontSize(
+            20
+        );
+
+
         doc.setTextColor(
             15,
             23,
             42
-        );
-
-
-        doc.setFontSize(
-            20
         );
 
 
@@ -3791,7 +4019,7 @@ async function generateSalaryPDF(){
 
 
         doc.setFontSize(
-            9
+            8
         );
 
 
@@ -3803,9 +4031,38 @@ async function generateSalaryPDF(){
 
 
         doc.text(
-            `รอบจ่าย ${data.period.name}`,
-            right,
+            'SALARY SLIP',
+            margin,
+            y + 7
+        );
+
+
+        doc.setFontSize(
+            9
+        );
+
+
+        doc.text(
+            'รอบจ่าย',
+            right - 48,
             y,
+            {
+                align:'left'
+            }
+        );
+
+
+        doc.setTextColor(
+            30,
+            41,
+            59
+        );
+
+
+        doc.text(
+            data.period.name,
+            right,
+            y + 6,
             {
                 align:'right'
             }
@@ -3813,41 +4070,12 @@ async function generateSalaryPDF(){
 
 
         y +=
-            7;
-
-
-        doc.setDrawColor(
-            13,
-            52,
-            144
-        );
-
-
-        doc.setLineWidth(
-            1
-        );
-
-
-        doc.line(
-            margin,
-            y,
-            right,
-            y
-        );
-
-
-        y +=
-            8;
+            18;
 
 
         /* =================================================
            EMPLOYEE INFO BOX
         ================================================= */
-
-        /*
-         * เพิ่มความสูงเพื่อให้ภาษาไทย
-         * และวรรณยุกต์ไม่ชิดขอบ
-         */
 
         const infoBoxHeight =
             34;
@@ -3882,9 +4110,7 @@ async function generateSalaryPDF(){
         );
 
 
-        /* =================================================
-           CENTER DIVIDER
-        ================================================= */
+        /* CENTER DIVIDER */
 
         doc.setDrawColor(
             226,
@@ -3901,10 +4127,6 @@ async function generateSalaryPDF(){
         );
 
 
-        /* =================================================
-           COLUMN CENTER
-        ================================================= */
-
         const leftCenter =
             margin +
             colWidth / 2;
@@ -3916,10 +4138,6 @@ async function generateSalaryPDF(){
             colWidth / 2;
 
 
-        /*
-         * ตำแหน่งแนวตั้ง
-         */
-
         const labelY =
             y + 9;
 
@@ -3928,17 +4146,7 @@ async function generateSalaryPDF(){
             y + 18;
 
 
-        const bottomLabelY =
-            y + 26;
-
-
-        const bottomValueY =
-            y + 31;
-
-
-        /* =================================================
-           LEFT COLUMN
-        ================================================= */
+        /* LEFT */
 
         doc.setFontSize(
             8
@@ -3966,28 +4174,19 @@ async function generateSalaryPDF(){
             10;
 
 
-        const employeeName =
-            String(
-                data.name || '-'
-            );
-
-
         if(
-            employeeName.length > 24
-        ){
-
-            nameFontSize =
-                8;
-
-        }else if(
-            employeeName.length > 19
+            String(
+                data.name || ''
+            ).length > 22
         ){
 
             nameFontSize =
                 8.5;
 
         }else if(
-            employeeName.length > 15
+            String(
+                data.name || ''
+            ).length > 17
         ){
 
             nameFontSize =
@@ -4009,20 +4208,16 @@ async function generateSalaryPDF(){
 
 
         doc.text(
-            employeeName,
+            data.name || '-',
             leftCenter,
             valueY,
             {
-                align:'center',
-                maxWidth:
-                    colWidth - 8
+                align:'center'
             }
         );
 
 
-        /* =================================================
-           RIGHT COLUMN
-        ================================================= */
+        /* RIGHT */
 
         doc.setFontSize(
             8
@@ -4059,9 +4254,7 @@ async function generateSalaryPDF(){
 
 
         doc.text(
-            String(
-                data.employeeId || '-'
-            ),
+            data.employeeId || '-',
             rightCenter,
             valueY,
             {
@@ -4070,9 +4263,15 @@ async function generateSalaryPDF(){
         );
 
 
-        /* =================================================
-           BOTTOM INFORMATION
-        ================================================= */
+        /* BOTTOM */
+
+        const bottomLabelY =
+            y + 26;
+
+
+        const bottomValueY =
+            y + 31;
+
 
         doc.setFontSize(
             8
@@ -4118,11 +4317,6 @@ async function generateSalaryPDF(){
         );
 
 
-        /*
-         * FIX:
-         * ต้องใช้ template string
-         */
-
         doc.text(
             `${data.workDays} วัน`,
             leftCenter,
@@ -4142,7 +4336,9 @@ async function generateSalaryPDF(){
 
 
         doc.text(
-            formatThaiDate(todayKey),
+            formatThaiDate(
+                todayKey
+            ),
             rightCenter,
             bottomValueY,
             {
@@ -4150,10 +4346,6 @@ async function generateSalaryPDF(){
             }
         );
 
-
-        /* =================================================
-           MOVE TO NEXT SECTION
-        ================================================= */
 
         y +=
             infoBoxHeight +
@@ -4183,25 +4375,19 @@ async function generateSalaryPDF(){
         );
 
 
-        y +=
-            5;
+        y += 5;
 
 
         doc.autoTable({
 
-            startY:
-                y,
+            startY:y,
 
             margin:{
-                left:
-                    margin,
-
-                right:
-                    margin
+                left:margin,
+                right:margin
             },
 
-            theme:
-                'grid',
+            theme:'grid',
 
             styles:{
 
@@ -4227,10 +4413,7 @@ async function generateSalaryPDF(){
                     30,
                     41,
                     59
-                ],
-
-                valign:
-                    'middle'
+                ]
 
             },
 
@@ -4249,26 +4432,20 @@ async function generateSalaryPDF(){
                 ],
 
                 fontStyle:
-                    'normal',
-
-                valign:
-                    'middle'
+                    'normal'
 
             },
 
             columnStyles:{
 
                 0:{
-                    halign:
-                        'left',
-
+                    halign:'left',
                     cellWidth:
                         contentWidth * .65
                 },
 
                 1:{
-                    halign:
-                        'right'
+                    halign:'right'
                 }
 
             },
@@ -4288,6 +4465,14 @@ async function generateSalaryPDF(){
                     'ค่าแรง',
                     formatNumber(
                         data.wage
+                    ) +
+                    ' บาท'
+                ],
+
+                [
+                    'ค่าล่วงเวลา (OT)',
+                    formatNumber(
+                        data.ot
                     ) +
                     ' บาท'
                 ],
@@ -4376,8 +4561,7 @@ async function generateSalaryPDF(){
         );
 
 
-        y +=
-            22;
+        y += 22;
 
 
         /* =================================================
@@ -4396,25 +4580,19 @@ async function generateSalaryPDF(){
         );
 
 
-        y +=
-            5;
+        y += 5;
 
 
         doc.autoTable({
 
-            startY:
-                y,
+            startY:y,
 
             margin:{
-                left:
-                    margin,
-
-                right:
-                    margin
+                left:margin,
+                right:margin
             },
 
-            theme:
-                'grid',
+            theme:'grid',
 
             styles:{
 
@@ -4440,26 +4618,20 @@ async function generateSalaryPDF(){
                     30,
                     41,
                     59
-                ],
-
-                valign:
-                    'middle'
+                ]
 
             },
 
             columnStyles:{
 
                 0:{
-                    halign:
-                        'left',
-
+                    halign:'left',
                     cellWidth:
                         contentWidth * .65
                 },
 
                 1:{
-                    halign:
-                        'right'
+                    halign:'right'
                 }
 
             },
@@ -4468,7 +4640,6 @@ async function generateSalaryPDF(){
 
                 [
                     `ประกันสังคม ${data.rate}%`,
-
                     formatNumber(
                         data.socialSecurity
                     ) +
@@ -4549,15 +4720,14 @@ async function generateSalaryPDF(){
                 data.total
             ),
             right - 8,
-            y + 17,
+            y + 16,
             {
                 align:'right'
             }
         );
 
 
-        y +=
-            42;
+        y += 42;
 
 
         /* =================================================
@@ -4568,11 +4738,6 @@ async function generateSalaryPDF(){
             226,
             232,
             240
-        );
-
-
-        doc.setLineWidth(
-            0.2
         );
 
 
@@ -4617,18 +4782,13 @@ async function generateSalaryPDF(){
            SAVE
         ================================================= */
 
-        const safePeriodName =
-            String(
-                data.period.name
-            ).replace(
-                /[\/\\:*?"<>| ]/g,
-                '_'
-            );
-
-
         const filename =
             'SalarySlip_' +
-            safePeriodName +
+            data.period.name
+                .replace(
+                    /[\/\\:*?"<>| ]/g,
+                    '_'
+                ) +
             '_' +
             (
                 data.employeeId ||
@@ -4650,6 +4810,7 @@ async function generateSalaryPDF(){
 
 
         alert(
+            'สร้าง PDF ไม่สำเร็จ\n\n' +
             error.message
         );
 
@@ -4659,57 +4820,113 @@ async function generateSalaryPDF(){
 
 
 /* =====================================================
-   NUMBER FORMAT FOR PDF
+   DELETE SELECTED DATE
 ===================================================== */
 
-function formatNumber(
-    value
-){
+function deleteSelectedDate(){
 
-    return Number(
-        value || 0
-    ).toLocaleString(
-        'en-US',
-        {
-            minimumFractionDigits:
-                2,
+    const input =
+        document.getElementById(
+            'deleteDate'
+        );
 
-            maximumFractionDigits:
-                2
-        }
+
+    const date =
+        input.value;
+
+
+    if(
+        !date
+    ){
+
+        alert(
+            'กรุณาเลือกวันที่ก่อน'
+        );
+
+        return;
+
+    }
+
+
+    const target =
+        shifts.filter(
+            shift =>
+                (
+                    shift.startDateKey ||
+                    shift.dateKey
+                ) === date
+        );
+
+
+    if(
+        target.length === 0
+    ){
+
+        alert(
+            `ไม่พบข้อมูลของวันที่ ${formatThaiDate(date)}`
+        );
+
+        return;
+
+    }
+
+
+    const ok =
+        confirm(
+            `ต้องการลบข้อมูลวันที่ ${formatThaiDate(date)} จำนวน ${target.length} กะหรือไม่?`
+        );
+
+
+    if(
+        !ok
+    ){
+
+        return;
+
+    }
+
+
+    shifts =
+        shifts.filter(
+            shift =>
+                (
+                    shift.startDateKey ||
+                    shift.dateKey
+                ) !== date
+        );
+
+
+    saveData();
+
+    renderAll();
+
+
+    alert(
+        'ลบข้อมูลเรียบร้อยแล้ว'
+    );
+
+
+    input.value =
+        '';
+
+}
+
+
+/* =====================================================
+   UTILITIES
+===================================================== */
+
+function pad(number){
+
+    return String(
+        number
+    ).padStart(
+        2,
+        '0'
     );
 
 }
 
-
-/* =====================================================
-   MONEY
-===================================================== */
-
-function money(
-    value
-){
-
-    return '฿' +
-        Number(
-            value || 0
-        ).toLocaleString(
-            'en-US',
-            {
-                minimumFractionDigits:
-                    2,
-
-                maximumFractionDigits:
-                    2
-            }
-        );
-
-}
-
-
-/* =====================================================
-   DATE OBJECT
-===================================================== */
 
 function dateObject(
     year,
@@ -4752,70 +4969,33 @@ function dateObject(
 }
 
 
-/* =====================================================
-   PARSE DATE KEY
-===================================================== */
-
-function parseDateKey(
-    key
-){
+function parseDateKey(key){
 
     const [
-        y,
-        m,
-        d
+        year,
+        month,
+        day
     ] =
         key
-        .split('-')
-        .map(
-            Number
-        );
+            .split('-')
+            .map(Number);
 
 
     return new Date(
-        y,
-        m - 1,
-        d
+        year,
+        month - 1,
+        day
     );
 
 }
 
 
-/* =====================================================
-   START OF DAY
-===================================================== */
+function formatDateKey(date){
 
-function startOfDay(
-    date
-){
-
-    return new Date(
-        date.getFullYear(),
-        date.getMonth(),
-        date.getDate()
-    );
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
 
 }
 
-
-/* =====================================================
-   DAY OF WEEK
-===================================================== */
-
-function getDay(
-    key
-){
-
-    return parseDateKey(
-        key
-    ).getDay();
-
-}
-
-
-/* =====================================================
-   TIMESTAMP
-===================================================== */
 
 function timestamp(
     dateKey,
@@ -4828,17 +5008,18 @@ function timestamp(
         );
 
 
-    const minutes =
-        toMinutes(
-            time
-        );
+    const [
+        hour,
+        minute
+    ] =
+        time
+            .split(':')
+            .map(Number);
 
 
     date.setHours(
-        Math.floor(
-            minutes / 60
-        ),
-        minutes % 60,
+        hour,
+        minute,
         0,
         0
     );
@@ -4849,80 +5030,46 @@ function timestamp(
 }
 
 
-/* =====================================================
-   TIME TO MINUTES
-===================================================== */
-
-function toMinutes(
-    time
-){
+function toMinutes(time){
 
     const [
-        h,
-        m
+        hour,
+        minute
     ] =
         time
-        .split(':')
-        .map(
-            Number
-        );
+            .split(':')
+            .map(Number);
 
 
     return (
-        h * 60
-    ) +
-    m;
-
-}
-
-
-/* =====================================================
-   MAKE SHIFT ID
-===================================================== */
-
-function makeId(
-    start,
-    end
-){
-
-    return (
-        start.dateKey +
-        '_' +
-        start.time +
-        '_' +
-        end.dateKey +
-        '_' +
-        end.time
+        hour * 60 +
+        minute
     );
 
 }
 
 
-/* =====================================================
-   PAD
-===================================================== */
+function getDay(key){
 
-function pad(
-    value
-){
+    return parseDateKey(
+        key
+    ).getDay();
 
-    return String(
-        value
-    ).padStart(
-        2,
-        '0'
+}
+
+
+function startOfDay(date){
+
+    return new Date(
+        date.getFullYear(),
+        date.getMonth(),
+        date.getDate()
     );
 
 }
 
 
-/* =====================================================
-   THAI MONTH
-===================================================== */
-
-function thaiMonth(
-    month
-){
+function thaiMonth(month){
 
     const months = [
 
@@ -4949,13 +5096,7 @@ function thaiMonth(
 }
 
 
-/* =====================================================
-   THAI DATE
-===================================================== */
-
-function formatThaiDate(
-    key
-){
+function formatThaiDate(key){
 
     const date =
         parseDateKey(
@@ -4963,63 +5104,87 @@ function formatThaiDate(
         );
 
 
-    const day =
-        date.getDate();
-
-
-    const month =
-        thaiMonth(
-            date.getMonth()
-        );
-
-
-    const year =
-        date.getFullYear() +
-        543;
-
-
-    return `${day} ${month} ${year}`;
+    return `${date.getDate()} ${thaiMonth(date.getMonth())} ${date.getFullYear() + 543}`;
 
 }
 
 
-/* =====================================================
-   ESCAPE HTML
-===================================================== */
+function money(value){
 
-function escapeHTML(
-    value
-){
-
-    return String(
-        value ?? ''
-    )
-    .replace(
-        /&/g,
-        '&amp;'
-    )
-    .replace(
-        /</g,
-        '&lt;'
-    )
-    .replace(
-        />/g,
-        '&gt;'
-    )
-    .replace(
-        /"/g,
-        '&quot;'
-    )
-    .replace(
-        /'/g,
-        '&#039;'
+    return (
+        '฿' +
+        Number(
+            value || 0
+        ).toLocaleString(
+            'en-US',
+            {
+                minimumFractionDigits:2,
+                maximumFractionDigits:2
+            }
+        )
     );
 
 }
 
 
+function formatNumber(value){
+
+    return Number(
+        value || 0
+    ).toLocaleString(
+        'en-US',
+        {
+            minimumFractionDigits:2,
+            maximumFractionDigits:2
+        }
+    );
+
+}
+
+
+function makeId(start,end){
+
+    return [
+        start.dateKey,
+        start.time,
+        end.dateKey,
+        end.time
+    ].join('_');
+
+}
+
+
+function escapeHTML(value){
+
+    return String(
+        value ?? ''
+    )
+        .replace(
+            /&/g,
+            '&amp;'
+        )
+        .replace(
+            /</g,
+            '&lt;'
+        )
+        .replace(
+            />/g,
+            '&gt;'
+        )
+        .replace(
+            /"/g,
+            '&quot;'
+        )
+        .replace(
+            /'/g,
+            '&#039;'
+        );
+
+}
+
+
 /* =====================================================
-   KEYBOARD
+   ESC KEY FOR MODALS
 ===================================================== */
 
 document.addEventListener(
@@ -5027,17 +5192,19 @@ document.addEventListener(
     event => {
 
         if(
-            event.key ===
-            'Escape'
+            event.key !== 'Escape'
         ){
 
-            closeModal();
-
-            closePeriodsMore();
-
-            closeSalaryPreview();
+            return;
 
         }
+
+
+        closeModal();
+
+        closePeriodsMore();
+
+        closeSalaryPreview();
 
     }
 );
