@@ -3637,6 +3637,792 @@ function escapeHTML(
 
 renderAll();
 
+    /* =====================================================
+   SALARY SLIP
+===================================================== */
+
+const salaryPeriod =
+    document.getElementById(
+        'salaryPeriod'
+    );
+
+
+/* =====================================================
+   RENDER SALARY PERIODS
+===================================================== */
+
+function renderSalaryPeriods(){
+
+    if(!salaryPeriod){
+        return;
+    }
+
+    const completed =
+        shifts.filter(
+            shift =>
+                !shift.incomplete
+        );
+
+
+    const map =
+        new Map();
+
+
+    completed.forEach(
+        shift => {
+
+            const period =
+                getPayPeriod(
+                    shift.dateKey
+                );
+
+
+            const key =
+                period.start +
+                '_' +
+                period.end;
+
+
+            if(
+                !map.has(key)
+            ){
+
+                map.set(
+                    key,
+                    period
+                );
+
+            }
+
+        }
+    );
+
+
+    salaryPeriod.innerHTML = `
+
+        <option value="">
+            -- เลือกรอบจ่าย --
+        </option>
+
+    `;
+
+
+    Array.from(
+        map.values()
+    )
+    .sort(
+        (a,b)=>
+            b.start.localeCompare(
+                a.start
+            )
+    )
+    .forEach(
+        period => {
+
+            const option =
+                document.createElement(
+                    'option'
+                );
+
+
+            option.value =
+                JSON.stringify(
+                    period
+                );
+
+
+            option.textContent =
+                `${period.name} (${formatShortDate(period.start)} – ${formatShortDate(period.end)})`;
+
+
+            salaryPeriod.appendChild(
+                option
+            );
+
+        }
+    );
+}
+
+
+/* =====================================================
+   SALARY DATA
+===================================================== */
+
+function getSalaryData(){
+
+    if(
+        !salaryPeriod ||
+        !salaryPeriod.value
+    ){
+
+        throw new Error(
+            'กรุณาเลือกรอบจ่ายก่อน'
+        );
+    }
+
+
+    const period =
+        JSON.parse(
+            salaryPeriod.value
+        );
+
+
+    const name =
+        document.getElementById(
+            'employeeName'
+        ).value.trim();
+
+
+    const employeeId =
+        document.getElementById(
+            'employeeId'
+        ).value.trim();
+
+
+    const room =
+        Number(
+            document.getElementById(
+                'roomAllowance'
+            ).value
+        ) || 0;
+
+
+    const rate =
+        Number(
+            document.getElementById(
+                'socialSecurityRate'
+            ).value
+        ) || 0;
+
+
+    const workShifts =
+        shifts.filter(
+            shift =>
+
+                !shift.incomplete &&
+
+                shift.dateKey >=
+                    period.start &&
+
+                shift.dateKey <=
+                    period.end
+        );
+
+
+    const workDays =
+        workShifts.length;
+
+
+    const wage =
+        workShifts.reduce(
+            (sum,shift)=>
+                sum +
+                Number(
+                    shift.pay || 0
+                ),
+            0
+        );
+
+
+    const beforeDeduction =
+        wage +
+        room;
+
+
+    const socialSecurity =
+        beforeDeduction *
+        rate /
+        100;
+
+
+    const total =
+        beforeDeduction -
+        socialSecurity;
+
+
+    return {
+
+        period,
+
+        name,
+
+        employeeId,
+
+        workDays,
+
+        wage,
+
+        room,
+
+        beforeDeduction,
+
+        rate,
+
+        socialSecurity,
+
+        total
+
+    };
+}
+
+
+/* =====================================================
+   PREVIEW
+===================================================== */
+
+function previewSalarySlip(){
+
+    try{
+
+        const data =
+            getSalaryData();
+
+
+        let old =
+            document.getElementById(
+                'salaryPreview'
+            );
+
+
+        if(
+            old
+        ){
+
+            old.remove();
+
+        }
+
+
+        const preview =
+            document.createElement(
+                'div'
+            );
+
+
+        preview.id =
+            'salaryPreview';
+
+
+        preview.className =
+            'salary-preview';
+
+
+        preview.innerHTML = `
+
+            <div class="salary-preview-header">
+
+                <h3>
+                    SLIP เงินเดือน
+                </h3>
+
+                <p>
+                    ${escapeHTML(
+                        data.period.name
+                    )}
+                </p>
+
+            </div>
+
+
+            <div class="salary-employee">
+
+                <strong>
+                    ${escapeHTML(
+                        data.name
+                    )}
+                </strong>
+
+                <span>
+                    รหัสพนักงาน
+                    ${escapeHTML(
+                        data.employeeId
+                    )}
+                </span>
+
+            </div>
+
+
+            <div class="salary-line">
+
+                <span>
+                    วันที่ทำงาน
+                </span>
+
+                <strong>
+                    ${data.workDays} วัน
+                </strong>
+
+            </div>
+
+
+            <div class="salary-line">
+
+                <span>
+                    ค่าแรง
+                </span>
+
+                <strong>
+                    ${formatBaht(
+                        data.wage
+                    )}
+                </strong>
+
+            </div>
+
+
+            <div class="salary-line">
+
+                <span>
+                    ค่าห้องเย็น
+                </span>
+
+                <strong>
+                    ${formatBaht(
+                        data.room
+                    )}
+                </strong>
+
+            </div>
+
+
+            <div class="salary-line salary-subtotal">
+
+                <span>
+                    รวมก่อนหัก
+                </span>
+
+                <strong>
+                    ${formatBaht(
+                        data.beforeDeduction
+                    )}
+                </strong>
+
+            </div>
+
+
+            <div class="salary-line">
+
+                <span>
+                    หักประกันสังคม ${data.rate}%
+                </span>
+
+                <strong>
+                    ${formatBaht(
+                        data.socialSecurity
+                    )}
+                </strong>
+
+            </div>
+
+
+            <div class="salary-total">
+
+                <span>
+                    รวมทั้งหมด
+                </span>
+
+                <span>
+                    ${formatBaht(
+                        data.total
+                    )}
+                </span>
+
+            </div>
+
+        `;
+
+
+        document
+            .querySelector(
+                '.salary-slip-box'
+            )
+            .appendChild(
+                preview
+            );
+
+
+    }catch(error){
+
+        alert(
+            error.message
+        );
+
+    }
+}
+
+
+/* =====================================================
+   FORMAT BAHT
+===================================================== */
+
+function formatBaht(
+    value
+){
+
+    return (
+        Number(
+            value || 0
+        ).toLocaleString(
+            'th-TH',
+            {
+                minimumFractionDigits:2,
+                maximumFractionDigits:2
+            }
+        ) +
+        ' บาท'
+    );
+}
+
+
+/* =====================================================
+   GENERATE PDF
+===================================================== */
+
+async function generateSalaryPDF(){
+
+    try{
+
+        const data =
+            getSalaryData();
+
+
+        const {
+            jsPDF
+        } =
+            window.jspdf;
+
+
+        const doc =
+            new jsPDF({
+                orientation:'portrait',
+                unit:'mm',
+                format:'a4'
+            });
+
+
+        /*
+         * ฟอนต์ไทย
+         *
+         * jsPDF ปกติไม่รองรับภาษาไทย
+         * ดังนั้นใช้ข้อความอังกฤษ/ตัวเลข
+         * ใน PDF หากยังไม่ได้ฝังฟอนต์ไทย
+         *
+         * ด้านล่างเตรียม layout ให้ตรง
+         * กับสลิปที่ต้องการ
+         */
+
+
+        const pageWidth =
+            doc.internal.pageSize.getWidth();
+
+
+        const center =
+            pageWidth / 2;
+
+
+        let y =
+            25;
+
+
+        doc.setFontSize(
+            22
+        );
+
+
+        doc.setFont(
+            'helvetica',
+            'bold'
+        );
+
+
+        doc.text(
+            'SALARY SLIP',
+            center,
+            y,
+            {
+                align:'center'
+            }
+        );
+
+
+        y += 9;
+
+
+        doc.setFontSize(
+            12
+        );
+
+
+        doc.setFont(
+            'helvetica',
+            'normal'
+        );
+
+
+        doc.text(
+            String(
+                data.period.name
+            ),
+            center,
+            y,
+            {
+                align:'center'
+            }
+        );
+
+
+        y += 14;
+
+
+        doc.line(
+            20,
+            y,
+            pageWidth - 20,
+            y
+        );
+
+
+        y += 10;
+
+
+        doc.setFontSize(
+            12
+        );
+
+
+        doc.setFont(
+            'helvetica',
+            'bold'
+        );
+
+
+        doc.text(
+            data.name || '-',
+            20,
+            y
+        );
+
+
+        y += 7;
+
+
+        doc.setFont(
+            'helvetica',
+            'normal'
+        );
+
+
+        doc.text(
+            'Employee ID: ' +
+            (data.employeeId || '-'),
+            20,
+            y
+        );
+
+
+        y += 12;
+
+
+        doc.line(
+            20,
+            y,
+            pageWidth - 20,
+            y
+        );
+
+
+        y += 12;
+
+
+        /*
+         * ตาราง
+         */
+
+        doc.autoTable({
+
+            startY:y,
+
+            theme:'plain',
+
+            margin:{
+                left:20,
+                right:20
+            },
+
+            styles:{
+                font:'helvetica',
+                fontSize:12,
+                cellPadding:4
+            },
+
+            columnStyles:{
+                0:{
+                    halign:'left'
+                },
+                1:{
+                    halign:'right'
+                }
+            },
+
+            body:[
+
+                [
+                    'วันที่ทำงาน',
+                    data.workDays +
+                    ' วัน'
+                ],
+
+                [
+                    'ค่าแรง',
+                    formatNumber(
+                        data.wage
+                    ) +
+                    ' บาท'
+                ],
+
+                [
+                    'ค่าห้องเย็น',
+                    formatNumber(
+                        data.room
+                    ) +
+                    ' บาท'
+                ],
+
+                [
+                    'รวมก่อนหัก',
+                    formatNumber(
+                        data.beforeDeduction
+                    ) +
+                    ' บาท'
+                ],
+
+                [
+                    'หักประกันสังคม ' +
+                    data.rate +
+                    '%',
+
+                    formatNumber(
+                        data.socialSecurity
+                    ) +
+                    ' บาท'
+                ]
+
+            ]
+
+        });
+
+
+        y =
+            doc.lastAutoTable.finalY +
+            10;
+
+
+        doc.line(
+            20,
+            y,
+            pageWidth - 20,
+            y
+        );
+
+
+        y += 12;
+
+
+        doc.setFontSize(
+            16
+        );
+
+
+        doc.setFont(
+            'helvetica',
+            'bold'
+        );
+
+
+        doc.text(
+            'รวมทั้งหมด',
+            20,
+            y
+        );
+
+
+        doc.text(
+            'THB ' +
+            formatNumber(
+                data.total
+            ),
+            pageWidth - 20,
+            y,
+            {
+                align:'right'
+            }
+        );
+
+
+        y += 8;
+
+
+        doc.line(
+            20,
+            y,
+            pageWidth - 20,
+            y
+        );
+
+
+        /*
+         * ชื่อไฟล์
+         */
+
+        const filename =
+            'SalarySlip_' +
+            data.period.name
+                .replace(
+                    /[\/\\:*?"<>| ]/g,
+                    '_'
+                ) +
+            '.pdf';
+
+
+        doc.save(
+            filename
+        );
+
+
+    }catch(error){
+
+        console.error(
+            error
+        );
+
+
+        alert(
+            error.message
+        );
+
+    }
+}
+
+
+/* =====================================================
+   NUMBER FORMAT FOR PDF
+===================================================== */
+
+function formatNumber(
+    value
+){
+
+    return Number(
+        value || 0
+    ).toLocaleString(
+        'en-US',
+        {
+            minimumFractionDigits:2,
+            maximumFractionDigits:2
+        }
+    );
+}
+
 </script>
 
 </body>
