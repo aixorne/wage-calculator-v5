@@ -1661,3 +1661,296 @@ body {
     }
 
 }
+
+/* =====================================================
+   SALARY SLIP
+===================================================== */
+
+.salary-slip-card {
+    overflow: hidden;
+}
+
+.salary-slip-box {
+    margin-top: 8px;
+}
+
+.slip-info {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 14px;
+}
+
+.slip-field {
+    margin-bottom: 16px;
+}
+
+.slip-field label {
+    display: block;
+    margin-bottom: 8px;
+
+    font-size: 13px;
+    font-weight: 700;
+
+    color: #657087;
+}
+
+.slip-field input,
+.slip-field select {
+    width: 100%;
+    height: 50px;
+
+    padding: 0 15px;
+
+    border: 1px solid #dfe4ec;
+    border-radius: 14px;
+
+    background: #f8fafc;
+    color: #172033;
+
+    font-size: 15px;
+    font-weight: 600;
+
+    outline: none;
+
+    transition:
+        border-color .2s ease,
+        box-shadow .2s ease,
+        background .2s ease;
+}
+
+.slip-field input:focus,
+.slip-field select:focus {
+    border-color: #667eea;
+
+    background: #fff;
+
+    box-shadow:
+        0 0 0 4px rgba(102,126,234,.12);
+}
+
+.money-input {
+    position: relative;
+}
+
+.money-input input {
+    padding-right: 65px;
+}
+
+.money-input span {
+    position: absolute;
+
+    right: 16px;
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    color: #778096;
+
+    font-size: 13px;
+    font-weight: 700;
+
+    pointer-events: none;
+}
+
+
+/* PREVIEW BUTTON */
+
+.salary-preview-btn,
+.salary-pdf-btn {
+    width: 100%;
+
+    min-height: 52px;
+
+    border: 0;
+    border-radius: 15px;
+
+    font-size: 15px;
+    font-weight: 800;
+
+    cursor: pointer;
+
+    transition:
+        transform .15s ease,
+        box-shadow .2s ease;
+}
+
+.salary-preview-btn {
+    margin-top: 4px;
+
+    background: #eef2ff;
+    color: #4f46e5;
+}
+
+.salary-preview-btn:hover {
+    box-shadow:
+        0 8px 20px rgba(79,70,229,.15);
+}
+
+.salary-pdf-btn {
+    margin-top: 10px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #667eea,
+            #764ba2
+        );
+
+    color: white;
+
+    box-shadow:
+        0 10px 25px rgba(102,126,234,.25);
+}
+
+.salary-pdf-btn:hover {
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 14px 30px rgba(102,126,234,.32);
+}
+
+.salary-preview-btn:active,
+.salary-pdf-btn:active {
+    transform: scale(.98);
+}
+
+
+/* =====================================================
+   SALARY PREVIEW
+===================================================== */
+
+.salary-preview {
+    margin-top: 20px;
+
+    padding: 22px;
+
+    border-radius: 20px;
+
+    background: #fff;
+
+    border: 1px solid #e5e7eb;
+
+    box-shadow:
+        0 12px 30px rgba(15,23,42,.08);
+}
+
+.salary-preview-header {
+    text-align: center;
+
+    padding-bottom: 15px;
+
+    border-bottom: 1px dashed #cbd5e1;
+}
+
+.salary-preview-header h3 {
+    margin: 0;
+
+    font-size: 21px;
+    color: #111827;
+}
+
+.salary-preview-header p {
+    margin: 5px 0 0;
+
+    color: #64748b;
+
+    font-size: 13px;
+}
+
+.salary-employee {
+    padding: 15px 0;
+
+    border-bottom: 1px dashed #cbd5e1;
+}
+
+.salary-employee strong {
+    display: block;
+
+    color: #111827;
+
+    font-size: 15px;
+}
+
+.salary-employee span {
+    display: block;
+
+    margin-top: 4px;
+
+    color: #64748b;
+
+    font-size: 13px;
+}
+
+.salary-line {
+    display: flex;
+
+    justify-content: space-between;
+    align-items: center;
+
+    gap: 20px;
+
+    padding: 9px 0;
+
+    font-size: 14px;
+}
+
+.salary-line span:first-child {
+    color: #475569;
+}
+
+.salary-line strong {
+    color: #111827;
+
+    white-space: nowrap;
+}
+
+.salary-subtotal {
+    margin-top: 8px;
+
+    padding-top: 13px;
+
+    border-top: 1px solid #e2e8f0;
+}
+
+.salary-total {
+    display: flex;
+
+    justify-content: space-between;
+
+    margin-top: 12px;
+    padding-top: 15px;
+
+    border-top: 2px solid #111827;
+
+    font-size: 18px;
+    font-weight: 900;
+}
+
+.salary-total span:last-child {
+    color: #4f46e5;
+}
+
+
+/* MOBILE */
+
+@media (max-width: 600px) {
+
+    .slip-info {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+
+    .salary-preview {
+        padding: 18px;
+    }
+
+    .salary-line {
+        font-size: 13px;
+    }
+
+    .salary-total {
+        font-size: 16px;
+    }
+
+}
