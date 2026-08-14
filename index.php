@@ -10,7 +10,7 @@
     content="width=device-width, initial-scale=1.0"
 >
 
-<title>Wage Calculator V1</title>
+<title>Wage Calculator V8</title>
 
 <link
     rel="stylesheet"
@@ -43,7 +43,7 @@
     </p>
 
     <span class="version">
-        WAGE CALCULATOR V1
+        WAGE CALCULATOR V8
     </span>
 
 </section>
@@ -4424,9 +4424,9 @@ async function generateSalaryPDF(){
         ================================================= */
 
         doc.setFillColor(
-            30,
-            41,
-            59
+            13,
+            52,
+            144
         );
 
 
@@ -4540,31 +4540,6 @@ doc.text(
 );
 
 y += 7;
-
-
-/* =================================================
-   EMPLOYEE INFORMATION
-================================================= */
-
-doc.setFontSize(
-    11
-);
-
-doc.setTextColor(
-    13,
-    52,
-    144
-);
-
-doc.text(
-    'ข้อมูลพนักงาน',
-    margin,
-    y
-);
-
-y += 7;
-
-
 /* =================================================
    EMPLOYEE INFO BOX
 ================================================= */
