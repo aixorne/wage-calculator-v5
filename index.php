@@ -483,6 +483,67 @@
 
 <script>
 
+async function loadThaiFont(doc){
+
+    const response =
+        await fetch(
+            'NotoSansThai-Regular.ttf'
+        );
+
+    if(!response.ok){
+        throw new Error(
+            'ไม่พบไฟล์ฟอนต์ภาษาไทย'
+        );
+    }
+
+    const buffer =
+        await response.arrayBuffer();
+
+    const bytes =
+        new Uint8Array(buffer);
+
+    let binary = '';
+
+    const chunkSize = 0x8000;
+
+    for(
+        let i = 0;
+        i < bytes.length;
+        i += chunkSize
+    ){
+
+        binary += String.fromCharCode(
+            ...bytes.subarray(
+                i,
+                Math.min(
+                    i + chunkSize,
+                    bytes.length
+                )
+            )
+        );
+
+    }
+
+    const base64 =
+        btoa(binary);
+
+    doc.addFileToVFS(
+        'NotoSansThai-Regular.ttf',
+        base64
+    );
+
+    doc.addFont(
+        'NotoSansThai-Regular.ttf',
+        'NotoSansThai',
+        'normal'
+    );
+
+    doc.setFont(
+        'NotoSansThai',
+        'normal'
+    );
+}
+
 /* =====================================================
    CONFIG
 ===================================================== */
@@ -2142,6 +2203,8 @@ function renderAll(){
     renderCalendar();
 
     renderPeriods();
+
+    renderSalaryPeriods();
 }
 
 
@@ -4098,6 +4161,13 @@ async function generateSalaryPDF(){
                 unit:'mm',
                 format:'a4'
             });
+            
+            await loadThaiFont(doc);
+
+doc.setFont(
+    'NotoSansThai',
+    'normal'
+);
 
 
         /*
@@ -4130,8 +4200,8 @@ async function generateSalaryPDF(){
 
 
         doc.setFont(
-            'helvetica',
-            'bold'
+            'NotoSansThai',
+            'normal'
         );
 
 
@@ -4154,7 +4224,7 @@ async function generateSalaryPDF(){
 
 
         doc.setFont(
-            'helvetica',
+            'NotoSansThai',
             'normal'
         );
 
@@ -4191,8 +4261,8 @@ async function generateSalaryPDF(){
 
 
         doc.setFont(
-            'helvetica',
-            'bold'
+            'NotoSansThai',
+            'normal'
         );
 
 
@@ -4207,7 +4277,7 @@ async function generateSalaryPDF(){
 
 
         doc.setFont(
-            'helvetica',
+            'NotoSansThai',
             'normal'
         );
 
@@ -4250,7 +4320,7 @@ async function generateSalaryPDF(){
             },
 
             styles:{
-                font:'helvetica',
+                font:'NotoSansThai',
                 fontSize:12,
                 cellPadding:4
             },
@@ -4334,8 +4404,8 @@ async function generateSalaryPDF(){
 
 
         doc.setFont(
-            'helvetica',
-            'bold'
+            'NotoSansThai',
+            'normal'
         );
 
 
