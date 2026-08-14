@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wage Calculator V.Beta</title>
+    <title>Wage Calculator V1</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
@@ -16,7 +16,7 @@
     <section class="hero">
         <h1>💰 ระบบคำนวณค่าแรง</h1>
         <p>OCR • ค่าแรง • OT • ปฏิทิน • รอบจ่าย</p>
-        <span class="version">WAGE CALCULATOR V.Beta</span>
+        <span class="version">WAGE CALCULATOR V1</span>
     </section>
 
     <!-- SUMMARY -->
@@ -83,7 +83,6 @@
             <div class="legend-item"><span class="dot blue"></span>ยังไม่ถึง</div>
             <div class="legend-item"><span class="dot green"></span>อัปแล้ว</div>
             <div class="legend-item"><span class="dot orange"></span>ลืมอัป</div>
-            <div class="legend-item"><span class="dot red"></span>วันหยุด</div>
         </div>
     </section>
 
@@ -612,10 +611,14 @@ function renderCalendar() {
 
         cell.className = `day ${status.className}`;
         let html = `<div class="day-number">${day}</div>`;
-        if (status.label) html += `<div class="day-status">${status.label}</div>`;
+        
+        if (status.label) {
+            html += `<div class="day-status">${status.label}</div>`;
+        }
+        
         if (shift && !shift.incomplete) {
             html += `
-                <div class="day-time">${escapeHTML(shift.startTime)} – ${escapeHTML(shift.endTime)}</div>
+                <div class="day-time">${escapeHTML(shift.startTime)}–${escapeHTML(shift.endTime)}</div>
                 <div class="day-money">${money(shift.pay)}</div>
             `;
         }
@@ -638,8 +641,15 @@ function getShiftForDate(key) {
 function getDayStatus(key, shift) {
     const today = startOfDay(new Date());
     const date = parseDateKey(key);
+    
     if (date > today) return { className: 'future', label: 'ยังไม่ถึง' };
-    if (shift) return shift.incomplete ? { className: 'missed', label: 'ลืมอัป' } : { className: 'worked', label: 'อัปแล้ว' };
+    
+    if (shift) {
+        return shift.incomplete 
+            ? { className: 'missed', label: 'ลืมอัป' } 
+            : { className: 'worked', label: null };
+    }
+    
     return { className: 'missed', label: 'ลืมอัป' };
 }
 
@@ -1001,3 +1011,4 @@ async function generateSalaryPDF() {
 
 </body>
 </html>
+
