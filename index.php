@@ -22,6 +22,27 @@
     .upload-review .primary-btn { margin-top:12px; }
     .day-type-badge { font-size:11px; font-weight:700; color:#b91c1c; }
 
+    /* FIX: readable summary cards and selected text */
+    ::selection { background: #ef233c !important; color: #ffffff !important; }
+    .summary-grid .summary,
+    .summary-grid > div,
+    .period-stats > div,
+    .period-item .stat-box,
+    .period-item .period-stat,
+    .stat-card {
+      background: #1b1b20 !important;
+      color: #f5f5f5 !important;
+      border: 1px solid #414149 !important;
+    }
+    .summary-grid .summary-label,
+    .summary-grid .summary-value,
+    .period-stats *,
+    .period-stat-label,
+    .period-stat-value { color: #f5f5f5 !important; }
+    .summary-grid .summary-value,
+    .period-stat-value { color: #ff5264 !important; }
+    .summary-grid .summary-label { color: #c4c4cc !important; }
+
     /* RED & BLACK THEME */
     :root { color-scheme: dark; --theme-red:#ef233c; --theme-red-dark:#b91c1c; --theme-black:#09090b; --theme-panel:#151518; --theme-panel-2:#1f1f23; --theme-border:#38383f; --theme-text:#f5f5f5; --theme-muted:#a1a1aa; }
     body { background: radial-gradient(ellipse at top, #2a0b10 0%, #09090b 48%, #050505 100%) !important; color:var(--theme-text) !important; }
@@ -89,7 +110,7 @@
     <section class="hero">
       <h1>💰 ระบบคำนวณค่าแรง</h1>
       <p>OCR • ค่าแรง • OT • ปฏิทิน • รอบจ่าย</p>
-      <span class="version">WAGE CALCULATOR V1</span>
+      <span class="version">WAGE CALCULATOR</span>
     </section>
 
     <!-- SUMMARY -->
