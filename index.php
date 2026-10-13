@@ -13,6 +13,14 @@
     .calendar .day.sunday-day { background: #fff7f7; }
     .calendar .day .holiday-label { color: #b91c1c; font-weight: 700; }
     .calendar .weekday:first-child { color: #dc2626; }
+    .day-type-editor { margin: 12px 0; padding: 12px; border: 1px solid #e5e7eb; border-radius: 12px; }
+    .day-type-editor label { display:block; margin-bottom:6px; font-weight:700; }
+    .day-type-editor select, .upload-review select { width:100%; padding:10px; border:1px solid #d1d5db; border-radius:8px; background:#fff; color:#111827; }
+    .upload-review { margin-top:14px; padding:14px; border:1px solid #bfdbfe; border-radius:12px; background:#eff6ff; }
+    .upload-review-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; align-items:center; padding:9px 0; border-bottom:1px solid #dbeafe; }
+    .upload-review-row:last-of-type { border-bottom:0; }
+    .upload-review .primary-btn { margin-top:12px; }
+    .day-type-badge { font-size:11px; font-weight:700; color:#b91c1c; }
   </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
@@ -69,6 +77,7 @@
         🔍 วิเคราะห์รูปทั้งหมด
       </button>
       <div id="loading" class="loading">ยังไม่ได้เลือกรูป</div>
+      <div id="uploadReview" class="upload-review" hidden></div>
     </section>
 
     <!-- CALENDAR -->
@@ -238,16 +247,13 @@
     const SOCIAL_SECURITY_FIXED = 229;
     const OT_START = 17 * 60 + 30;
 
-    // ใส่วันที่หยุดตามประเพณีของโรงงานทั้ง 13 วันในรูปแบบ YYYY-MM-DD
-    // ตัวอย่าง: '2026-01-01'. ต้องใช้วันที่ ค.ศ. ไม่ใช่ พ.ศ.
-    const TRADITIONAL_HOLIDAYS = [
-      // '2026-01-01',
-      // เพิ่มวันหยุดโรงงานอีก 13 วันตามประกาศของโรงงาน
-    ];
-    const HOLIDAY_SET = new Set(TRADITIONAL_HOLIDAYS);
+    // ประเภทวันกำหนดเอง: normal, off, factoryHoliday (บันทึกแยกตามวันที่)
+    let dayTypes = {};
 
     let shifts = [];
     let selectedFiles = [];
+    let pendingUploadShifts = [];
+    let pendingUploadDates = [];
     let viewDate = new Date();
 
     const pad = n => String(n).padStart(2, '0');
@@ -308,6 +314,7 @@
     const modalTitle = document.getElementById('modalTitle');
     const modalBody = document.getElementById('modalBody');
     const salaryPeriod = document.getElementById('salaryPeriod');
+    const uploadReview = document.getElementById('uploadReview');
 
     /* STARTUP */
     document.addEventListener('DOMContentLoaded', () => {
@@ -408,12 +415,11 @@
         const newShifts = createShifts(records);
         if (newShifts.length === 0) throw new Error('ไม่พบวันที่หรือเวลาในรูป');
 
-        mergeShifts(newShifts);
-        selectedFiles = [];
-        imageInput.value = '';
-        renderPreviews();
-        loading.textContent = `✅ บันทึกข้อมูล ${newShifts.length} กะเรียบร้อย`;
-        renderAll();
+        pendingUploadShifts = newShifts;
+        pendingUploadDates = [...new Set(newShifts.map(s => s.startDateKey || s.dateKey))].sort();
+        renderUploadReview();
+        loading.textContent = 'เลือกประเภทของแต่ละวัน แล้วกดยืนยันบันทึก';
+        uploadReview.hidden = false;
 
       } catch (error) {
         console.error(error);
@@ -422,6 +428,63 @@
       } finally {
         ocrButton.disabled = selectedFiles.length === 0;
       }
+    }
+
+    function dayTypeLabel(type) {
+      return ({ normal: 'วันธรรมดา', off: 'วัน Off', factoryHoliday: 'วันหยุดโรงงาน' })[type] || 'วันธรรมดา';
+    }
+
+    function dayTypeOptions(selected) {
+      return `<option value="normal" ${selected === 'normal' ? 'selected' : ''}>วันธรรมดา</option>
+        <option value="off" ${selected === 'off' ? 'selected' : ''}>วัน Off</option>
+        <option value="factoryHoliday" ${selected === 'factoryHoliday' ? 'selected' : ''}>วันหยุดโรงงาน</option>`;
+    }
+
+    function renderUploadReview() {
+      uploadReview.hidden = false;
+      uploadReview.innerHTML = `<h3>📅 ตรวจสอบประเภทวันก่อนบันทึก</h3>
+        <p>เลือกรายการให้ตรงกับแต่ละวันที่อ่านได้จากรูป หากมีหลายรูปในวันเดียวกัน จะใช้ประเภทวันเดียวกัน</p>
+        ${pendingUploadDates.map(key => `<div class="upload-review-row"><div><strong>${formatThaiDate(key)}</strong><br><small>${getDay(key) === 0 ? 'วันอาทิตย์' : 'วันที่อ่านจากรูป'}</small></div>
+        <select data-date="${key}" aria-label="ประเภทวัน ${key}">${dayTypeOptions(dayTypes[key] || (getDay(key) === 0 ? 'off' : 'normal'))}</select></div>`).join('')}
+        <button class="primary-btn" type="button" onclick="confirmUploadReview()">✅ ยืนยันประเภทวันและบันทึก</button>
+        <button class="secondary-btn" type="button" onclick="cancelUploadReview()">ยกเลิก</button>`;
+    }
+
+    function confirmUploadReview() {
+      uploadReview.querySelectorAll('select[data-date]').forEach(el => { dayTypes[el.dataset.date] = el.value; });
+      pendingUploadShifts = pendingUploadShifts.map(s => recalculateShiftForType(s, dayTypes[s.startDateKey || s.dateKey] || 'normal'));
+      mergeShifts(pendingUploadShifts);
+      const count = pendingUploadShifts.length;
+      pendingUploadShifts = [];
+      pendingUploadDates = [];
+      uploadReview.hidden = true;
+      uploadReview.innerHTML = '';
+      selectedFiles = [];
+      imageInput.value = '';
+      renderPreviews();
+      loading.textContent = `✅ บันทึกข้อมูล ${count} กะเรียบร้อย`;
+      renderAll();
+    }
+
+    function cancelUploadReview() {
+      pendingUploadShifts = [];
+      pendingUploadDates = [];
+      uploadReview.hidden = true;
+      uploadReview.innerHTML = '';
+      loading.textContent = selectedFiles.length ? `เลือกรูปแล้ว ${selectedFiles.length} รูป` : 'ยังไม่ได้เลือกรูป';
+      ocrButton.disabled = selectedFiles.length === 0;
+    }
+
+    function recalculateShiftForType(shift, type) {
+      if (shift.incomplete) return { ...shift, dayType: type, isHoliday: type === 'factoryHoliday', isOff: type === 'off' };
+      const start = { dateKey: shift.startDateKey || shift.dateKey, time: shift.startTime, minutes: toMinutes(shift.startTime) };
+      const end = { dateKey: shift.endDateKey || shift.dateKey, time: shift.endTime, minutes: toMinutes(shift.endTime) };
+      let calculated;
+      if (type === 'factoryHoliday') calculated = calculateHoliday(start, end);
+      else if (getDay(start.dateKey) === 0) calculated = calculateSunday(start, end);
+      else if (start.minutes >= 19 * 60) calculated = calculateNight(start, end);
+      else calculated = calculateDay(start, end);
+      return { ...calculated, dayType: type, isHoliday: type === 'factoryHoliday', isOff: type === 'off', isSunday: getDay(start.dateKey) === 0 };
     }
 
     function compressImage(file) {
@@ -538,7 +601,7 @@
             incomplete: true,
             pay: 0,
             isSunday: getDay(start.dateKey) === 0,
-            isHoliday: HOLIDAY_SET.has(start.dateKey),
+            isHoliday: dayTypes[start.dateKey] === 'factoryHoliday',
             isNight: start.minutes >= 19 * 60,
             normalHours: 0, otHours: 0, normalPay: 0, otPay: 0
           });
@@ -559,7 +622,7 @@
     function buildShift(start, end) {
       const day = getDay(start.dateKey);
       // วันหยุดประเพณีมีสิทธิ์คำนวณก่อนวันอาทิตย์ หากวันหยุดตรงกันให้ใช้กฎวันหยุดประเพณี
-      if (HOLIDAY_SET.has(start.dateKey)) return calculateHoliday(start, end);
+      if (dayTypes[start.dateKey] === 'factoryHoliday') return { ...calculateHoliday(start, end), dayType: 'factoryHoliday' };
       if (day === 0) return calculateSunday(start, end);
       if (start.minutes >= 19 * 60) return calculateNight(start, end);
       return calculateDay(start, end);
@@ -683,8 +746,9 @@
 
     function saveData() {
       localStorage.setItem(STORAGE_KEY, JSON.stringify({
-        version: 6,
+        version: 7,
         updatedAt: new Date().toISOString(),
+        dayTypes,
         shifts
       }));
     }
@@ -695,6 +759,7 @@
         if (!raw) { shifts = []; return; }
         const data = JSON.parse(raw);
         shifts = Array.isArray(data.shifts) ? data.shifts : [];
+        dayTypes = data.dayTypes && typeof data.dayTypes === 'object' ? data.dayTypes : {};
       } catch (e) {
         console.error(e);
         shifts = [];
@@ -747,10 +812,12 @@
         const status = getDayStatus(key, shift);
 
         const isSunday = getDay(key) === 0;
-        const isHoliday = HOLIDAY_SET.has(key);
-        cell.className = `day ${status.className}${isSunday ? ' sunday-day' : ''}${isHoliday ? ' holiday-day' : ''}`;
+        const isHoliday = dayTypes[key] === 'factoryHoliday';
+        const isOff = dayTypes[key] === 'off';
+        cell.className = `day ${status.className}${isSunday ? ' sunday-day' : ''}${isHoliday || isOff ? ' holiday-day' : ''}`;
         let html = `<div class="day-number">${day}</div>`;
-        if (isHoliday) html += `<div class="day-status holiday-label">วันหยุด</div>`;
+        if (isHoliday) html += `<div class="day-status holiday-label">วันหยุดโรงงาน</div>`;
+        else if (isOff) html += `<div class="day-status holiday-label">วัน Off</div>`;
 
         if (status.label) {
           html += `<div class="day-status">${status.label}</div>`;
@@ -787,19 +854,32 @@
       if (shift) {
         return shift.incomplete ? { className: 'missed', label: 'ลืมอัป' } : { className: 'worked', label: null };
       }
+      if (dayTypes[key] === 'off' || dayTypes[key] === 'factoryHoliday') return { className: 'worked', label: dayTypes[key] === 'off' ? 'วัน Off' : 'วันหยุดโรงงาน' };
       return { className: 'missed', label: 'ลืมอัป' };
     }
 
     function openDay(key) {
       const dayShifts = shifts.filter(s => s.startDateKey === key || s.dateKey === key);
+      const currentType = dayTypes[key] || (getDay(key) === 0 ? 'off' : 'normal');
       modalTitle.textContent = `📅 ${formatThaiDate(key)}`;
-
-      if (dayShifts.length === 0) {
-        modalBody.innerHTML = `<div class="empty-state">ไม่มีข้อมูลการทำงานวันนี้</div>`;
-      } else {
-        modalBody.innerHTML = dayShifts.map(s => createShiftHTML(s)).join('');
-      }
+      modalBody.innerHTML = `<div class="day-type-editor">
+        <label for="dayTypeSelect">ประเภทของวันนี้</label>
+        <select id="dayTypeSelect">${dayTypeOptions(currentType)}</select>
+        <button class="primary-btn" type="button" onclick="saveDayType('${key}')">💾 บันทึกประเภทวัน</button>
+        </div>` + (dayShifts.length === 0
+          ? `<div class="empty-state">${currentType === 'off' || currentType === 'factoryHoliday' ? 'กำหนดวันหยุดแล้ว ไม่มีข้อมูลการทำงานวันนี้' : 'วันนี้ยังไม่มีข้อมูล — ลืมอัปโหลดหรือไม่?'}</div>`
+          : dayShifts.map(s => createShiftHTML(s)).join(''));
       dayModal.classList.add('show');
+    }
+
+    function saveDayType(key) {
+      const select = document.getElementById('dayTypeSelect');
+      if (!select) return;
+      dayTypes[key] = select.value;
+      shifts = shifts.map(s => (s.startDateKey || s.dateKey) === key ? recalculateShiftForType(s, select.value) : s);
+      saveData();
+      renderAll();
+      openDay(key);
     }
 
     function createShiftHTML(shift) {
@@ -814,7 +894,7 @@
       return `
         <div class="shift-detail">
           <div class="shift-detail-title">
-            ${shift.isHoliday ? '🔴 วันหยุดประเพณี' : shift.isSunday ? '🔴 วันอาทิตย์' : shift.isNight ? '🌙 กะกลางคืน' : '☀️ กะกลางวัน'}
+            ${shift.isHoliday ? '🔴 วันหยุดโรงงาน' : shift.isOff ? '🟠 วัน Off' : shift.isSunday ? '🔴 วันอาทิตย์' : shift.isNight ? '🌙 กะกลางคืน' : '☀️ กะกลางวัน'}
           </div>
           <div>เวลา: <strong>${escapeHTML(shift.startTime)} – ${escapeHTML(shift.endTime)}</strong></div>
           <div>ค่าแรงปกติ: <strong>${money(shift.normalPay)}</strong></div>
