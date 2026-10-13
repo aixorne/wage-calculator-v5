@@ -5,6 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Wage Calculator V1</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    /* ปฏิทิน: วันอาทิตย์และวันหยุดประเพณีเป็นสีแดง */
+    .calendar .day.sunday-day, .calendar .day.holiday-day { color: #b91c1c; border-color: #fecaca; }
+    .calendar .day.sunday-day .day-number, .calendar .day.holiday-day .day-number { color: #dc2626; font-weight: 800; }
+    .calendar .day.holiday-day { background: #fff1f2; }
+    .calendar .day.sunday-day { background: #fff7f7; }
+    .calendar .day .holiday-label { color: #b91c1c; font-weight: 700; }
+    .calendar .weekday:first-child { color: #dc2626; }
+  </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 </head>
@@ -133,10 +142,10 @@
         </div>
 
         <div class="slip-field">
-          <label>ประกันสังคม</label>
+          <label>ประกันสังคม (หักคงที่ต่อรอบจ่าย)</label>
           <div class="money-input">
-            <input id="socialSecurityRate" type="number" value="3" min="0" max="100" step="0.1">
-            <span>%</span>
+            <input id="socialSecurityFixed" type="number" value="229" readonly>
+            <span>บาท</span>
           </div>
         </div>
 
@@ -220,9 +229,22 @@
        ===================================================== */
     const STORAGE_KEY = 'wage_calculator_v6_data';
     const NORMAL_WAGE = 352;
+    const NORMAL_HOURS = 8;
+    const HOURLY_WAGE = NORMAL_WAGE / NORMAL_HOURS; // 44 บาท/ชม.
     const OT_RATE = 66;
-    const SUNDAY_RATE = 88;
+    const SUNDAY_RATE = HOURLY_WAGE * 2; // 88 บาท/ชม.
+    const HOLIDAY_RATE = HOURLY_WAGE * 2; // 2 แรง = 88 บาท/ชม.
+    const HOLIDAY_OT_RATE = HOURLY_WAGE * 3; // 3 แรง = 132 บาท/ชม.
+    const SOCIAL_SECURITY_FIXED = 229;
     const OT_START = 17 * 60 + 30;
+
+    // ใส่วันที่หยุดตามประเพณีของโรงงานทั้ง 13 วันในรูปแบบ YYYY-MM-DD
+    // ตัวอย่าง: '2026-01-01'. ต้องใช้วันที่ ค.ศ. ไม่ใช่ พ.ศ.
+    const TRADITIONAL_HOLIDAYS = [
+      // '2026-01-01',
+      // เพิ่มวันหยุดโรงงานอีก 13 วันตามประกาศของโรงงาน
+    ];
+    const HOLIDAY_SET = new Set(TRADITIONAL_HOLIDAYS);
 
     let shifts = [];
     let selectedFiles = [];
@@ -516,6 +538,7 @@
             incomplete: true,
             pay: 0,
             isSunday: getDay(start.dateKey) === 0,
+            isHoliday: HOLIDAY_SET.has(start.dateKey),
             isNight: start.minutes >= 19 * 60,
             normalHours: 0, otHours: 0, normalPay: 0, otPay: 0
           });
@@ -535,9 +558,31 @@
 
     function buildShift(start, end) {
       const day = getDay(start.dateKey);
+      // วันหยุดประเพณีมีสิทธิ์คำนวณก่อนวันอาทิตย์ หากวันหยุดตรงกันให้ใช้กฎวันหยุดประเพณี
+      if (HOLIDAY_SET.has(start.dateKey)) return calculateHoliday(start, end);
       if (day === 0) return calculateSunday(start, end);
       if (start.minutes >= 19 * 60) return calculateNight(start, end);
       return calculateDay(start, end);
+    }
+
+    function calculateHoliday(start, end) {
+      let startMinutes = start.minutes;
+      let endMinutes = end.minutes;
+      if (end.dateKey !== start.dateKey && endMinutes < startMinutes) endMinutes += 24 * 60;
+      endMinutes = Math.floor(endMinutes / 30) * 30;
+      const totalMinutes = Math.max(0, endMinutes - startMinutes);
+      const doubleRateMinutes = Math.min(totalMinutes, NORMAL_HOURS * 60);
+      const tripleRateMinutes = Math.max(0, totalMinutes - doubleRateMinutes);
+      const normalPay = (doubleRateMinutes / 60) * HOLIDAY_RATE;
+      const otPay = (tripleRateMinutes / 60) * HOLIDAY_OT_RATE;
+      return {
+        id: makeId(start, end), dateKey: start.dateKey,
+        startDateKey: start.dateKey, endDateKey: end.dateKey,
+        startTime: start.time, endTime: end.time, incomplete: false,
+        isSunday: getDay(start.dateKey) === 0, isHoliday: true, isNight: false,
+        normalHours: doubleRateMinutes / 60, otHours: tripleRateMinutes / 60,
+        normalPay, otPay, pay: normalPay + otPay
+      };
     }
 
     function calculateSunday(start, end) {
@@ -557,6 +602,7 @@
         endTime: end.time,
         incomplete: false,
         isSunday: true,
+        isHoliday: false,
         isNight: false,
         normalHours: minutes / 60,
         otHours: 0,
@@ -586,6 +632,7 @@
         endTime: end.time,
         incomplete: false,
         isSunday: false,
+        isHoliday: false,
         isNight: false,
         normalHours: 8,
         otHours: otMinutes / 60,
@@ -616,6 +663,7 @@
         endTime: end.time,
         incomplete: false,
         isSunday: false,
+        isHoliday: false,
         isNight: true,
         normalHours: 8,
         otHours: otMinutes / 60,
@@ -698,8 +746,11 @@
         const shift = getShiftForDate(key);
         const status = getDayStatus(key, shift);
 
-        cell.className = `day ${status.className}`;
+        const isSunday = getDay(key) === 0;
+        const isHoliday = HOLIDAY_SET.has(key);
+        cell.className = `day ${status.className}${isSunday ? ' sunday-day' : ''}${isHoliday ? ' holiday-day' : ''}`;
         let html = `<div class="day-number">${day}</div>`;
+        if (isHoliday) html += `<div class="day-status holiday-label">วันหยุด</div>`;
 
         if (status.label) {
           html += `<div class="day-status">${status.label}</div>`;
@@ -763,7 +814,7 @@
       return `
         <div class="shift-detail">
           <div class="shift-detail-title">
-            ${shift.isSunday ? '🟠 วันอาทิตย์' : shift.isNight ? '🌙 กะกลางคืน' : '☀️ กะกลางวัน'}
+            ${shift.isHoliday ? '🔴 วันหยุดประเพณี' : shift.isSunday ? '🔴 วันอาทิตย์' : shift.isNight ? '🌙 กะกลางคืน' : '☀️ กะกลางวัน'}
           </div>
           <div>เวลา: <strong>${escapeHTML(shift.startTime)} – ${escapeHTML(shift.endTime)}</strong></div>
           <div>ค่าแรงปกติ: <strong>${money(shift.normalPay)}</strong></div>
@@ -938,10 +989,9 @@
 
       const summary = getPeriodSummary(period);
       const room = Math.max(0, Number(document.getElementById('roomAllowance').value || 0));
-      const rate = Math.min(100, Math.max(0, Number(document.getElementById('socialSecurityRate').value || 0)));
+      const socialSecurity = SOCIAL_SECURITY_FIXED;
 
       const beforeDeduction = summary.total + room;
-      const socialSecurity = (beforeDeduction * rate) / 100;
       const total = Math.max(0, beforeDeduction - socialSecurity);
 
       return {
@@ -952,7 +1002,6 @@
         wage: summary.wage,
         ot: summary.ot,
         room,
-        rate,
         beforeDeduction,
         socialSecurity,
         total
@@ -1006,7 +1055,7 @@
               </div>
 
               <div class="salary-line deduction">
-                <span>ประกันสังคม ${data.rate}%</span>
+                <span>ประกันสังคม (หักคงที่)</span>
                 <strong class="text-red">- ${money(data.socialSecurity)}</strong>
               </div>
             </div>
@@ -1131,7 +1180,7 @@
           ['ค่าล่วงเวลา (OT)', money(data.ot)],
           ['ค่าห้องเย็น (Cold Room Allowance)', money(data.room)],
           ['รวมก่อนหัก (Gross Income)', money(data.beforeDeduction)],
-          [`หัก ประกันสังคม (Social Security ${data.rate}%)`, `- ${money(data.socialSecurity)}`],
+          ['หัก ประกันสังคม (Social Security)', `- ${money(data.socialSecurity)}`],
           ['เงินรับสุทธิ (Net Salary)', money(data.total)]
         ];
 
