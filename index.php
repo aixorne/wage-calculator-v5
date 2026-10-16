@@ -832,15 +832,18 @@
     }
 
     function calculateSunday(start, end) {
-      let e = end.minutes;
+      // วันอาทิตย์/วัน Off: เริ่มนับ 08:00 หากรูดเข้าก่อน 08:00
+      let s = start.minutes;
+      if (s >= 7 * 60 && s < 8 * 60) s = 8 * 60;
 
-      // รองรับการทำงานข้ามวัน
+      // ปัดเวลาออกลงเป็นครึ่งชั่วโมง:
+      // 17:01-17:29 => 17:00, 17:30-17:59 => 17:30
+      let e = end.minutes;
       if (end.dateKey !== start.dateKey && e < start.minutes) e += 24 * 60;
       e = Math.floor(e / 30) * 30;
 
-      // วัน Off/วันอาทิตย์: หักพักงานปกติ 1 ชั่วโมงเท่านั้น
-      // ไม่หักพัก OT เพิ่ม 30 นาที เพราะไม่ได้คิด OT 3 แรงในประเภทวันนี้
-      const totalMinutes = Math.max(0, e - start.minutes);
+      // 08:00-17:00 = 9 ชั่วโมงตามนาฬิกา หักพัก 1 ชั่วโมง = 8 ชั่วโมงสุทธิ
+      const totalMinutes = Math.max(0, e - s);
       const workMinutes = Math.max(0, totalMinutes - NORMAL_BREAK_MINUTES);
       const hours = workMinutes / 60;
       const pay = hours * SUNDAY_RATE;
@@ -853,9 +856,7 @@
         startTime: start.time,
         endTime: end.time,
         incomplete: false,
-        isSunday: getDay(start.dateKey) === 0,
-        isOff: dayTypes[start.dateKey] === 'off',
-        dayType: dayTypes[start.dateKey] || (getDay(start.dateKey) === 0 ? 'off' : 'normal'),
+        isSunday: true,
         isHoliday: false,
         isNight: false,
         normalHours: hours,
@@ -867,17 +868,17 @@
     }
 
     function calculateDay(start, end) {
+      // กะกลางวัน: เวลาเข้า 07:00-07:59 ให้นับเริ่ม 08:00
       let s = start.minutes;
-      if (s >= 7 * 60 + 30 && s <= 8 * 60) s = 8 * 60;
+      if (s >= 7 * 60 && s < 8 * 60) s = 8 * 60;
 
-      // ปัดเวลาออกลงทุก 30 นาที และ OT เริ่ม 17:30
+      // ปัดเวลาออกลงทุก 30 นาที: 17:01-17:29 => 17:00,
+      // 17:30-17:59 => 17:30
       const roundedEnd = Math.floor(end.minutes / 30) * 30;
       let otMinutes = Math.max(0, roundedEnd - OT_START);
 
       // หักพัก OT 30 นาทีเมื่อมี OT
-      if (otMinutes > 0) {
-        otMinutes = Math.max(0, otMinutes - OT_BREAK_MINUTES);
-      }
+      if (otMinutes > 0) otMinutes = Math.max(0, otMinutes - OT_BREAK_MINUTES);
 
       const otHours = otMinutes / 60;
       const otPay = otHours * OT_RATE;
