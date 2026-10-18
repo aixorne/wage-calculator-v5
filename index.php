@@ -875,10 +875,9 @@
       // ปัดเวลาออกลงทุก 30 นาที: 17:01-17:29 => 17:00,
       // 17:30-17:59 => 17:30
       const roundedEnd = Math.floor(end.minutes / 30) * 30;
-      let otMinutes = Math.max(0, roundedEnd - OT_START);
-
-      // หักพัก OT 30 นาทีเมื่อมี OT
-      if (otMinutes > 0) otMinutes = Math.max(0, otMinutes - OT_BREAK_MINUTES);
+      // พัก 17:00-17:30 อยู่ก่อนเวลาเริ่ม OT จึงไม่หักซ้ำจาก OT
+      // เช่น 17:30-20:00 = 2.5 ชั่วโมง OT
+      const otMinutes = Math.max(0, roundedEnd - OT_START);
 
       const otHours = otMinutes / 60;
       const otPay = otHours * OT_RATE;
@@ -910,12 +909,8 @@
       // OT กะกลางคืนเริ่ม 05:30 ของวันถัดไป
       const otStart = 24 * 60 + 5 * 60 + 30;
       const roundedEnd = Math.floor(e / 30) * 30;
-      let otMinutes = Math.max(0, roundedEnd - otStart);
-
-      // หักพัก OT 30 นาทีเมื่อมี OT
-      if (otMinutes > 0) {
-        otMinutes = Math.max(0, otMinutes - OT_BREAK_MINUTES);
-      }
+      // พัก OT อยู่ก่อนเวลาเริ่มคิด OT จึงไม่หักซ้ำจากชั่วโมง OT
+      const otMinutes = Math.max(0, roundedEnd - otStart);
 
       const otHours = otMinutes / 60;
       const otPay = otHours * OT_RATE;
