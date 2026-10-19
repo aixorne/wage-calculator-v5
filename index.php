@@ -6,29 +6,29 @@
   <title>Wage Calculator V1</title>
   <link rel="stylesheet" href="style.css">
   <style>
-    /* ธีมขาว-เขียว อ่านง่าย ลดความล้าสายตา */
+    /* ธีมแดง-ขาว อ่านง่าย ลดความล้าสายตา */
     :root {
       color-scheme: light;
-      --theme-red: #16834a;
-      --theme-red-dark: #126b3a;
-      --theme-red-soft: #eaf7ef;
+      --theme-red: #d92332;
+      --theme-red-dark: #b91c1c;
+      --theme-red-soft: #fff1f2;
       --theme-panel: #ffffff;
-      --theme-border: #d7e7dc;
+      --theme-border: #eadadd;
       --theme-text: #29252a;
       --theme-muted: #6b6267;
-      --theme-shadow: 0 8px 24px rgba(22, 131, 74, .08);
+      --theme-shadow: 0 8px 24px rgba(91, 23, 35, .08);
     }
     body {
-      background: #f5fbf7 !important;
+      background: #fff7f8 !important;
       color: var(--theme-text) !important;
     }
     .app { color: var(--theme-text) !important; }
     .hero {
-      background: linear-gradient(135deg, #16834a 0%, #22a35a 58%, #46bf7a 100%) !important;
-      border: 1px solid #16834a !important;
+      background: linear-gradient(135deg, #c81e2b 0%, #e63b49 58%, #f36b76 100%) !important;
+      border: 1px solid #d92d3b !important;
       color: #fff !important;
       border-radius: 20px !important;
-      box-shadow: 0 12px 28px rgba(22, 131, 74, .16) !important;
+      box-shadow: 0 12px 28px rgba(185, 28, 28, .16) !important;
     }
     .hero h1, .hero p, .hero .version { color: #fff !important; }
     .hero .version {
@@ -55,26 +55,26 @@
     .summary, .summary-grid .summary, .summary-grid > div,
     .period-stats > div, .period-item .stat-box, .period-item .period-stat,
     .stat-card {
-      background: #f1faf4 !important;
+      background: #fff5f6 !important;
       color: var(--theme-text) !important;
-      border: 1px solid #d7e7dc !important;
+      border: 1px solid #f2d7db !important;
       border-radius: 12px !important;
     }
     .summary-label, .period-stat-label { color: #6b6267 !important; }
     .summary-value, .period-total-value, .shift-total strong,
     .period-stat-value { color: var(--theme-red) !important; }
-    ::selection { background: #bde8cb !important; color: #123d27 !important; }
+    ::selection { background: #f7b7bf !important; color: #4b1018 !important; }
 
     /* ปุ่ม: ขนาดสม่ำเสมอ มุมโค้ง และมีสถานะ hover/focus */
     button, .primary-btn, .salary-preview-btn, .salary-pdf-btn, .period-more-btn {
       appearance: none;
-      background: linear-gradient(135deg, #16834a, #126b3a) !important;
+      background: linear-gradient(135deg, #df2938, #bd1727) !important;
       color: #fff !important;
-      border: 1px solid #16834a !important;
+      border: 1px solid #c81e2b !important;
       border-radius: 11px !important;
       padding: 10px 16px !important;
       font-weight: 700 !important;
-      box-shadow: 0 4px 10px rgba(18, 107, 58, .14) !important;
+      box-shadow: 0 4px 10px rgba(189, 23, 39, .14) !important;
       transition: transform .15s ease, box-shadow .15s ease, filter .15s ease;
       cursor: pointer;
     }
@@ -82,97 +82,97 @@
     .salary-pdf-btn:hover, .period-more-btn:hover {
       filter: brightness(1.04);
       transform: translateY(-1px);
-      box-shadow: 0 6px 14px rgba(18, 107, 58, .2) !important;
+      box-shadow: 0 6px 14px rgba(189, 23, 39, .2) !important;
     }
     button:active { transform: translateY(0); }
     button:focus-visible, input:focus-visible, select:focus-visible,
     textarea:focus-visible {
-      outline: 3px solid rgba(22, 131, 74, .25) !important;
+      outline: 3px solid rgba(217, 35, 50, .25) !important;
       outline-offset: 2px;
     }
     button:disabled { opacity: .5 !important; cursor: not-allowed; transform: none; }
     .secondary-btn, .month-btn, .modal-close {
       background: #fff !important;
-      color: #126b3a !important;
-      border: 1px solid #cce5d4 !important;
+      color: #b91c1c !important;
+      border: 1px solid #efc4ca !important;
       box-shadow: none !important;
     }
-    .danger-btn { background: #126b3a !important; color: #fff !important; }
+    .danger-btn { background: #b91c1c !important; color: #fff !important; }
     .month-btn { min-width: 42px; }
     input, select, textarea, .money-input {
       background: #fff !important;
       color: #29252a !important;
-      border-color: #d3dfd7 !important;
+      border-color: #d9cdd0 !important;
       border-radius: 9px !important;
     }
-    input::placeholder, textarea::placeholder { color: #78867d !important; }
+    input::placeholder, textarea::placeholder { color: #8a7d82 !important; }
     input:focus, select:focus, textarea:focus {
-      border-color: #16834a !important;
-      outline: 2px solid rgba(22,131,74,.12) !important;
+      border-color: #d92332 !important;
+      outline: 2px solid rgba(217,35,50,.12) !important;
     }
     .upload-zone {
-      background: #f5fbf7 !important;
-      border-color: #9acdac !important;
+      background: #fff7f8 !important;
+      border-color: #e6aab2 !important;
       color: #29252a !important;
       border-radius: 15px !important;
     }
     .upload-zone:hover, .upload-zone.dragover {
-      background: #eaf7ef !important;
-      border-color: #16834a !important;
+      background: #fff0f2 !important;
+      border-color: #d92332 !important;
     }
-    .upload-title, .upload-sub { color: #33443a !important; }
-    .preview-item { background: #fff !important; border-color: #d7e7dc !important; border-radius: 12px !important; }
-    .preview-name { color: #33443a !important; }
+    .upload-title, .upload-sub { color: #4b4146 !important; }
+    .preview-item { background: #fff !important; border-color: #eadadd !important; border-radius: 12px !important; }
+    .preview-name { color: #4b4146 !important; }
     .upload-review {
-      background: #f1faf4 !important;
-      border-color: #cce5d4 !important;
+      background: #fff6f7 !important;
+      border-color: #efc4ca !important;
       color: #29252a !important;
       border-radius: 14px !important;
     }
-    .upload-review-row { border-color: #d7e7dc !important; }
+    .upload-review-row { border-color: #f0dadd !important; }
     .calendar .day, .calendar .weekday {
       background: #fff !important;
       color: #41383d !important;
-      border-color: #e0ebe3 !important;
+      border-color: #eee1e4 !important;
       border-radius: 9px !important;
     }
-    .calendar .day:hover { background: #eaf7ef !important; border-color: #16834a !important; }
+    .calendar .day:hover { background: #fff0f2 !important; border-color: #d92332 !important; }
     .calendar .day.worked { background: #f0fbf3 !important; }
-    .calendar .day.missed { background: #f7fbf8 !important; }
-    .calendar .day.future { background: #f7faf8 !important; }
+    .calendar .day.missed { background: #fff7f7 !important; }
+    .calendar .day.future { background: #faf8f9 !important; }
     .calendar .day.sunday-day, .calendar .day.holiday-day {
-      color: #126b3a !important; border-color: #b6ddc2 !important;
+      color: #b91c1c !important; border-color: #f0c5cb !important;
     }
     .calendar .day.sunday-day .day-number, .calendar .day.holiday-day .day-number,
     .calendar .day .holiday-label, .calendar .weekday:first-child {
-      color: #16834a !important; font-weight: 800;
+      color: #c81e2b !important; font-weight: 800;
     }
-    .calendar .day.holiday-day { background: #eaf7ef !important; }
-    .calendar .day.sunday-day { background: #f5fbf7 !important; }
-    .dot.red, .dot.orange { background: #16834a !important; }
+    .calendar .day.holiday-day { background: #fff0f2 !important; }
+    .calendar .day.sunday-day { background: #fff7f8 !important; }
+    .dot.red, .dot.orange { background: #df2938 !important; }
     .dot.green { background: #22a35a !important; }
     .dot.blue { background: #9ca3af !important; }
-    .period-badge { background: #eaf7ef !important; color: #126b3a !important; border: 1px solid #cce5d4 !important; border-radius: 999px !important; }
-    .modal { background: rgba(20, 45, 30, .45) !important; }
+    .period-badge { background: #fff0f2 !important; color: #b91c1c !important; border: 1px solid #efc4ca !important; border-radius: 999px !important; }
+    .modal { background: rgba(45, 20, 25, .45) !important; }
     .modal-box {
       background: #fff !important; color: #29252a !important;
-      border: 1px solid #d7e7dc !important; border-radius: 18px !important;
-      box-shadow: 0 18px 55px rgba(20, 45, 30, .2) !important;
+      border: 1px solid #eadadd !important; border-radius: 18px !important;
+      box-shadow: 0 18px 55px rgba(40, 10, 15, .2) !important;
     }
-    .modal-header { border-color: #e0ebe3 !important; }
+    .modal-header { border-color: #eee1e4 !important; }
     .modal-header h3, .modal-body, .info-item span, .salary-line span, .slip-field label {
       color: #29252a !important;
     }
     .salary-preview { background: #fff !important; color: #29252a !important; }
-    .salary-preview-header { background: #16834a !important; color: #fff !important; }
-    .salary-line { border-color: #e0ebe3 !important; }
-    .salary-subtotal { background: #f1faf4 !important; }
-    .salary-net-preview { background: #eaf7ef !important; color: #29252a !important; border: 1px solid #cce5d4 !important; border-radius: 12px !important; }
-    .text-red, a { color: #16834a !important; }
+    .salary-preview-header { background: #c81e2b !important; color: #fff !important; }
+    .salary-line { border-color: #eee1e4 !important; }
+    .salary-subtotal { background: #fff5f6 !important; }
+    .salary-net-preview { background: #fff0f2 !important; color: #29252a !important; border: 1px solid #efc4ca !important; border-radius: 12px !important; }
+    .text-red, a { color: #c81e2b !important; }
     .legend, .legend-item, .loading { color: #6b6267 !important; }
-    .day-type-editor { border-color: #d7e7dc !important; border-radius: 12px !important; }
-    .empty-title { color: #33443a !important; }
-    .empty-sub { color: #6b7b70 !important; }
+    .day-type-editor { border-color: #eadadd !important; border-radius: 12px !important; }
+    .empty-title { color: #4b4146 !important; }
+    .empty-sub { color: #766b70 !important; }
     @media (max-width: 600px) {
       button, .primary-btn, .salary-preview-btn, .salary-pdf-btn, .period-more-btn {
         max-width: 100%;
@@ -560,30 +560,10 @@
           const form = new FormData();
           form.append('image', compressed, file.name);
 
-          let response;
-          try {
-            response = await fetch(new URL('ocr.php', window.location.href), {
-              method: 'POST',
-              body: form,
-              headers: { 'Accept': 'application/json' }
-            });
-          } catch (networkError) {
-            throw new Error('ติดต่อ ocr.php ไม่ได้ กรุณาตรวจสอบ URL และการเชื่อมต่อ');
-          }
+          const response = await fetch('ocr.php', { method: 'POST', body: form });
+          if (!response.ok) throw new Error(`OCR Server Error: ${response.status}`);
 
-          const responseText = await response.text();
-          let data;
-          try {
-            data = JSON.parse(responseText);
-          } catch (parseError) {
-            console.error('OCR response ไม่ใช่ JSON:', response.status, response.url, responseText.slice(0, 1000));
-            if (responseText.trim().startsWith('<!DOCTYPE') || responseText.trim().startsWith('<html') || responseText.trim().startsWith('<?xml')) {
-              throw new Error(`เซิร์ฟเวอร์ส่งหน้า HTML กลับมาแทน JSON (HTTP ${response.status}) ตรวจสอบว่าไฟล์ ocr.php อยู่โฟลเดอร์เดียวกับ index.php และเปิดผ่านเว็บเซิร์ฟเวอร์ที่รองรับ PHP`);
-            }
-            throw new Error(`คำตอบจาก ocr.php ไม่ใช่ JSON (HTTP ${response.status}) กรุณาตรวจสอบ ocr.php/config.php`);
-          }
-
-          if (!response.ok) throw new Error(data.error || `OCR Server Error: ${response.status}`);
+          const data = await response.json();
           if (!data.success) throw new Error(data.error || 'OCR ไม่สำเร็จ');
 
           const text = data.text || '';
