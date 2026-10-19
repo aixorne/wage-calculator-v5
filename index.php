@@ -577,7 +577,7 @@
             data = JSON.parse(responseText);
           } catch (parseError) {
             console.error('OCR response ไม่ใช่ JSON:', response.status, response.url, responseText.slice(0, 1000));
-            if (responseText.trim().startsWith('<!DOCTYPE') || responseText.trim().startsWith('<html') || responseText.trim().startsWith('<?xml')) {
+            if (responseText.trim().startsWith('<!DOCTYPE') || responseText.trim().startsWith('<html') || responseText.trim().startsWith('<' + '?xml')) {
               throw new Error(`เซิร์ฟเวอร์ส่งหน้า HTML กลับมาแทน JSON (HTTP ${response.status}) ตรวจสอบว่าไฟล์ ocr.php อยู่โฟลเดอร์เดียวกับ index.php และเปิดผ่านเว็บเซิร์ฟเวอร์ที่รองรับ PHP`);
             }
             throw new Error(`คำตอบจาก ocr.php ไม่ใช่ JSON (HTTP ${response.status}) กรุณาตรวจสอบ ocr.php/config.php`);
