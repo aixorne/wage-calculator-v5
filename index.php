@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Wage Calculator</title>
+  <title>Wage Calculator V1</title>
   <link rel="stylesheet" href="style.css">
-  <style>
-    /* ธีมส้ม-ขาว */
+  <style> */
+  /* ธีมส้ม-ขาว */
 :root {
   color-scheme: light;
   --theme-red: #f07818;
@@ -109,6 +109,7 @@ input:focus, select:focus, textarea:focus { border-color: #f07818 !important; ou
   </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 </head>
 <body>
 
@@ -152,7 +153,7 @@ input:focus, select:focus, textarea:focus { border-color: #f07818 !important; ou
       <div class="upload-zone" id="uploadZone">
         <div class="upload-icon">📸</div>
         <div class="upload-title">เลือกรูปเวลาเข้า–ออกงาน</div>
-        <div class="upload-sub">แตะเพื่อเลือกหลายรูป หรือวางรูปลงตรงนี้</div>
+        <div class="upload-sub">อ่านรูปในเบราว์เซอร์ด้วย Tesseract.js • เลือกได้หลายรูป</div>
         <input id="imageInput" class="file-input" type="file" accept="image/*" multiple>
       </div>
 
@@ -472,69 +473,55 @@ input:focus, select:focus, textarea:focus { border-color: #f07818 !important; ou
       renderPreviews();
     }
 
-    /* OCR PROCESS */
+    /* OCR PROCESS — Tesseract.js runs in the browser; no OCR.Space API key/server needed. */
     async function runOCR() {
       if (selectedFiles.length === 0) return;
+      if (!window.Tesseract || typeof window.Tesseract.recognize !== 'function') {
+        const message = 'โหลด Tesseract.js ไม่สำเร็จ กรุณาตรวจอินเทอร์เน็ตแล้วรีเฟรชหน้าเว็บ';
+        loading.textContent = '❌ ' + message;
+        alert(message);
+        return;
+      }
+
       ocrButton.disabled = true;
       const records = [];
-
       try {
         for (let i = 0; i < selectedFiles.length; i++) {
           const file = selectedFiles[i];
-          loading.textContent = `🔍 กำลังอ่านรูป ${i + 1}/${selectedFiles.length}`;
-
+          loading.textContent = `🔍 กำลังอ่านรูป ${i + 1}/${selectedFiles.length} ด้วย Tesseract.js...`;
           const compressed = await compressImage(file);
-          const form = new FormData();
-          form.append('image', compressed, file.name);
-
-          let response;
-          try {
-            response = await fetch(new URL('ocr.php', window.location.href), {
-              method: 'POST',
-              body: form,
-              headers: { 'Accept': 'application/json' }
-            });
-          } catch (networkError) {
-            throw new Error('ติดต่อ ocr.php ไม่ได้ กรุณาตรวจสอบ URL และการเชื่อมต่อ');
-          }
-
-          const responseText = await response.text();
-          let data;
-          try {
-            data = JSON.parse(responseText);
-          } catch (parseError) {
-            console.error('OCR response ไม่ใช่ JSON:', response.status, response.url, responseText.slice(0, 1000));
-            if (response.status === 502) {
-              throw new Error('เซิร์ฟเวอร์ OCR ตอบกลับ HTTP 502 (Bad Gateway) ซึ่งอาจเกิดจาก PHP ล้มเหลวหรือเชื่อมต่อ OCR.Space ไม่สำเร็จ กรุณาดู Render Logs โดยค้นหา [WageCalculator OCR]');
+          const result = await window.Tesseract.recognize(compressed, 'eng', {
+            logger: message => {
+              if (message && typeof message.progress === 'number') {
+                loading.textContent = `🔍 อ่านรูป ${i + 1}/${selectedFiles.length}: ${message.status || 'กำลังประมวลผล'} ${Math.round(message.progress * 100)}%`;
+              }
             }
-            if (responseText.trim().startsWith('<!DOCTYPE') || responseText.trim().startsWith('<html') || responseText.trim().startsWith('<' + '?xml')) {
-              throw new Error(`เซิร์ฟเวอร์ส่งหน้า HTML กลับมาแทน JSON (HTTP ${response.status}) กรุณาตรวจ Render Logs และตรวจว่าไฟล์ ocr.php อยู่โฟลเดอร์เดียวกับ index.php`);
-            }
-            throw new Error(`คำตอบจาก ocr.php ไม่ใช่ JSON (HTTP ${response.status}) ข้อความตอบกลับ: ${responseText.slice(0, 250) || 'ไม่มีรายละเอียด'} กรุณาตรวจ Render Logs`);
-          }
-
-          if (!response.ok) throw new Error(`${data.error || `OCR Server Error: ${response.status}`}${data.code ? ` [${data.code}]` : ''}`);
-          if (!data.success) throw new Error(`${data.error || 'OCR ไม่สำเร็จ แต่เซิร์ฟเวอร์ไม่ได้ส่งสาเหตุ'}${data.code ? ` [${data.code}]` : ''}`);
-
-          const text = data.text || '';
+          });
+          const text = (result && result.data && result.data.text) ? result.data.text : '';
+          if (!text.trim()) throw new Error(`ไม่พบข้อความในรูป ${file.name} กรุณาใช้รูปที่ชัดขึ้น`);
           const parsed = parseOCR(text);
-
           records.push({ fileName: file.name, text, date: parsed.date, times: parsed.times });
         }
 
         const newShifts = createShifts(records);
-        if (newShifts.length === 0) throw new Error('ไม่พบวันที่หรือเวลาในรูป');
+        if (newShifts.length === 0) {
+          const hasDate = records.some(record => record.date);
+          const hasTime = records.some(record => record.times && record.times.length > 0);
+          if (!hasDate) throw new Error('อ่านข้อความได้ แต่ไม่พบวันที่ในรูป กรุณาตรวจวันที่หรือเลือกภาพใหม่');
+          if (!hasTime) throw new Error('อ่านวันที่ได้ แต่ไม่พบเวลาในรูป กรุณาเลือกภาพที่เห็นเวลาเข้า–ออกชัดเจน');
+          throw new Error('ไม่พบคู่เวลาเข้า–ออกที่นำไปคำนวณได้ กรุณาตรวจสอบข้อความในรูป');
+        }
 
         pendingUploadShifts = newShifts;
         pendingUploadDates = [...new Set(newShifts.map(s => s.startDateKey || s.dateKey))].sort();
         renderUploadReview();
-        loading.textContent = 'เลือกประเภทของแต่ละวัน แล้วกดยืนยันบันทึก';
+        loading.textContent = 'อ่านรูปเสร็จแล้ว เลือกประเภทของแต่ละวัน แล้วกดยืนยันบันทึก';
         uploadReview.hidden = false;
-
       } catch (error) {
-        console.error(error);
-        loading.textContent = '❌ ' + error.message;
-        alert(error.message);
+        console.error('Tesseract.js OCR error:', error);
+        const message = error && error.message ? error.message : 'อ่านรูปไม่สำเร็จ กรุณาลองใหม่';
+        loading.textContent = '❌ ' + message;
+        alert(message);
       } finally {
         ocrButton.disabled = selectedFiles.length === 0;
       }
