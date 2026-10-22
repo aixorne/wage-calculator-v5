@@ -507,7 +507,7 @@ input:focus, select:focus, textarea:focus { border-color: #f07818 !important; ou
         if (newShifts.length === 0) {
           const hasDate = records.some(record => record.date);
           const hasTime = records.some(record => record.times && record.times.length > 0);
-          if (!hasDate) throw new Error('อ่านข้อความได้ แต่ไม่พบวันที่ในรูป กรุณาตรวจวันที่หรือเลือกภาพใหม่');
+          if (!hasDate) { const sample = records.map(r => r.text.split(/\r?\n/).slice(0, 3).join(' ')).join(' | ').slice(0, 220); throw new Error('อ่านข้อความได้ แต่ไม่พบวันที่ในรูป ข้อความที่ OCR อ่านช่วงต้น: ' + sample + ' — หากส่งภาพนี้ให้ผู้ช่วยดู กรุณาปิดบังชื่อ/รหัสพนักงาน'); }
           if (!hasTime) throw new Error('อ่านวันที่ได้ แต่ไม่พบเวลาในรูป กรุณาเลือกภาพที่เห็นเวลาเข้า–ออกชัดเจน');
           throw new Error('ไม่พบคู่เวลาเข้า–ออกที่นำไปคำนวณได้ กรุณาตรวจสอบข้อความในรูป');
         }
@@ -590,18 +590,30 @@ input:focus, select:focus, textarea:focus { border-color: #f07818 !important; ou
         const url = URL.createObjectURL(file);
         img.onload = () => {
           URL.revokeObjectURL(url);
-          const maxWidth = 1800;
-          let width = img.width, height = img.height;
-          if (width > maxWidth) {
-            height = Math.round(height * (maxWidth / width));
-            width = maxWidth;
-          }
+          // Upscale small text on the time-clock display instead of shrinking it.
+          const maxWidth = 2400;
+          const scale = Math.min(2.5, maxWidth / img.width);
+          const width = Math.max(1, Math.round(img.width * scale));
+          const height = Math.max(1, Math.round(img.height * scale));
           const canvas = document.createElement('canvas');
           canvas.width = width;
           canvas.height = height;
-          const ctx = canvas.getContext('2d');
+          const ctx = canvas.getContext('2d', { willReadFrequently: true });
+          if (!ctx) { reject(new Error('เปิดระบบปรับภาพไม่สำเร็จ')); return; }
+          ctx.imageSmoothingEnabled = true;
+          ctx.imageSmoothingQuality = 'high';
           ctx.drawImage(img, 0, 0, width, height);
-          canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('ไม่สามารถบีบอัดรูปได้')), 'image/jpeg', 0.88);
+          // Improve contrast slightly while retaining colored LCD text.
+          const frame = ctx.getImageData(0, 0, width, height);
+          const pixels = frame.data;
+          for (let i = 0; i < pixels.length; i += 4) {
+            for (let c = 0; c < 3; c++) {
+              const v = pixels[i + c];
+              pixels[i + c] = Math.max(0, Math.min(255, (v - 128) * 1.25 + 128));
+            }
+          }
+          ctx.putImageData(frame, 0, 0);
+          canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('ไม่สามารถปรับรูปได้')), 'image/jpeg', 0.95);
         };
         img.onerror = () => {
           URL.revokeObjectURL(url);
@@ -617,49 +629,34 @@ input:focus, select:focus, textarea:focus { border-color: #f07818 !important; ou
 
     function extractDate(text) {
       if (!text) return null;
-
-      // Normalize common OCR mistakes only for date detection.
-      // Example: "2O26-1O-22" -> "2026-10-22".
-      const normalized = String(text)
+      // Normalize common OCR substitutions only for date detection.
+      let normalized = String(text)
         .replace(/[ＯОO]/g, '0')
         .replace(/[Il|]/g, '1')
-        .replace(/[–—−]/g, '-');
+        .replace(/[–—−]/g, '-')
+        .replace(/[：]/g, ':');
+      // OCR may insert spaces around or inside date separators/digits.
+      normalized = normalized.replace(/(\d)\s+(?=\d)/g, '$1')
+        .replace(/\s*([-/.])\s*/g, '$1');
 
-      const candidates = [
-        // YYYY-MM-DD / YYYY/MM/DD, allow OCR to use dots or spaces as separators
-        { regex: /(?:^|\D)((?:20|25)\d{2})\s*[-/. ]\s*(\d{1,2})\s*[-/. ]\s*(\d{1,2})(?!\d)/gm, order: 'ymd' },
-        // DD-MM-YYYY / DD/MM/YYYY
-        { regex: /(?:^|\D)(\d{1,2})\s*[-/. ]\s*(\d{1,2})\s*[-/. ]\s*((?:19|20|25)\d{2})(?!\d)/gm, order: 'dmy' }
+      const patterns = [
+        { regex: /(?:^|\D)((?:19|20|25)\d{2})[-/. ](\d{1,2})[-/. ](\d{1,2})(?!\d)/g, order: 'ymd' },
+        { regex: /(?:^|\D)(\d{1,2})[-/. ](\d{1,2})[-/. ]((?:19|20|25)\d{2})(?!\d)/g, order: 'dmy' }
       ];
-
-      for (const candidate of candidates) {
-        candidate.regex.lastIndex = 0;
+      for (const pattern of patterns) {
+        pattern.regex.lastIndex = 0;
         let m;
-        while ((m = candidate.regex.exec(normalized)) !== null) {
+        while ((m = pattern.regex.exec(normalized)) !== null) {
           let year, month, day;
-          if (candidate.order === 'ymd') {
+          if (pattern.order === 'ymd') {
             year = Number(m[1]); month = Number(m[2]); day = Number(m[3]);
           } else {
             day = Number(m[1]); month = Number(m[2]); year = Number(m[3]);
           }
           if (year >= 2400 && year <= 2600) year -= 543;
-          if (year >= 2000 && year <= 2099 &&
-              month >= 1 && month <= 12 &&
-              day >= 1 && day <= new Date(year, month, 0).getDate()) {
+          if (year >= 2000 && year <= 2099 && month >= 1 && month <= 12 && day >= 1 && day <= new Date(year, month, 0).getDate()) {
             return dateObject(year, month, day);
           }
-        }
-      }
-
-      // Fallback for OCR that inserts spaces inside an ISO date.
-      const compact = normalized.replace(/(\d)\s+(?=\d)/g, '$1');
-      const iso = compact.match(/(?:^|\D)((?:20|25)\d{2})[-/.](\d{1,2})[-/.](\d{1,2})(?!\d)/);
-      if (iso) {
-        let year = Number(iso[1]);
-        if (year > 2400) year -= 543;
-        const month = Number(iso[2]), day = Number(iso[3]);
-        if (month >= 1 && month <= 12 && day >= 1 && day <= new Date(year, month, 0).getDate()) {
-          return dateObject(year, month, day);
         }
       }
       return null;
