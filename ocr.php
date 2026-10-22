@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-// OCR endpoint for Wage Calculator. API key is read from config.php / Render Environment.
+// Wage Calculator OCR endpoint. Never hard-code or expose the API key.
 ini_set('display_errors', '0');
 error_reporting(E_ALL);
 header('Content-Type: application/json; charset=utf-8');
@@ -23,14 +23,16 @@ if (!is_file($configPath)) {
 }
 require_once $configPath;
 
-// Support the project's existing variable and the Render environment variable directly.
+// Existing config.php sets $OCR_API_KEY from getenv('OCR_SPACE_API_KEY').
 $apiKey = '';
 if (isset($OCR_API_KEY) && is_string($OCR_API_KEY)) {
     $apiKey = trim($OCR_API_KEY);
 }
 if ($apiKey === '') {
     $envKey = getenv('OCR_SPACE_API_KEY');
-    if (is_string($envKey)) $apiKey = trim($envKey);
+    if (is_string($envKey)) {
+        $apiKey = trim($envKey);
+    }
 }
 if ($apiKey === '') {
     jsonResponse(['success' => false, 'error' => 'เซิร์ฟเวอร์อ่านค่า OCR_SPACE_API_KEY ไม่ได้ กรุณาตรวจ Environment ใน Render แล้ว Deploy ใหม่'], 500);
@@ -58,8 +60,12 @@ if ($uploadError !== UPLOAD_ERR_OK) {
 }
 
 $size = (int)($file['size'] ?? 0);
-if ($size <= 0) jsonResponse(['success' => false, 'error' => 'ไฟล์รูปภาพว่างเปล่าหรืออ่านไม่ได้'], 400);
-if ($size > 10 * 1024 * 1024) jsonResponse(['success' => false, 'error' => 'ไฟล์ใหญ่เกิน 10MB กรุณาย่อรูปก่อนอัปโหลด'], 413);
+if ($size <= 0) {
+    jsonResponse(['success' => false, 'error' => 'ไฟล์รูปภาพว่างเปล่าหรืออ่านไม่ได้'], 400);
+}
+if ($size > 10 * 1024 * 1024) {
+    jsonResponse(['success' => false, 'error' => 'ไฟล์ใหญ่เกิน 10MB กรุณาย่อรูปก่อนอัปโหลด'], 413);
+}
 
 $tmp = (string)($file['tmp_name'] ?? '');
 if ($tmp === '' || !is_uploaded_file($tmp)) {
@@ -67,9 +73,9 @@ if ($tmp === '' || !is_uploaded_file($tmp)) {
 }
 
 $mime = function_exists('mime_content_type') ? (string)mime_content_type($tmp) : '';
-$allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/bmp', 'image/tiff'];
+$allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/bmp', 'image/tiff', 'image/gif'];
 if (!in_array($mime, $allowed, true)) {
-    jsonResponse(['success' => false, 'error' => 'รองรับไฟล์รูป JPG, PNG, WebP, BMP หรือ TIFF เท่านั้น'], 415);
+    jsonResponse(['success' => false, 'error' => 'รองรับไฟล์รูป JPG, PNG, WebP, BMP, TIFF หรือ GIF เท่านั้น'], 415);
 }
 
 $filename = basename((string)($file['name'] ?? 'upload.jpg'));
@@ -83,8 +89,11 @@ $postFields = [
 ];
 
 $ch = curl_init('https://api.ocr.space/parse/image');
-if ($ch === false) jsonResponse(['success' => false, 'error' => 'เริ่มการเชื่อมต่อ OCR.Space ไม่ได้'], 502);
-curl_setopt_array($ch, [
+if ($ch === false) {
+    jsonResponse(['success' => false, 'error' => 'เริ่มการเชื่อมต่อ OCR.Space ไม่ได้'], 502);
+}
+
+$curlOptionsSet = curl_setopt_array($ch, [
     CURLOPT_POST => true,
     CURLOPT_POSTFIELDS => $postFields,
     CURLOPT_RETURNTRANSFER => true,
@@ -95,6 +104,10 @@ curl_setopt_array($ch, [
         'apikey: ' . $apiKey
     ]
 ]);
+if (!$curlOptionsSet) {
+    curl_close($ch);
+    jsonResponse(['success' => false, 'error' => 'ตั้งค่าคำขอไป OCR.Space ไม่สำเร็จ'], 502);
+}
 
 $response = curl_exec($ch);
 $curlError = curl_error($ch);
@@ -102,16 +115,18 @@ $httpCode = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
 curl_close($ch);
 
 if ($response === false) {
-    jsonResponse(['success' => false, 'error' => 'เชื่อมต่อ OCR.Space ไม่สำเร็จ กรุณาลองใหม่ภายหลัง (' . ($curlError ?: 'network error') . ')'], 502);
+    jsonResponse(['success' => false, 'error' => 'เชื่อมต่อ OCR.Space ไม่สำเร็จ กรุณาลองใหม่ภายหลัง (' . ($curlError ?: 'network error') . ')', 'code' => 'OCR_NETWORK_ERROR'], 502);
 }
+
 $data = json_decode((string)$response, true);
 if (!is_array($data)) {
-    jsonResponse(['success' => false, 'error' => 'OCR.Space ส่งคำตอบกลับมาไม่ใช่ JSON (HTTP ' . $httpCode . ')'], 502);
+    // Do not return raw response; it may contain provider or request metadata.
+    jsonResponse(['success' => false, 'error' => 'OCR.Space ส่งคำตอบกลับมาไม่ใช่ JSON (HTTP ' . $httpCode . ')', 'code' => 'OCR_INVALID_RESPONSE'], 502);
 }
 
 if ($httpCode < 200 || $httpCode >= 300 || !empty($data['IsErroredOnProcessing'])) {
     $details = [];
-    foreach (['ErrorMessage', 'ErrorDetails'] as $field) {
+    foreach (['ErrorMessage', 'ErrorDetails', 'error'] as $field) {
         if (!empty($data[$field])) {
             $value = $data[$field];
             $details[] = is_array($value) ? implode(' ', array_map('strval', $value)) : (string)$value;
@@ -119,17 +134,29 @@ if ($httpCode < 200 || $httpCode >= 300 || !empty($data['IsErroredOnProcessing']
     }
     $providerMessage = trim(implode(' ', $details));
     $lower = strtolower($providerMessage);
-    if (strpos($lower, 'api key') !== false || strpos($lower, 'apikey') !== false || strpos($lower, 'invalid key') !== false || strpos($lower, 'invalid free') !== false) {
+    $looksLikeKeyError = strpos($lower, 'api key') !== false
+        || strpos($lower, 'apikey') !== false
+        || strpos($lower, 'invalid key') !== false
+        || strpos($lower, 'invalid free') !== false
+        || strpos($lower, 'e555') !== false;
+
+    if ($httpCode === 403 || $looksLikeKeyError) {
+        $safeMessage = $providerMessage !== ''
+            ? 'OCR.Space ปฏิเสธคำขอ (HTTP ' . $httpCode . '): ' . $providerMessage
+            : 'OCR.Space ปฏิเสธคำขอ (HTTP ' . $httpCode . ') และไม่ได้ส่งรายละเอียดกลับมา';
         jsonResponse([
             'success' => false,
-            'error' => 'OCR.Space ปฏิเสธ API Key ที่เซิร์ฟเวอร์ส่งไป กรุณาตรวจว่าคีย์ใน Render เป็นคีย์เดียวกับที่ทดสอบสำเร็จ และไม่มีช่องว่าง หากตรงกัน ให้ติดต่อ OCR.Space Support พร้อมรหัส HTTP ' . $httpCode . ' โดยไม่ส่งคีย์',
-            'code' => 'OCR_PROVIDER_KEY_REJECTED',
+            'error' => $safeMessage,
+            'code' => 'OCR_PROVIDER_FORBIDDEN',
             'httpCode' => $httpCode
         ], 502);
     }
+
     jsonResponse([
         'success' => false,
-        'error' => $providerMessage !== '' ? 'OCR.Space แจ้งข้อผิดพลาด: ' . $providerMessage : 'OCR.Space ประมวลผลไม่สำเร็จ (HTTP ' . $httpCode . ')',
+        'error' => $providerMessage !== ''
+            ? 'OCR.Space แจ้งข้อผิดพลาด: ' . $providerMessage
+            : 'OCR.Space ประมวลผลไม่สำเร็จ (HTTP ' . $httpCode . ')',
         'code' => 'OCR_PROVIDER_ERROR',
         'httpCode' => $httpCode
     ], 502);
@@ -138,11 +165,14 @@ if ($httpCode < 200 || $httpCode >= 300 || !empty($data['IsErroredOnProcessing']
 $text = '';
 if (!empty($data['ParsedResults']) && is_array($data['ParsedResults'])) {
     foreach ($data['ParsedResults'] as $result) {
-        if (isset($result['ParsedText'])) $text .= "\n" . (string)$result['ParsedText'];
+        if (isset($result['ParsedText'])) {
+            $text .= "\n" . (string)$result['ParsedText'];
+        }
     }
 }
 $text = trim($text);
 if ($text === '') {
     jsonResponse(['success' => false, 'error' => 'OCR ทำงานแล้ว แต่ไม่พบข้อความในรูป กรุณาใช้รูปที่ชัดขึ้น'], 422);
 }
+
 jsonResponse(['success' => true, 'text' => $text, 'httpCode' => $httpCode]);
