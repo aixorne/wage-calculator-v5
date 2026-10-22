@@ -119,7 +119,7 @@ input:focus, select:focus, textarea:focus { border-color: #f07818 !important; ou
     <section class="hero">
       <h1>💰 ระบบคำนวณค่าแรง</h1>
       <p>OCR • ค่าแรง • OT • ปฏิทิน • รอบจ่าย</p>
-      <span class="version">WAGE CALCULATOR </span>
+      <span class="version">WAGE CALCULATOR BY Tessera</span>
     </section>
 
     <!-- SUMMARY -->
@@ -637,23 +637,28 @@ input:focus, select:focus, textarea:focus { border-color: #f07818 !important; ou
         const url = URL.createObjectURL(file);
         img.onload = () => {
           URL.revokeObjectURL(url);
-          // Crop only the top 18% where the device displays YYYY-MM-DD HH:mm.
-          const sourceHeight = Math.max(1, Math.round(img.height * 0.18));
-          const scale = Math.min(4, 2400 / img.width);
+          // The photo includes the wall/device bezel. The timestamp is usually
+          // around 28%-43% down the full photo, not at the top edge of the photo.
+          // Crop a broad band around the likely device screen header and upscale it.
+          const sx = Math.round(img.width * 0.12);
+          const sy = Math.round(img.height * 0.27);
+          const sw = Math.min(img.width - sx, Math.round(img.width * 0.78));
+          const sh = Math.min(img.height - sy, Math.round(img.height * 0.16));
+          const scale = Math.min(5, 2800 / Math.max(sw, sh));
           const canvas = document.createElement('canvas');
-          canvas.width = Math.max(1, Math.round(img.width * scale));
-          canvas.height = Math.max(1, Math.round(sourceHeight * scale));
+          canvas.width = Math.max(1, Math.round(sw * scale));
+          canvas.height = Math.max(1, Math.round(sh * scale));
           const ctx = canvas.getContext('2d', { willReadFrequently: true });
           if (!ctx) { reject(new Error('เปิดระบบอ่านแถบวันที่ไม่สำเร็จ')); return; }
           ctx.imageSmoothingEnabled = true;
           ctx.imageSmoothingQuality = 'high';
-          ctx.drawImage(img, 0, 0, img.width, sourceHeight, 0, 0, canvas.width, canvas.height);
-          // Increase contrast and grayscale the date strip to improve digit recognition.
+          ctx.drawImage(img, sx, sy, sw, sh, 0, 0, canvas.width, canvas.height);
+          // Grayscale and increase contrast without crushing all midtones.
           const frame = ctx.getImageData(0, 0, canvas.width, canvas.height);
           const data = frame.data;
           for (let i = 0; i < data.length; i += 4) {
             const gray = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
-            const value = Math.max(0, Math.min(255, (gray - 128) * 1.7 + 128));
+            const value = Math.max(0, Math.min(255, (gray - 128) * 1.45 + 128));
             data[i] = data[i + 1] = data[i + 2] = value;
           }
           ctx.putImageData(frame, 0, 0);
