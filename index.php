@@ -5,111 +5,183 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Wage Calculator V1</title>
   <link rel="stylesheet" href="style.css">
-  <style> */
-  /* ธีมส้ม-ขาว */
-:root {
-  color-scheme: light;
-  --theme-red: #f07818;
-  --theme-red-dark: #d9630b;
-  --theme-red-soft: #fff3e8;
-  --theme-panel: #ffffff;
-  --theme-border: #f2dcc8;
-  --theme-text: #302820;
-  --theme-muted: #786b60;
-  --theme-shadow: 0 8px 24px rgba(217, 99, 11, .08);
-}
-body { background: #fffaf5 !important; color: var(--theme-text) !important; }
-.app { color: var(--theme-text) !important; }
-.hero {
-  background: linear-gradient(135deg, #e96810 0%, #f58a24 58%, #ffb15c 100%) !important;
-  border: 1px solid #e96810 !important; color: #fff !important;
-  border-radius: 20px !important; box-shadow: 0 12px 28px rgba(217, 99, 11, .16) !important;
-}
-.hero h1, .hero p, .hero .version { color: #fff !important; }
-.hero .version { background: rgba(255,255,255,.16) !important; border: 1px solid rgba(255,255,255,.42) !important; border-radius: 999px !important; }
-.card, .period-item, .salary-slip-box, .shift-detail, .empty-state, .delete-day-box {
-  background: #fff !important; color: var(--theme-text) !important; border: 1px solid var(--theme-border) !important;
-  border-radius: 16px !important; box-shadow: var(--theme-shadow) !important;
-}
-h1, h2, h3, h4, p, label, strong, .card-title, .summary-label, .summary-value, .period-name-text,
-.period-stat-label, .period-stat-value, .data-description, .delete-day-hint, .modal-body,
-.info-item span, .salary-line span, .slip-field label { color: var(--theme-text); }
-.card-title h2 { color: #302820 !important; }
-.card-title > span, .empty-icon { color: var(--theme-red) !important; }
-.summary, .summary-grid .summary, .summary-grid > div, .period-stats > div,
-.period-item .stat-box, .period-item .period-stat, .stat-card {
-  background: #fff5eb !important; color: var(--theme-text) !important; border: 1px solid #f2dcc8 !important; border-radius: 12px !important;
-}
-.summary-label, .period-stat-label { color: #786b60 !important; }
-.summary-value, .period-total-value, .shift-total strong, .period-stat-value { color: var(--theme-red) !important; }
-::selection { background: #ffd9b5 !important; color: #70320a !important; }
-button, .primary-btn, .salary-preview-btn, .salary-pdf-btn, .period-more-btn {
-  appearance: none; background: linear-gradient(135deg, #f07818, #d9630b) !important; color: #fff !important;
-  border: 1px solid #e87516 !important; border-radius: 11px !important; padding: 10px 16px !important;
-  font-weight: 700 !important; box-shadow: 0 4px 10px rgba(217, 99, 11, .14) !important;
-  transition: transform .15s ease, box-shadow .15s ease, filter .15s ease; cursor: pointer;
-}
-button:hover, .primary-btn:hover, .salary-preview-btn:hover, .salary-pdf-btn:hover, .period-more-btn:hover {
-  filter: brightness(1.04); transform: translateY(-1px); box-shadow: 0 6px 14px rgba(217, 99, 11, .2) !important;
-}
-button:active { transform: translateY(0); }
-button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
-  outline: 3px solid rgba(240, 120, 24, .28) !important; outline-offset: 2px;
-}
-button:disabled { opacity: .5 !important; cursor: not-allowed; transform: none; }
-.secondary-btn, .month-btn, .modal-close {
-  background: #fff !important; color: #d9630b !important; border: 1px solid #f2dcc8 !important; box-shadow: none !important;
-}
-.danger-btn { background: #d9630b !important; color: #fff !important; }
-.month-btn { min-width: 42px; }
-input, select, textarea, .money-input {
-  background: #fff !important; color: #302820 !important; border-color: #ead8c8 !important; border-radius: 9px !important;
-}
-input::placeholder, textarea::placeholder { color: #958579 !important; }
-input:focus, select:focus, textarea:focus { border-color: #f07818 !important; outline: 2px solid rgba(240, 120, 24, .12) !important; }
-.upload-zone { background: #fffaf5 !important; border-color: #efb780 !important; color: #302820 !important; border-radius: 15px !important; }
-.upload-zone:hover, .upload-zone.dragover { background: #fff0e0 !important; border-color: #f07818 !important; }
-.upload-title, .upload-sub { color: #594333 !important; }
-.preview-item { background: #fff !important; border-color: #f2dcc8 !important; border-radius: 12px !important; }
-.preview-name { color: #594333 !important; }
-.upload-review { background: #fff5eb !important; border-color: #f2dcc8 !important; color: #302820 !important; border-radius: 14px !important; }
-.upload-review-row { border-color: #f2dcc8 !important; }
-.calendar .day, .calendar .weekday { background: #fff !important; color: #493a30 !important; border-color: #f0e3d8 !important; border-radius: 9px !important; }
-.calendar .day:hover { background: #fff0e0 !important; border-color: #f07818 !important; }
-.calendar .day.worked { background: #fff5eb !important; }
-.calendar .day.missed { background: #fffaf5 !important; }
-.calendar .day.future { background: #faf8f6 !important; }
-.calendar .day.sunday-day, .calendar .day.holiday-day { color: #d9630b !important; border-color: #efc39f !important; }
-.calendar .day.sunday-day .day-number, .calendar .day.holiday-day .day-number, .calendar .day .holiday-label, .calendar .weekday:first-child { color: #e87516 !important; font-weight: 800; }
-.calendar .day.holiday-day { background: #fff0e0 !important; }
-.calendar .day.sunday-day { background: #fff8f1 !important; }
-.dot.red, .dot.orange { background: #f07818 !important; }
-.dot.green { background: #35a86b !important; }
-.dot.blue { background: #9ca3af !important; }
-.period-badge { background: #fff0e0 !important; color: #c45308 !important; border: 1px solid #f2dcc8 !important; border-radius: 999px !important; }
-.modal { background: rgba(55, 35, 20, .45) !important; }
-.modal-box { background: #fff !important; color: #302820 !important; border: 1px solid #f2dcc8 !important; border-radius: 18px !important; box-shadow: 0 18px 55px rgba(55, 35, 20, .2) !important; }
-.modal-header { border-color: #f0e3d8 !important; }
-.modal-header h3, .modal-body, .info-item span, .salary-line span, .slip-field label { color: #302820 !important; }
-.salary-preview { background: #fff !important; color: #302820 !important; }
-.salary-preview-header { background: #e87516 !important; color: #fff !important; }
-.salary-line { border-color: #f0e3d8 !important; }
-.salary-subtotal { background: #fff5eb !important; }
-.salary-net-preview { background: #fff0e0 !important; color: #302820 !important; border: 1px solid #f2dcc8 !important; border-radius: 12px !important; }
-.text-red, a { color: #e87516 !important; }
-.legend, .legend-item, .loading { color: #786b60 !important; }
-.day-type-editor { border-color: #f2dcc8 !important; border-radius: 12px !important; }
-.empty-title { color: #594333 !important; }
-.empty-sub { color: #8b7a6c !important; }
-@media (max-width: 600px) {
-  button, .primary-btn, .salary-preview-btn, .salary-pdf-btn, .period-more-btn { max-width: 100%; }
-  .upload-review-row { grid-template-columns: 1fr; }
-}
+  <style>
+    /* ธีมขาว-เขียว อ่านง่าย ลดความล้าสายตา */
+    :root {
+      color-scheme: light;
+      --theme-red: #16834a;
+      --theme-red-dark: #126b3a;
+      --theme-red-soft: #eaf7ef;
+      --theme-panel: #ffffff;
+      --theme-border: #d7e7dc;
+      --theme-text: #29252a;
+      --theme-muted: #6b6267;
+      --theme-shadow: 0 8px 24px rgba(22, 131, 74, .08);
+    }
+    body {
+      background: #f5fbf7 !important;
+      color: var(--theme-text) !important;
+    }
+    .app { color: var(--theme-text) !important; }
+    .hero {
+      background: linear-gradient(135deg, #16834a 0%, #22a35a 58%, #46bf7a 100%) !important;
+      border: 1px solid #16834a !important;
+      color: #fff !important;
+      border-radius: 20px !important;
+      box-shadow: 0 12px 28px rgba(22, 131, 74, .16) !important;
+    }
+    .hero h1, .hero p, .hero .version { color: #fff !important; }
+    .hero .version {
+      background: rgba(255,255,255,.16) !important;
+      border: 1px solid rgba(255,255,255,.42) !important;
+      border-radius: 999px !important;
+    }
+    .card, .period-item, .salary-slip-box, .shift-detail, .empty-state,
+    .delete-day-box {
+      background: #fff !important;
+      color: var(--theme-text) !important;
+      border: 1px solid var(--theme-border) !important;
+      border-radius: 16px !important;
+      box-shadow: var(--theme-shadow) !important;
+    }
+    h1, h2, h3, h4, p, label, strong, .card-title, .summary-label,
+    .summary-value, .period-name-text, .period-stat-label,
+    .period-stat-value, .data-description, .delete-day-hint,
+    .modal-body, .info-item span, .salary-line span, .slip-field label {
+      color: var(--theme-text);
+    }
+    .card-title h2 { color: #29252a !important; }
+    .card-title > span, .empty-icon { color: var(--theme-red) !important; }
+    .summary, .summary-grid .summary, .summary-grid > div,
+    .period-stats > div, .period-item .stat-box, .period-item .period-stat,
+    .stat-card {
+      background: #f1faf4 !important;
+      color: var(--theme-text) !important;
+      border: 1px solid #d7e7dc !important;
+      border-radius: 12px !important;
+    }
+    .summary-label, .period-stat-label { color: #6b6267 !important; }
+    .summary-value, .period-total-value, .shift-total strong,
+    .period-stat-value { color: var(--theme-red) !important; }
+    ::selection { background: #bde8cb !important; color: #123d27 !important; }
 
+    /* ปุ่ม: ขนาดสม่ำเสมอ มุมโค้ง และมีสถานะ hover/focus */
+    button, .primary-btn, .salary-preview-btn, .salary-pdf-btn, .period-more-btn {
+      appearance: none;
+      background: linear-gradient(135deg, #16834a, #126b3a) !important;
+      color: #fff !important;
+      border: 1px solid #16834a !important;
+      border-radius: 11px !important;
+      padding: 10px 16px !important;
+      font-weight: 700 !important;
+      box-shadow: 0 4px 10px rgba(18, 107, 58, .14) !important;
+      transition: transform .15s ease, box-shadow .15s ease, filter .15s ease;
+      cursor: pointer;
+    }
+    button:hover, .primary-btn:hover, .salary-preview-btn:hover,
+    .salary-pdf-btn:hover, .period-more-btn:hover {
+      filter: brightness(1.04);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 14px rgba(18, 107, 58, .2) !important;
+    }
+    button:active { transform: translateY(0); }
+    button:focus-visible, input:focus-visible, select:focus-visible,
+    textarea:focus-visible {
+      outline: 3px solid rgba(22, 131, 74, .25) !important;
+      outline-offset: 2px;
+    }
+    button:disabled { opacity: .5 !important; cursor: not-allowed; transform: none; }
+    .secondary-btn, .month-btn, .modal-close {
+      background: #fff !important;
+      color: #126b3a !important;
+      border: 1px solid #cce5d4 !important;
+      box-shadow: none !important;
+    }
+    .danger-btn { background: #126b3a !important; color: #fff !important; }
+    .month-btn { min-width: 42px; }
+    input, select, textarea, .money-input {
+      background: #fff !important;
+      color: #29252a !important;
+      border-color: #d3dfd7 !important;
+      border-radius: 9px !important;
+    }
+    input::placeholder, textarea::placeholder { color: #78867d !important; }
+    input:focus, select:focus, textarea:focus {
+      border-color: #16834a !important;
+      outline: 2px solid rgba(22,131,74,.12) !important;
+    }
+    .upload-zone {
+      background: #f5fbf7 !important;
+      border-color: #9acdac !important;
+      color: #29252a !important;
+      border-radius: 15px !important;
+    }
+    .upload-zone:hover, .upload-zone.dragover {
+      background: #eaf7ef !important;
+      border-color: #16834a !important;
+    }
+    .upload-title, .upload-sub { color: #33443a !important; }
+    .preview-item { background: #fff !important; border-color: #d7e7dc !important; border-radius: 12px !important; }
+    .preview-name { color: #33443a !important; }
+    .upload-review {
+      background: #f1faf4 !important;
+      border-color: #cce5d4 !important;
+      color: #29252a !important;
+      border-radius: 14px !important;
+    }
+    .upload-review-row { border-color: #d7e7dc !important; }
+    .calendar .day, .calendar .weekday {
+      background: #fff !important;
+      color: #41383d !important;
+      border-color: #e0ebe3 !important;
+      border-radius: 9px !important;
+    }
+    .calendar .day:hover { background: #eaf7ef !important; border-color: #16834a !important; }
+    .calendar .day.worked { background: #f0fbf3 !important; }
+    .calendar .day.missed { background: #f7fbf8 !important; }
+    .calendar .day.future { background: #f7faf8 !important; }
+    .calendar .day.sunday-day, .calendar .day.holiday-day {
+      color: #126b3a !important; border-color: #b6ddc2 !important;
+    }
+    .calendar .day.sunday-day .day-number, .calendar .day.holiday-day .day-number,
+    .calendar .day .holiday-label, .calendar .weekday:first-child {
+      color: #16834a !important; font-weight: 800;
+    }
+    .calendar .day.holiday-day { background: #eaf7ef !important; }
+    .calendar .day.sunday-day { background: #f5fbf7 !important; }
+    .dot.red, .dot.orange { background: #16834a !important; }
+    .dot.green { background: #22a35a !important; }
+    .dot.blue { background: #9ca3af !important; }
+    .period-badge { background: #eaf7ef !important; color: #126b3a !important; border: 1px solid #cce5d4 !important; border-radius: 999px !important; }
+    .modal { background: rgba(20, 45, 30, .45) !important; }
+    .modal-box {
+      background: #fff !important; color: #29252a !important;
+      border: 1px solid #d7e7dc !important; border-radius: 18px !important;
+      box-shadow: 0 18px 55px rgba(20, 45, 30, .2) !important;
+    }
+    .modal-header { border-color: #e0ebe3 !important; }
+    .modal-header h3, .modal-body, .info-item span, .salary-line span, .slip-field label {
+      color: #29252a !important;
+    }
+    .salary-preview { background: #fff !important; color: #29252a !important; }
+    .salary-preview-header { background: #16834a !important; color: #fff !important; }
+    .salary-line { border-color: #e0ebe3 !important; }
+    .salary-subtotal { background: #f1faf4 !important; }
+    .salary-net-preview { background: #eaf7ef !important; color: #29252a !important; border: 1px solid #cce5d4 !important; border-radius: 12px !important; }
+    .text-red, a { color: #16834a !important; }
+    .legend, .legend-item, .loading { color: #6b6267 !important; }
+    .day-type-editor { border-color: #d7e7dc !important; border-radius: 12px !important; }
+    .empty-title { color: #33443a !important; }
+    .empty-sub { color: #6b7b70 !important; }
+    @media (max-width: 600px) {
+      button, .primary-btn, .salary-preview-btn, .salary-pdf-btn, .period-more-btn {
+        max-width: 100%;
+      }
+      .upload-review-row { grid-template-columns: 1fr; }
+    }
   </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 </head>
 <body>
 
@@ -153,7 +225,7 @@ input:focus, select:focus, textarea:focus { border-color: #f07818 !important; ou
       <div class="upload-zone" id="uploadZone">
         <div class="upload-icon">📸</div>
         <div class="upload-title">เลือกรูปเวลาเข้า–ออกงาน</div>
-        <div class="upload-sub">อ่านรูปในเบราว์เซอร์ด้วย Tesseract.js • เลือกได้หลายรูป</div>
+        <div class="upload-sub">แตะเพื่อเลือกหลายรูป หรือวางรูปลงตรงนี้</div>
         <input id="imageInput" class="file-input" type="file" accept="image/*" multiple>
       </div>
 
@@ -473,57 +545,69 @@ input:focus, select:focus, textarea:focus { border-color: #f07818 !important; ou
       renderPreviews();
     }
 
-    /* OCR PROCESS — Tesseract.js runs in the browser; no OCR.Space API key/server needed. */
+    /* OCR PROCESS */
     async function runOCR() {
       if (selectedFiles.length === 0) return;
-      if (!window.Tesseract || typeof window.Tesseract.recognize !== 'function') {
-        const message = 'โหลด Tesseract.js ไม่สำเร็จ กรุณาตรวจอินเทอร์เน็ตแล้วรีเฟรชหน้าเว็บ';
-        loading.textContent = '❌ ' + message;
-        alert(message);
-        return;
-      }
-
       ocrButton.disabled = true;
       const records = [];
+
       try {
         for (let i = 0; i < selectedFiles.length; i++) {
           const file = selectedFiles[i];
-          loading.textContent = `🔍 กำลังอ่านรูป ${i + 1}/${selectedFiles.length} ด้วย Tesseract.js...`;
-          const compressed = await compressImage(file);
-          const logger = message => {
-            if (message && typeof message.progress === 'number') {
-              loading.textContent = `🔍 อ่านรูป ${i + 1}/${selectedFiles.length}: ${message.status || 'กำลังประมวลผล'} ${Math.round(message.progress * 100)}%`;
-            }
-          };
+          loading.textContent = `🔍 กำลังอ่านรูป ${i + 1}/${selectedFiles.length}`;
 
-          // Read the ENTIRE image only. Date detection searches the OCR text for
-          // a timestamp in YYYY-MM-DD HH:MM format; no region is cropped.
-          const result = await window.Tesseract.recognize(compressed, 'eng', { logger });
-          const text = (result && result.data && result.data.text) ? result.data.text.trim() : '';
-          if (!text) throw new Error(`ไม่พบข้อความในรูป ${file.name} กรุณาใช้รูปที่ชัดขึ้น`);
+          const compressed = await compressImage(file);
+          const form = new FormData();
+          form.append('image', compressed, file.name);
+
+          let response;
+          try {
+            response = await fetch(new URL('ocr.php', window.location.href), {
+              method: 'POST',
+              body: form,
+              headers: { 'Accept': 'application/json' }
+            });
+          } catch (networkError) {
+            throw new Error('ติดต่อ ocr.php ไม่ได้ กรุณาตรวจสอบ URL และการเชื่อมต่อ');
+          }
+
+          const responseText = await response.text();
+          let data;
+          try {
+            data = JSON.parse(responseText);
+          } catch (parseError) {
+            console.error('OCR response ไม่ใช่ JSON:', response.status, response.url, responseText.slice(0, 1000));
+            if (response.status === 502) {
+              throw new Error('เซิร์ฟเวอร์ OCR ตอบกลับ HTTP 502 (Bad Gateway) ซึ่งอาจเกิดจาก PHP ล้มเหลวหรือเชื่อมต่อ OCR.Space ไม่สำเร็จ กรุณาดู Render Logs โดยค้นหา [WageCalculator OCR]');
+            }
+            if (responseText.trim().startsWith('<!DOCTYPE') || responseText.trim().startsWith('<html') || responseText.trim().startsWith('<' + '?xml')) {
+              throw new Error(`เซิร์ฟเวอร์ส่งหน้า HTML กลับมาแทน JSON (HTTP ${response.status}) กรุณาตรวจ Render Logs และตรวจว่าไฟล์ ocr.php อยู่โฟลเดอร์เดียวกับ index.php`);
+            }
+            throw new Error(`คำตอบจาก ocr.php ไม่ใช่ JSON (HTTP ${response.status}) ข้อความตอบกลับ: ${responseText.slice(0, 250) || 'ไม่มีรายละเอียด'} กรุณาตรวจ Render Logs`);
+          }
+
+          if (!response.ok) throw new Error(`${data.error || `OCR Server Error: ${response.status}`}${data.code ? ` [${data.code}]` : ''}`);
+          if (!data.success) throw new Error(`${data.error || 'OCR ไม่สำเร็จ แต่เซิร์ฟเวอร์ไม่ได้ส่งสาเหตุ'}${data.code ? ` [${data.code}]` : ''}`);
+
+          const text = data.text || '';
           const parsed = parseOCR(text);
+
           records.push({ fileName: file.name, text, date: parsed.date, times: parsed.times });
         }
 
         const newShifts = createShifts(records);
-        if (newShifts.length === 0) {
-          const hasDate = records.some(record => record.date);
-          const hasTime = records.some(record => record.times && record.times.length > 0);
-          if (!hasDate) { const sample = records.map(r => r.text.split(/\r?\n/).slice(0, 3).join(' ')).join(' | ').slice(0, 220); throw new Error('อ่านข้อความได้ แต่ไม่พบวันที่ในรูป ข้อความที่ OCR อ่านช่วงต้น: ' + sample + ' — หากส่งภาพนี้ให้ผู้ช่วยดู กรุณาปิดบังชื่อ/รหัสพนักงาน'); }
-          if (!hasTime) throw new Error('อ่านวันที่ได้ แต่ไม่พบเวลาในรูป กรุณาเลือกภาพที่เห็นเวลาเข้า–ออกชัดเจน');
-          throw new Error('ไม่พบคู่เวลาเข้า–ออกที่นำไปคำนวณได้ กรุณาตรวจสอบข้อความในรูป');
-        }
+        if (newShifts.length === 0) throw new Error('ไม่พบวันที่หรือเวลาในรูป');
 
         pendingUploadShifts = newShifts;
         pendingUploadDates = [...new Set(newShifts.map(s => s.startDateKey || s.dateKey))].sort();
         renderUploadReview();
-        loading.textContent = 'อ่านรูปเสร็จแล้ว เลือกประเภทของแต่ละวัน แล้วกดยืนยันบันทึก';
+        loading.textContent = 'เลือกประเภทของแต่ละวัน แล้วกดยืนยันบันทึก';
         uploadReview.hidden = false;
+
       } catch (error) {
-        console.error('Tesseract.js OCR error:', error);
-        const message = error && error.message ? error.message : 'อ่านรูปไม่สำเร็จ กรุณาลองใหม่';
-        loading.textContent = '❌ ' + message;
-        alert(message);
+        console.error(error);
+        loading.textContent = '❌ ' + error.message;
+        alert(error.message);
       } finally {
         ocrButton.disabled = selectedFiles.length === 0;
       }
@@ -592,73 +676,23 @@ input:focus, select:focus, textarea:focus { border-color: #f07818 !important; ou
         const url = URL.createObjectURL(file);
         img.onload = () => {
           URL.revokeObjectURL(url);
-          // Upscale small text on the time-clock display instead of shrinking it.
-          const maxWidth = 2400;
-          const scale = Math.min(2.5, maxWidth / img.width);
-          const width = Math.max(1, Math.round(img.width * scale));
-          const height = Math.max(1, Math.round(img.height * scale));
+          const maxWidth = 1800;
+          let width = img.width, height = img.height;
+          if (width > maxWidth) {
+            height = Math.round(height * (maxWidth / width));
+            width = maxWidth;
+          }
           const canvas = document.createElement('canvas');
           canvas.width = width;
           canvas.height = height;
-          const ctx = canvas.getContext('2d', { willReadFrequently: true });
-          if (!ctx) { reject(new Error('เปิดระบบปรับภาพไม่สำเร็จ')); return; }
-          ctx.imageSmoothingEnabled = true;
-          ctx.imageSmoothingQuality = 'high';
+          const ctx = canvas.getContext('2d');
           ctx.drawImage(img, 0, 0, width, height);
-          // Improve contrast slightly while retaining colored LCD text.
-          const frame = ctx.getImageData(0, 0, width, height);
-          const pixels = frame.data;
-          for (let i = 0; i < pixels.length; i += 4) {
-            for (let c = 0; c < 3; c++) {
-              const v = pixels[i + c];
-              pixels[i + c] = Math.max(0, Math.min(255, (v - 128) * 1.25 + 128));
-            }
-          }
-          ctx.putImageData(frame, 0, 0);
-          canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('ไม่สามารถปรับรูปได้')), 'image/jpeg', 0.95);
+          canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('ไม่สามารถบีบอัดรูปได้')), 'image/jpeg', 0.88);
         };
         img.onerror = () => {
           URL.revokeObjectURL(url);
           reject(new Error('ไม่สามารถเปิดรูปได้'));
         };
-        img.src = url;
-      });
-    }
-
-    function cropDateStrip(file) {
-      return new Promise((resolve, reject) => {
-        const img = new Image();
-        const url = URL.createObjectURL(file);
-        img.onload = () => {
-          URL.revokeObjectURL(url);
-          // The photo includes the wall/device bezel. The timestamp is usually
-          // around 28%-43% down the full photo, not at the top edge of the photo.
-          // Crop a broad band around the likely device screen header and upscale it.
-          const sx = Math.round(img.width * 0.12);
-          const sy = Math.round(img.height * 0.27);
-          const sw = Math.min(img.width - sx, Math.round(img.width * 0.78));
-          const sh = Math.min(img.height - sy, Math.round(img.height * 0.16));
-          const scale = Math.min(5, 2800 / Math.max(sw, sh));
-          const canvas = document.createElement('canvas');
-          canvas.width = Math.max(1, Math.round(sw * scale));
-          canvas.height = Math.max(1, Math.round(sh * scale));
-          const ctx = canvas.getContext('2d', { willReadFrequently: true });
-          if (!ctx) { reject(new Error('เปิดระบบอ่านแถบวันที่ไม่สำเร็จ')); return; }
-          ctx.imageSmoothingEnabled = true;
-          ctx.imageSmoothingQuality = 'high';
-          ctx.drawImage(img, sx, sy, sw, sh, 0, 0, canvas.width, canvas.height);
-          // Grayscale and increase contrast without crushing all midtones.
-          const frame = ctx.getImageData(0, 0, canvas.width, canvas.height);
-          const data = frame.data;
-          for (let i = 0; i < data.length; i += 4) {
-            const gray = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
-            const value = Math.max(0, Math.min(255, (gray - 128) * 1.45 + 128));
-            data[i] = data[i + 1] = data[i + 2] = value;
-          }
-          ctx.putImageData(frame, 0, 0);
-          canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('ไม่สามารถตัดแถบวันที่ได้')), 'image/png');
-        };
-        img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('ไม่สามารถเปิดรูปเพื่อตัดแถบวันที่ได้')); };
         img.src = url;
       });
     }
@@ -669,32 +703,18 @@ input:focus, select:focus, textarea:focus { border-color: #f07818 !important; ou
 
     function extractDate(text) {
       if (!text) return null;
-      // Normalize common OCR substitutions and whitespace, then search the
-      // whole-image OCR output for the requested YYYY-MM-DD HH:MM timestamp.
-      let normalized = String(text)
-        .replace(/[ＯОO]/g, '0')
-        .replace(/[Il|]/g, '1')
-        .replace(/[–—−]/g, '-')
-        .replace(/[：]/g, ':')
-        .replace(/[年月]/g, '-')
-        .replace(/日/g, ' ');
-
-      // Allow OCR to insert spaces around separators or between timestamp parts.
-      normalized = normalized
-        .replace(/\s*([-/.])\s*/g, '$1')
-        .replace(/(\d)\s+(?=\d)/g, '$1')
-        .replace(/\s+/g, ' ');
-
-      const regex = /(?:^|\D)((?:19|20|25)\d{2})[-/.](\d{1,2})[-/.](\d{1,2})\s+([01]?\d|2[0-3])[:.]([0-5]\d)(?!\d)/g;
-      let match;
-      while ((match = regex.exec(normalized)) !== null) {
-        let year = Number(match[1]);
-        const month = Number(match[2]);
-        const day = Number(match[3]);
-        if (year >= 2400 && year <= 2600) year -= 543;
-        if (year >= 2000 && year <= 2099 && month >= 1 && month <= 12 && day >= 1 && day <= new Date(year, month, 0).getDate()) {
-          return dateObject(year, month, day);
-        }
+      let m = text.match(/\b(20\d{2}|25\d{2})[-\/](\d{1,2})[-\/](\d{1,2})\b/);
+      if (m) {
+        let y = Number(m[1]);
+        if (y > 2400) y -= 543;
+        return dateObject(y, Number(m[2]), Number(m[3]));
+      }
+      m = text.match(/\b(\d{1,2})[-\/](\d{1,2})[-\/](\d{2,4})\b/);
+      if (m) {
+        let y = Number(m[3]);
+        if (y < 100) y += 2000;
+        if (y > 2400) y -= 543;
+        return dateObject(y, Number(m[2]), Number(m[1]));
       }
       return null;
     }
