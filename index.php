@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Wage Calculator V1</title>
+  <title>Wage Calculator V.beta</title>
   <link rel="stylesheet" href="style.css">
   <style>
     /* ธีมขาว-เขียว อ่านง่าย ลดความล้าสายตา */
