@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Wage Calculator V.beta</title>
+  <title>Wage Calculator</title>
   <link rel="stylesheet" href="style.css">
   <style>
     /* ธีมส้ม-ขาว */
@@ -118,7 +118,7 @@ input:focus, select:focus, textarea:focus { border-color: #f07818 !important; ou
     <section class="hero">
       <h1>💰 ระบบคำนวณค่าแรง</h1>
       <p>OCR • ค่าแรง • OT • ปฏิทิน • รอบจ่าย</p>
-      <span class="version">WAGE CALCULATOR V.beta</span>
+      <span class="version">WAGE CALCULATOR</span>
     </section>
 
     <!-- SUMMARY -->
