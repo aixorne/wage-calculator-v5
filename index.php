@@ -119,7 +119,7 @@ input:focus, select:focus, textarea:focus { border-color: #f07818 !important; ou
     <section class="hero">
       <h1>💰 ระบบคำนวณค่าแรง</h1>
       <p>OCR • ค่าแรง • OT • ปฏิทิน • รอบจ่าย</p>
-      <span class="version">WAGE CALCULATOR BY Tessera</span>
+      <span class="version">WAGE CALCULATOR</span>
     </section>
 
     <!-- SUMMARY -->
@@ -496,16 +496,10 @@ input:focus, select:focus, textarea:focus { border-color: #f07818 !important; ou
             }
           };
 
-          // First OCR the whole image for clock-in/out times.
+          // Read the ENTIRE image only. Date detection searches the OCR text for
+          // a timestamp in YYYY-MM-DD HH:MM format; no region is cropped.
           const result = await window.Tesseract.recognize(compressed, 'eng', { logger });
-          const fullText = (result && result.data && result.data.text) ? result.data.text : '';
-
-          // The date is printed in a small strip at the very top of this time-clock screen.
-          // OCR that strip separately at higher scale so the portrait and Thai labels do not confuse date detection.
-          const dateCrop = await cropDateStrip(file);
-          const dateResult = await window.Tesseract.recognize(dateCrop, 'eng', { logger });
-          const dateText = (dateResult && dateResult.data && dateResult.data.text) ? dateResult.data.text : '';
-          const text = `${dateText}\n${fullText}`.trim();
+          const text = (result && result.data && result.data.text) ? result.data.text.trim() : '';
           if (!text) throw new Error(`ไม่พบข้อความในรูป ${file.name} กรุณาใช้รูปที่ชัดขึ้น`);
           const parsed = parseOCR(text);
           records.push({ fileName: file.name, text, date: parsed.date, times: parsed.times });
@@ -675,34 +669,31 @@ input:focus, select:focus, textarea:focus { border-color: #f07818 !important; ou
 
     function extractDate(text) {
       if (!text) return null;
-      // Normalize common OCR substitutions only for date detection.
+      // Normalize common OCR substitutions and whitespace, then search the
+      // whole-image OCR output for the requested YYYY-MM-DD HH:MM timestamp.
       let normalized = String(text)
         .replace(/[ＯОO]/g, '0')
         .replace(/[Il|]/g, '1')
         .replace(/[–—−]/g, '-')
-        .replace(/[：]/g, ':');
-      // OCR may insert spaces around or inside date separators/digits.
-      normalized = normalized.replace(/(\d)\s+(?=\d)/g, '$1')
-        .replace(/\s*([-/.])\s*/g, '$1');
+        .replace(/[：]/g, ':')
+        .replace(/[年月]/g, '-')
+        .replace(/日/g, ' ');
 
-      const patterns = [
-        { regex: /(?:^|\D)((?:19|20|25)\d{2})[-/. ](\d{1,2})[-/. ](\d{1,2})(?!\d)/g, order: 'ymd' },
-        { regex: /(?:^|\D)(\d{1,2})[-/. ](\d{1,2})[-/. ]((?:19|20|25)\d{2})(?!\d)/g, order: 'dmy' }
-      ];
-      for (const pattern of patterns) {
-        pattern.regex.lastIndex = 0;
-        let m;
-        while ((m = pattern.regex.exec(normalized)) !== null) {
-          let year, month, day;
-          if (pattern.order === 'ymd') {
-            year = Number(m[1]); month = Number(m[2]); day = Number(m[3]);
-          } else {
-            day = Number(m[1]); month = Number(m[2]); year = Number(m[3]);
-          }
-          if (year >= 2400 && year <= 2600) year -= 543;
-          if (year >= 2000 && year <= 2099 && month >= 1 && month <= 12 && day >= 1 && day <= new Date(year, month, 0).getDate()) {
-            return dateObject(year, month, day);
-          }
+      // Allow OCR to insert spaces around separators or between timestamp parts.
+      normalized = normalized
+        .replace(/\s*([-/.])\s*/g, '$1')
+        .replace(/(\d)\s+(?=\d)/g, '$1')
+        .replace(/\s+/g, ' ');
+
+      const regex = /(?:^|\D)((?:19|20|25)\d{2})[-/.](\d{1,2})[-/.](\d{1,2})\s+([01]?\d|2[0-3])[:.]([0-5]\d)(?!\d)/g;
+      let match;
+      while ((match = regex.exec(normalized)) !== null) {
+        let year = Number(match[1]);
+        const month = Number(match[2]);
+        const day = Number(match[3]);
+        if (year >= 2400 && year <= 2600) year -= 543;
+        if (year >= 2000 && year <= 2099 && month >= 1 && month <= 12 && day >= 1 && day <= new Date(year, month, 0).getDate()) {
+          return dateObject(year, month, day);
         }
       }
       return null;
