@@ -580,7 +580,7 @@
             if (response.status === 502) {
               throw new Error('เซิร์ฟเวอร์ OCR ตอบกลับ HTTP 502 (Bad Gateway) ซึ่งอาจเกิดจาก PHP ล้มเหลวหรือเชื่อมต่อ OCR.Space ไม่สำเร็จ กรุณาดู Render Logs โดยค้นหา [WageCalculator OCR]');
             }
-            if (responseText.trim().startsWith('<!DOCTYPE') || responseText.trim().startsWith('<html') || responseText.trim().startsWith('<?xml')) {
+            if (responseText.trim().startsWith('<!DOCTYPE') || responseText.trim().startsWith('<html') || responseText.trim().startsWith('<' + '?xml')) {
               throw new Error(`เซิร์ฟเวอร์ส่งหน้า HTML กลับมาแทน JSON (HTTP ${response.status}) กรุณาตรวจ Render Logs และตรวจว่าไฟล์ ocr.php อยู่โฟลเดอร์เดียวกับ index.php`);
             }
             throw new Error(`คำตอบจาก ocr.php ไม่ใช่ JSON (HTTP ${response.status}) ข้อความตอบกลับ: ${responseText.slice(0, 250) || 'ไม่มีรายละเอียด'} กรุณาตรวจ Render Logs`);
