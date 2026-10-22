@@ -617,18 +617,50 @@ input:focus, select:focus, textarea:focus { border-color: #f07818 !important; ou
 
     function extractDate(text) {
       if (!text) return null;
-      let m = text.match(/\b(20\d{2}|25\d{2})[-\/](\d{1,2})[-\/](\d{1,2})\b/);
-      if (m) {
-        let y = Number(m[1]);
-        if (y > 2400) y -= 543;
-        return dateObject(y, Number(m[2]), Number(m[3]));
+
+      // Normalize common OCR mistakes only for date detection.
+      // Example: "2O26-1O-22" -> "2026-10-22".
+      const normalized = String(text)
+        .replace(/[ＯОO]/g, '0')
+        .replace(/[Il|]/g, '1')
+        .replace(/[–—−]/g, '-');
+
+      const candidates = [
+        // YYYY-MM-DD / YYYY/MM/DD, allow OCR to use dots or spaces as separators
+        { regex: /(?:^|\D)((?:20|25)\d{2})\s*[-/. ]\s*(\d{1,2})\s*[-/. ]\s*(\d{1,2})(?!\d)/gm, order: 'ymd' },
+        // DD-MM-YYYY / DD/MM/YYYY
+        { regex: /(?:^|\D)(\d{1,2})\s*[-/. ]\s*(\d{1,2})\s*[-/. ]\s*((?:19|20|25)\d{2})(?!\d)/gm, order: 'dmy' }
+      ];
+
+      for (const candidate of candidates) {
+        candidate.regex.lastIndex = 0;
+        let m;
+        while ((m = candidate.regex.exec(normalized)) !== null) {
+          let year, month, day;
+          if (candidate.order === 'ymd') {
+            year = Number(m[1]); month = Number(m[2]); day = Number(m[3]);
+          } else {
+            day = Number(m[1]); month = Number(m[2]); year = Number(m[3]);
+          }
+          if (year >= 2400 && year <= 2600) year -= 543;
+          if (year >= 2000 && year <= 2099 &&
+              month >= 1 && month <= 12 &&
+              day >= 1 && day <= new Date(year, month, 0).getDate()) {
+            return dateObject(year, month, day);
+          }
+        }
       }
-      m = text.match(/\b(\d{1,2})[-\/](\d{1,2})[-\/](\d{2,4})\b/);
-      if (m) {
-        let y = Number(m[3]);
-        if (y < 100) y += 2000;
-        if (y > 2400) y -= 543;
-        return dateObject(y, Number(m[2]), Number(m[1]));
+
+      // Fallback for OCR that inserts spaces inside an ISO date.
+      const compact = normalized.replace(/(\d)\s+(?=\d)/g, '$1');
+      const iso = compact.match(/(?:^|\D)((?:20|25)\d{2})[-/.](\d{1,2})[-/.](\d{1,2})(?!\d)/);
+      if (iso) {
+        let year = Number(iso[1]);
+        if (year > 2400) year -= 543;
+        const month = Number(iso[2]), day = Number(iso[3]);
+        if (month >= 1 && month <= 12 && day >= 1 && day <= new Date(year, month, 0).getDate()) {
+          return dateObject(year, month, day);
+        }
       }
       return null;
     }
