@@ -191,7 +191,7 @@
     <section class="hero">
       <h1>💰 ระบบคำนวณค่าแรง</h1>
       <p>OCR • ค่าแรง • OT • ปฏิทิน • รอบจ่าย</p>
-      <span class="version">WAGE CALCULATOR</span>
+      <span class="version">WAGE CALCULATOR V.beta</span>
     </section>
 
     <!-- SUMMARY -->
