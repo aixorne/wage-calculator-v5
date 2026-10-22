@@ -6,179 +6,396 @@
   <title>Wage Calculator V1</title>
   <link rel="stylesheet" href="style.css">
   <style>
-    /* ธีมขาว-เขียว อ่านง่าย ลดความล้าสายตา */
-    :root {
-      color-scheme: light;
-      --theme-red: #16834a;
-      --theme-red-dark: #126b3a;
-      --theme-red-soft: #eaf7ef;
-      --theme-panel: #ffffff;
-      --theme-border: #d7e7dc;
-      --theme-text: #29252a;
-      --theme-muted: #6b6267;
-      --theme-shadow: 0 8px 24px rgba(22, 131, 74, .08);
-    }
-    body {
-      background: #f5fbf7 !important;
-      color: var(--theme-text) !important;
-    }
-    .app { color: var(--theme-text) !important; }
-    .hero {
-      background: linear-gradient(135deg, #16834a 0%, #22a35a 58%, #46bf7a 100%) !important;
-      border: 1px solid #16834a !important;
-      color: #fff !important;
-      border-radius: 20px !important;
-      box-shadow: 0 12px 28px rgba(22, 131, 74, .16) !important;
-    }
-    .hero h1, .hero p, .hero .version { color: #fff !important; }
-    .hero .version {
-      background: rgba(255,255,255,.16) !important;
-      border: 1px solid rgba(255,255,255,.42) !important;
-      border-radius: 999px !important;
-    }
-    .card, .period-item, .salary-slip-box, .shift-detail, .empty-state,
-    .delete-day-box {
-      background: #fff !important;
-      color: var(--theme-text) !important;
-      border: 1px solid var(--theme-border) !important;
-      border-radius: 16px !important;
-      box-shadow: var(--theme-shadow) !important;
-    }
-    h1, h2, h3, h4, p, label, strong, .card-title, .summary-label,
-    .summary-value, .period-name-text, .period-stat-label,
-    .period-stat-value, .data-description, .delete-day-hint,
-    .modal-body, .info-item span, .salary-line span, .slip-field label {
-      color: var(--theme-text);
-    }
-    .card-title h2 { color: #29252a !important; }
-    .card-title > span, .empty-icon { color: var(--theme-red) !important; }
-    .summary, .summary-grid .summary, .summary-grid > div,
-    .period-stats > div, .period-item .stat-box, .period-item .period-stat,
-    .stat-card {
-      background: #f1faf4 !important;
-      color: var(--theme-text) !important;
-      border: 1px solid #d7e7dc !important;
-      border-radius: 12px !important;
-    }
-    .summary-label, .period-stat-label { color: #6b6267 !important; }
-    .summary-value, .period-total-value, .shift-total strong,
-    .period-stat-value { color: var(--theme-red) !important; }
-    ::selection { background: #bde8cb !important; color: #123d27 !important; }
+    
+/* ธีมส้ม-ขาว */
+:root {
+  color-scheme: light;
+  --theme-red: #f07818;
+  --theme-red-dark: #d9630b;
+  --theme-red-soft: #fff3e8;
+  --theme-panel: #ffffff;
+  --theme-border: #f2dcc8;
+  --theme-text: #302820;
+  --theme-muted: #786b60;
+  --theme-shadow: 0 8px 24px rgba(217, 99, 11, .08);
+}
 
-    /* ปุ่ม: ขนาดสม่ำเสมอ มุมโค้ง และมีสถานะ hover/focus */
-    button, .primary-btn, .salary-preview-btn, .salary-pdf-btn, .period-more-btn {
-      appearance: none;
-      background: linear-gradient(135deg, #16834a, #126b3a) !important;
-      color: #fff !important;
-      border: 1px solid #16834a !important;
-      border-radius: 11px !important;
-      padding: 10px 16px !important;
-      font-weight: 700 !important;
-      box-shadow: 0 4px 10px rgba(18, 107, 58, .14) !important;
-      transition: transform .15s ease, box-shadow .15s ease, filter .15s ease;
-      cursor: pointer;
-    }
-    button:hover, .primary-btn:hover, .salary-preview-btn:hover,
-    .salary-pdf-btn:hover, .period-more-btn:hover {
-      filter: brightness(1.04);
-      transform: translateY(-1px);
-      box-shadow: 0 6px 14px rgba(18, 107, 58, .2) !important;
-    }
-    button:active { transform: translateY(0); }
-    button:focus-visible, input:focus-visible, select:focus-visible,
-    textarea:focus-visible {
-      outline: 3px solid rgba(22, 131, 74, .25) !important;
-      outline-offset: 2px;
-    }
-    button:disabled { opacity: .5 !important; cursor: not-allowed; transform: none; }
-    .secondary-btn, .month-btn, .modal-close {
-      background: #fff !important;
-      color: #126b3a !important;
-      border: 1px solid #cce5d4 !important;
-      box-shadow: none !important;
-    }
-    .danger-btn { background: #126b3a !important; color: #fff !important; }
-    .month-btn { min-width: 42px; }
-    input, select, textarea, .money-input {
-      background: #fff !important;
-      color: #29252a !important;
-      border-color: #d3dfd7 !important;
-      border-radius: 9px !important;
-    }
-    input::placeholder, textarea::placeholder { color: #78867d !important; }
-    input:focus, select:focus, textarea:focus {
-      border-color: #16834a !important;
-      outline: 2px solid rgba(22,131,74,.12) !important;
-    }
-    .upload-zone {
-      background: #f5fbf7 !important;
-      border-color: #9acdac !important;
-      color: #29252a !important;
-      border-radius: 15px !important;
-    }
-    .upload-zone:hover, .upload-zone.dragover {
-      background: #eaf7ef !important;
-      border-color: #16834a !important;
-    }
-    .upload-title, .upload-sub { color: #33443a !important; }
-    .preview-item { background: #fff !important; border-color: #d7e7dc !important; border-radius: 12px !important; }
-    .preview-name { color: #33443a !important; }
-    .upload-review {
-      background: #f1faf4 !important;
-      border-color: #cce5d4 !important;
-      color: #29252a !important;
-      border-radius: 14px !important;
-    }
-    .upload-review-row { border-color: #d7e7dc !important; }
-    .calendar .day, .calendar .weekday {
-      background: #fff !important;
-      color: #41383d !important;
-      border-color: #e0ebe3 !important;
-      border-radius: 9px !important;
-    }
-    .calendar .day:hover { background: #eaf7ef !important; border-color: #16834a !important; }
-    .calendar .day.worked { background: #f0fbf3 !important; }
-    .calendar .day.missed { background: #f7fbf8 !important; }
-    .calendar .day.future { background: #f7faf8 !important; }
-    .calendar .day.sunday-day, .calendar .day.holiday-day {
-      color: #126b3a !important; border-color: #b6ddc2 !important;
-    }
-    .calendar .day.sunday-day .day-number, .calendar .day.holiday-day .day-number,
-    .calendar .day .holiday-label, .calendar .weekday:first-child {
-      color: #16834a !important; font-weight: 800;
-    }
-    .calendar .day.holiday-day { background: #eaf7ef !important; }
-    .calendar .day.sunday-day { background: #f5fbf7 !important; }
-    .dot.red, .dot.orange { background: #16834a !important; }
-    .dot.green { background: #22a35a !important; }
-    .dot.blue { background: #9ca3af !important; }
-    .period-badge { background: #eaf7ef !important; color: #126b3a !important; border: 1px solid #cce5d4 !important; border-radius: 999px !important; }
-    .modal { background: rgba(20, 45, 30, .45) !important; }
-    .modal-box {
-      background: #fff !important; color: #29252a !important;
-      border: 1px solid #d7e7dc !important; border-radius: 18px !important;
-      box-shadow: 0 18px 55px rgba(20, 45, 30, .2) !important;
-    }
-    .modal-header { border-color: #e0ebe3 !important; }
-    .modal-header h3, .modal-body, .info-item span, .salary-line span, .slip-field label {
-      color: #29252a !important;
-    }
-    .salary-preview { background: #fff !important; color: #29252a !important; }
-    .salary-preview-header { background: #16834a !important; color: #fff !important; }
-    .salary-line { border-color: #e0ebe3 !important; }
-    .salary-subtotal { background: #f1faf4 !important; }
-    .salary-net-preview { background: #eaf7ef !important; color: #29252a !important; border: 1px solid #cce5d4 !important; border-radius: 12px !important; }
-    .text-red, a { color: #16834a !important; }
-    .legend, .legend-item, .loading { color: #6b6267 !important; }
-    .day-type-editor { border-color: #d7e7dc !important; border-radius: 12px !important; }
-    .empty-title { color: #33443a !important; }
-    .empty-sub { color: #6b7b70 !important; }
-    @media (max-width: 600px) {
-      button, .primary-btn, .salary-preview-btn, .salary-pdf-btn, .period-more-btn {
-        max-width: 100%;
-      }
-      .upload-review-row { grid-template-columns: 1fr; }
-    }
+body {
+  background: #fffaf5 !important;
+  color: var(--theme-text) !important;
+}
+
+.app {
+  color: var(--theme-text) !important;
+}
+
+.hero {
+  background: linear-gradient(135deg, #e96810 0%, #f58a24 58%, #ffb15c 100%) !important;
+  border: 1px solid #e96810 !important;
+  color: #fff !important;
+  border-radius: 20px !important;
+  box-shadow: 0 12px 28px rgba(217, 99, 11, .16) !important;
+}
+
+.hero h1,
+.hero p,
+.hero .version {
+  color: #fff !important;
+}
+
+.hero .version {
+  background: rgba(255,255,255,.16) !important;
+  border: 1px solid rgba(255,255,255,.42) !important;
+  border-radius: 999px !important;
+}
+
+.card,
+.period-item,
+.salary-slip-box,
+.shift-detail,
+.empty-state,
+.delete-day-box {
+  background: #fff !important;
+  color: var(--theme-text) !important;
+  border: 1px solid var(--theme-border) !important;
+  border-radius: 16px !important;
+  box-shadow: var(--theme-shadow) !important;
+}
+
+h1, h2, h3, h4, p, label, strong,
+.card-title, .summary-label, .summary-value,
+.period-name-text, .period-stat-label,
+.period-stat-value, .data-description,
+.delete-day-hint, .modal-body, .info-item span,
+.salary-line span, .slip-field label {
+  color: var(--theme-text);
+}
+
+.card-title h2 {
+  color: #302820 !important;
+}
+
+.card-title > span,
+.empty-icon {
+  color: var(--theme-red) !important;
+}
+
+.summary,
+.summary-grid .summary,
+.summary-grid > div,
+.period-stats > div,
+.period-item .stat-box,
+.period-item .period-stat,
+.stat-card {
+  background: #fff5eb !important;
+  color: var(--theme-text) !important;
+  border: 1px solid #f2dcc8 !important;
+  border-radius: 12px !important;
+}
+
+.summary-label,
+.period-stat-label {
+  color: #786b60 !important;
+}
+
+.summary-value,
+.period-total-value,
+.shift-total strong,
+.period-stat-value {
+  color: var(--theme-red) !important;
+}
+
+::selection {
+  background: #ffd9b5 !important;
+  color: #70320a !important;
+}
+
+/* ปุ่มหลัก */
+button,
+.primary-btn,
+.salary-preview-btn,
+.salary-pdf-btn,
+.period-more-btn {
+  appearance: none;
+  background: linear-gradient(135deg, #f07818, #d9630b) !important;
+  color: #fff !important;
+  border: 1px solid #e87516 !important;
+  border-radius: 11px !important;
+  padding: 10px 16px !important;
+  font-weight: 700 !important;
+  box-shadow: 0 4px 10px rgba(217, 99, 11, .14) !important;
+  transition: transform .15s ease, box-shadow .15s ease, filter .15s ease;
+  cursor: pointer;
+}
+
+button:hover,
+.primary-btn:hover,
+.salary-preview-btn:hover,
+.salary-pdf-btn:hover,
+.period-more-btn:hover {
+  filter: brightness(1.04);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(217, 99, 11, .2) !important;
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid rgba(240, 120, 24, .28) !important;
+  outline-offset: 2px;
+}
+
+button:disabled {
+  opacity: .5 !important;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ปุ่มรอง */
+.secondary-btn,
+.month-btn,
+.modal-close {
+  background: #fff !important;
+  color: #d9630b !important;
+  border: 1px solid #f2dcc8 !important;
+  box-shadow: none !important;
+}
+
+.danger-btn {
+  background: #d9630b !important;
+  color: #fff !important;
+}
+
+.month-btn {
+  min-width: 42px;
+}
+
+/* ช่องกรอกข้อมูล */
+input,
+select,
+textarea,
+.money-input {
+  background: #fff !important;
+  color: #302820 !important;
+  border-color: #ead8c8 !important;
+  border-radius: 9px !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #958579 !important;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: #f07818 !important;
+  outline: 2px solid rgba(240, 120, 24, .12) !important;
+}
+
+/* อัปโหลดรูป */
+.upload-zone {
+  background: #fffaf5 !important;
+  border-color: #efb780 !important;
+  color: #302820 !important;
+  border-radius: 15px !important;
+}
+
+.upload-zone:hover,
+.upload-zone.dragover {
+  background: #fff0e0 !important;
+  border-color: #f07818 !important;
+}
+
+.upload-title,
+.upload-sub {
+  color: #594333 !important;
+}
+
+.preview-item {
+  background: #fff !important;
+  border-color: #f2dcc8 !important;
+  border-radius: 12px !important;
+}
+
+.preview-name {
+  color: #594333 !important;
+}
+
+.upload-review {
+  background: #fff5eb !important;
+  border-color: #f2dcc8 !important;
+  color: #302820 !important;
+  border-radius: 14px !important;
+}
+
+.upload-review-row {
+  border-color: #f2dcc8 !important;
+}
+
+/* ปฏิทิน */
+.calendar .day,
+.calendar .weekday {
+  background: #fff !important;
+  color: #493a30 !important;
+  border-color: #f0e3d8 !important;
+  border-radius: 9px !important;
+}
+
+.calendar .day:hover {
+  background: #fff0e0 !important;
+  border-color: #f07818 !important;
+}
+
+.calendar .day.worked {
+  background: #fff5eb !important;
+}
+
+.calendar .day.missed {
+  background: #fffaf5 !important;
+}
+
+.calendar .day.future {
+  background: #faf8f6 !important;
+}
+
+.calendar .day.sunday-day,
+.calendar .day.holiday-day {
+  color: #d9630b !important;
+  border-color: #efc39f !important;
+}
+
+.calendar .day.sunday-day .day-number,
+.calendar .day.holiday-day .day-number,
+.calendar .day .holiday-label,
+.calendar .weekday:first-child {
+  color: #e87516 !important;
+  font-weight: 800;
+}
+
+.calendar .day.holiday-day {
+  background: #fff0e0 !important;
+}
+
+.calendar .day.sunday-day {
+  background: #fff8f1 !important;
+}
+
+.dot.red,
+.dot.orange {
+  background: #f07818 !important;
+}
+
+.dot.green {
+  background: #35a86b !important;
+}
+
+.dot.blue {
+  background: #9ca3af !important;
+}
+
+/* รอบจ่าย */
+.period-badge {
+  background: #fff0e0 !important;
+  color: #c45308 !important;
+  border: 1px solid #f2dcc8 !important;
+  border-radius: 999px !important;
+}
+
+/* หน้าต่างรายละเอียด */
+.modal {
+  background: rgba(55, 35, 20, .45) !important;
+}
+
+.modal-box {
+  background: #fff !important;
+  color: #302820 !important;
+  border: 1px solid #f2dcc8 !important;
+  border-radius: 18px !important;
+  box-shadow: 0 18px 55px rgba(55, 35, 20, .2) !important;
+}
+
+.modal-header {
+  border-color: #f0e3d8 !important;
+}
+
+.modal-header h3,
+.modal-body,
+.info-item span,
+.salary-line span,
+.slip-field label {
+  color: #302820 !important;
+}
+
+/* สลิปเงินเดือน */
+.salary-preview {
+  background: #fff !important;
+  color: #302820 !important;
+}
+
+.salary-preview-header {
+  background: #e87516 !important;
+  color: #fff !important;
+}
+
+.salary-line {
+  border-color: #f0e3d8 !important;
+}
+
+.salary-subtotal {
+  background: #fff5eb !important;
+}
+
+.salary-net-preview {
+  background: #fff0e0 !important;
+  color: #302820 !important;
+  border: 1px solid #f2dcc8 !important;
+  border-radius: 12px !important;
+}
+
+.text-red,
+a {
+  color: #e87516 !important;
+}
+
+.legend,
+.legend-item,
+.loading {
+  color: #786b60 !important;
+}
+
+.day-type-editor {
+  border-color: #f2dcc8 !important;
+  border-radius: 12px !important;
+}
+
+.empty-title {
+  color: #594333 !important;
+}
+
+.empty-sub {
+  color: #8b7a6c !important;
+}
+
+@media (max-width: 600px) {
+  button,
+  .primary-btn,
+  .salary-preview-btn,
+  .salary-pdf-btn,
+  .period-more-btn {
+    max-width: 100%;
+  }
+
+  .upload-review-row {
+    grid-template-columns: 1fr;
+  }
+}
+
   </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
