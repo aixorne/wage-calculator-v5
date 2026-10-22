@@ -119,7 +119,7 @@ input:focus, select:focus, textarea:focus { border-color: #f07818 !important; ou
     <section class="hero">
       <h1>💰 ระบบคำนวณค่าแรง</h1>
       <p>OCR • ค่าแรง • OT • ปฏิทิน • รอบจ่าย</p>
-      <span class="version">WAGE CALCULATOR BY Tessera</span>
+      <span class="version">WAGE CALCULATOR </span>
     </section>
 
     <!-- SUMMARY -->
@@ -490,15 +490,23 @@ input:focus, select:focus, textarea:focus { border-color: #f07818 !important; ou
           const file = selectedFiles[i];
           loading.textContent = `🔍 กำลังอ่านรูป ${i + 1}/${selectedFiles.length} ด้วย Tesseract.js...`;
           const compressed = await compressImage(file);
-          const result = await window.Tesseract.recognize(compressed, 'eng', {
-            logger: message => {
-              if (message && typeof message.progress === 'number') {
-                loading.textContent = `🔍 อ่านรูป ${i + 1}/${selectedFiles.length}: ${message.status || 'กำลังประมวลผล'} ${Math.round(message.progress * 100)}%`;
-              }
+          const logger = message => {
+            if (message && typeof message.progress === 'number') {
+              loading.textContent = `🔍 อ่านรูป ${i + 1}/${selectedFiles.length}: ${message.status || 'กำลังประมวลผล'} ${Math.round(message.progress * 100)}%`;
             }
-          });
-          const text = (result && result.data && result.data.text) ? result.data.text : '';
-          if (!text.trim()) throw new Error(`ไม่พบข้อความในรูป ${file.name} กรุณาใช้รูปที่ชัดขึ้น`);
+          };
+
+          // First OCR the whole image for clock-in/out times.
+          const result = await window.Tesseract.recognize(compressed, 'eng', { logger });
+          const fullText = (result && result.data && result.data.text) ? result.data.text : '';
+
+          // The date is printed in a small strip at the very top of this time-clock screen.
+          // OCR that strip separately at higher scale so the portrait and Thai labels do not confuse date detection.
+          const dateCrop = await cropDateStrip(file);
+          const dateResult = await window.Tesseract.recognize(dateCrop, 'eng', { logger });
+          const dateText = (dateResult && dateResult.data && dateResult.data.text) ? dateResult.data.text : '';
+          const text = `${dateText}\n${fullText}`.trim();
+          if (!text) throw new Error(`ไม่พบข้อความในรูป ${file.name} กรุณาใช้รูปที่ชัดขึ้น`);
           const parsed = parseOCR(text);
           records.push({ fileName: file.name, text, date: parsed.date, times: parsed.times });
         }
@@ -619,6 +627,39 @@ input:focus, select:focus, textarea:focus { border-color: #f07818 !important; ou
           URL.revokeObjectURL(url);
           reject(new Error('ไม่สามารถเปิดรูปได้'));
         };
+        img.src = url;
+      });
+    }
+
+    function cropDateStrip(file) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        const url = URL.createObjectURL(file);
+        img.onload = () => {
+          URL.revokeObjectURL(url);
+          // Crop only the top 18% where the device displays YYYY-MM-DD HH:mm.
+          const sourceHeight = Math.max(1, Math.round(img.height * 0.18));
+          const scale = Math.min(4, 2400 / img.width);
+          const canvas = document.createElement('canvas');
+          canvas.width = Math.max(1, Math.round(img.width * scale));
+          canvas.height = Math.max(1, Math.round(sourceHeight * scale));
+          const ctx = canvas.getContext('2d', { willReadFrequently: true });
+          if (!ctx) { reject(new Error('เปิดระบบอ่านแถบวันที่ไม่สำเร็จ')); return; }
+          ctx.imageSmoothingEnabled = true;
+          ctx.imageSmoothingQuality = 'high';
+          ctx.drawImage(img, 0, 0, img.width, sourceHeight, 0, 0, canvas.width, canvas.height);
+          // Increase contrast and grayscale the date strip to improve digit recognition.
+          const frame = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          const data = frame.data;
+          for (let i = 0; i < data.length; i += 4) {
+            const gray = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
+            const value = Math.max(0, Math.min(255, (gray - 128) * 1.7 + 128));
+            data[i] = data[i + 1] = data[i + 2] = value;
+          }
+          ctx.putImageData(frame, 0, 0);
+          canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('ไม่สามารถตัดแถบวันที่ได้')), 'image/png');
+        };
+        img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('ไม่สามารถเปิดรูปเพื่อตัดแถบวันที่ได้')); };
         img.src = url;
       });
     }
